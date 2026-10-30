@@ -1,0 +1,397 @@
+<?xml version='1.0' encoding='utf-8'?>
+<gexf xmlns="http://www.gexf.net/1.2draft" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd" version="1.2">
+  <meta lastmodifieddate="2026-10-22">
+    <creator>NetworkX 3.6.1</creator>
+  </meta>
+  <graph defaultedgetype="undirected" mode="static" name="">
+    <attributes mode="static" class="node">
+      <attribute id="0" title="frequency" type="long" />
+      <attribute id="1" title="degree" type="double" />
+      <attribute id="2" title="in_degree" type="long" />
+      <attribute id="3" title="out_degree" type="long" />
+      <attribute id="4" title="betweenness" type="double" />
+      <attribute id="5" title="closeness" type="double" />
+      <attribute id="6" title="eigenvector" type="double" />
+      <attribute id="7" title="pagerank" type="double" />
+      <attribute id="8" title="community" type="long" />
+    </attributes>
+    <nodes>
+      <node id="jaringan terorisme" label="jaringan terorisme">
+        <attvalues>
+          <attvalue for="0" value="123" />
+          <attvalue for="1" value="0.03846" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.08791" />
+          <attvalue for="6" value="1e-05" />
+          <attvalue for="7" value="0.016954" />
+          <attvalue for="8" value="0" />
+        </attvalues>
+      </node>
+      <node id="terorisme" label="terorisme">
+        <attvalues>
+          <attvalue for="0" value="917" />
+          <attvalue for="1" value="0.15385" />
+          <attvalue for="2" value="4" />
+          <attvalue for="3" value="4" />
+          <attvalue for="4" value="0.01846" />
+          <attvalue for="5" value="0.15385" />
+          <attvalue for="6" value="1e-05" />
+          <attvalue for="7" value="0.088084" />
+          <attvalue for="8" value="0" />
+        </attvalues>
+      </node>
+      <node id="pendanaan terorisme" label="pendanaan terorisme">
+        <attvalues>
+          <attvalue for="0" value="123" />
+          <attvalue for="1" value="0.03846" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.08791" />
+          <attvalue for="6" value="1e-05" />
+          <attvalue for="7" value="0.016954" />
+          <attvalue for="8" value="0" />
+        </attvalues>
+      </node>
+      <node id="jihad" label="jihad">
+        <attvalues>
+          <attvalue for="0" value="234" />
+          <attvalue for="1" value="0.07692" />
+          <attvalue for="2" value="2" />
+          <attvalue for="3" value="2" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.14497" />
+          <attvalue for="6" value="0.36903" />
+          <attvalue for="7" value="0.029689" />
+          <attvalue for="8" value="2" />
+        </attvalues>
+      </node>
+      <node id="kontra-narasi" label="kontra-narasi">
+        <attvalues>
+          <attvalue for="0" value="463" />
+          <attvalue for="1" value="0.15385" />
+          <attvalue for="2" value="4" />
+          <attvalue for="3" value="4" />
+          <attvalue for="4" value="0.03077" />
+          <attvalue for="5" value="0.17133" />
+          <attvalue for="6" value="0.51461" />
+          <attvalue for="7" value="0.055881" />
+          <attvalue for="8" value="2" />
+        </attvalues>
+      </node>
+      <node id="moderasi beragama" label="moderasi beragama">
+        <attvalues>
+          <attvalue for="0" value="448" />
+          <attvalue for="1" value="0.15385" />
+          <attvalue for="2" value="4" />
+          <attvalue for="3" value="4" />
+          <attvalue for="4" value="0.03692" />
+          <attvalue for="5" value="0.18846" />
+          <attvalue for="6" value="0.50879" />
+          <attvalue for="7" value="0.054645" />
+          <attvalue for="8" value="1" />
+        </attvalues>
+      </node>
+      <node id="propaganda terorisme" label="propaganda terorisme">
+        <attvalues>
+          <attvalue for="0" value="112" />
+          <attvalue for="1" value="0.03846" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.08791" />
+          <attvalue for="6" value="0.0" />
+          <attvalue for="7" value="0.015935" />
+          <attvalue for="8" value="0" />
+        </attvalues>
+      </node>
+      <node id="tauhid" label="tauhid">
+        <attvalues>
+          <attvalue for="0" value="478" />
+          <attvalue for="1" value="0.11538" />
+          <attvalue for="2" value="3" />
+          <attvalue for="3" value="3" />
+          <attvalue for="4" value="0.01846" />
+          <attvalue for="5" value="0.14497" />
+          <attvalue for="6" value="0.30744" />
+          <attvalue for="7" value="0.046433" />
+          <attvalue for="8" value="1" />
+        </attvalues>
+      </node>
+      <node id="toleransi" label="toleransi">
+        <attvalues>
+          <attvalue for="0" value="214" />
+          <attvalue for="1" value="0.07692" />
+          <attvalue for="2" value="2" />
+          <attvalue for="3" value="2" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.13462" />
+          <attvalue for="6" value="0.26917" />
+          <attvalue for="7" value="0.028855" />
+          <attvalue for="8" value="1" />
+        </attvalues>
+      </node>
+      <node id="legitimasi kekerasan" label="legitimasi kekerasan">
+        <attvalues>
+          <attvalue for="0" value="229" />
+          <attvalue for="1" value="0.07692" />
+          <attvalue for="2" value="2" />
+          <attvalue for="3" value="2" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.11779" />
+          <attvalue for="6" value="0.28063" />
+          <attvalue for="7" value="0.03009" />
+          <attvalue for="8" value="2" />
+        </attvalues>
+      </node>
+      <node id="propaganda digital" label="propaganda digital">
+        <attvalues>
+          <attvalue for="0" value="229" />
+          <attvalue for="1" value="0.07692" />
+          <attvalue for="2" value="2" />
+          <attvalue for="3" value="2" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.11779" />
+          <attvalue for="6" value="0.28063" />
+          <attvalue for="7" value="0.03009" />
+          <attvalue for="8" value="2" />
+        </attvalues>
+      </node>
+      <node id="demokrasi" label="demokrasi">
+        <attvalues>
+          <attvalue for="0" value="238" />
+          <attvalue for="1" value="0.03846" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.05128" />
+          <attvalue for="6" value="0.0" />
+          <attvalue for="7" value="0.039836" />
+          <attvalue for="8" value="3" />
+        </attvalues>
+      </node>
+      <node id="polarisasi ideologis" label="polarisasi ideologis">
+        <attvalues>
+          <attvalue for="0" value="319" />
+          <attvalue for="1" value="0.07692" />
+          <attvalue for="2" value="2" />
+          <attvalue for="3" value="2" />
+          <attvalue for="4" value="0.00308" />
+          <attvalue for="5" value="0.07692" />
+          <attvalue for="6" value="0.0" />
+          <attvalue for="7" value="0.054053" />
+          <attvalue for="8" value="3" />
+        </attvalues>
+      </node>
+      <node id="ekstremisme" label="ekstremisme">
+        <attvalues>
+          <attvalue for="0" value="83" />
+          <attvalue for="1" value="0.07692" />
+          <attvalue for="2" value="2" />
+          <attvalue for="3" value="2" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.07692" />
+          <attvalue for="6" value="0.0" />
+          <attvalue for="7" value="0.037037" />
+          <attvalue for="8" value="4" />
+        </attvalues>
+      </node>
+      <node id="ekstremisme kekerasan" label="ekstremisme kekerasan">
+        <attvalues>
+          <attvalue for="0" value="83" />
+          <attvalue for="1" value="0.07692" />
+          <attvalue for="2" value="2" />
+          <attvalue for="3" value="2" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.07692" />
+          <attvalue for="6" value="0.0" />
+          <attvalue for="7" value="0.037037" />
+          <attvalue for="8" value="4" />
+        </attvalues>
+      </node>
+      <node id="radikalisasi" label="radikalisasi">
+        <attvalues>
+          <attvalue for="0" value="83" />
+          <attvalue for="1" value="0.07692" />
+          <attvalue for="2" value="2" />
+          <attvalue for="3" value="2" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.07692" />
+          <attvalue for="6" value="0.0" />
+          <attvalue for="7" value="0.037037" />
+          <attvalue for="8" value="4" />
+        </attvalues>
+      </node>
+      <node id="kontra terorisme" label="kontra terorisme">
+        <attvalues>
+          <attvalue for="0" value="450" />
+          <attvalue for="1" value="0.03846" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.08791" />
+          <attvalue for="6" value="2e-05" />
+          <attvalue for="7" value="0.047258" />
+          <attvalue for="8" value="0" />
+        </attvalues>
+      </node>
+      <node id="identitas kelompok" label="identitas kelompok">
+        <attvalues>
+          <attvalue for="0" value="81" />
+          <attvalue for="1" value="0.03846" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.05128" />
+          <attvalue for="6" value="0.0" />
+          <attvalue for="7" value="0.017222" />
+          <attvalue for="8" value="3" />
+        </attvalues>
+      </node>
+      <node id="hakimiyah" label="hakimiyah">
+        <attvalues>
+          <attvalue for="0" value="106" />
+          <attvalue for="1" value="0.03846" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.03846" />
+          <attvalue for="6" value="0.0" />
+          <attvalue for="7" value="0.037037" />
+          <attvalue for="8" value="5" />
+        </attvalues>
+      </node>
+      <node id="khilafah" label="khilafah">
+        <attvalues>
+          <attvalue for="0" value="360" />
+          <attvalue for="1" value="0.03846" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.03846" />
+          <attvalue for="6" value="0.0" />
+          <attvalue for="7" value="0.037037" />
+          <attvalue for="8" value="5" />
+        </attvalues>
+      </node>
+      <node id="hijrah" label="hijrah">
+        <attvalues>
+          <attvalue for="0" value="584" />
+          <attvalue for="1" value="0.03846" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.03846" />
+          <attvalue for="6" value="0.0" />
+          <attvalue for="7" value="0.037037" />
+          <attvalue for="8" value="6" />
+        </attvalues>
+      </node>
+      <node id="kaffah" label="kaffah">
+        <attvalues>
+          <attvalue for="0" value="309" />
+          <attvalue for="1" value="0.03846" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.03846" />
+          <attvalue for="6" value="0.0" />
+          <attvalue for="7" value="0.037037" />
+          <attvalue for="8" value="6" />
+        </attvalues>
+      </node>
+      <node id="dakwah" label="dakwah">
+        <attvalues>
+          <attvalue for="0" value="264" />
+          <attvalue for="1" value="0.03846" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.09919" />
+          <attvalue for="6" value="0.12507" />
+          <attvalue for="7" value="0.020613" />
+          <attvalue for="8" value="1" />
+        </attvalues>
+      </node>
+      <node id="daulah" label="daulah">
+        <attvalues>
+          <attvalue for="0" value="21" />
+          <attvalue for="1" value="0.03846" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.03846" />
+          <attvalue for="6" value="0.0" />
+          <attvalue for="7" value="0.037037" />
+          <attvalue for="8" value="7" />
+        </attvalues>
+      </node>
+      <node id="thaghut" label="thaghut">
+        <attvalues>
+          <attvalue for="0" value="21" />
+          <attvalue for="1" value="0.03846" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.03846" />
+          <attvalue for="6" value="0.0" />
+          <attvalue for="7" value="0.037037" />
+          <attvalue for="8" value="7" />
+        </attvalues>
+      </node>
+      <node id="jahiliyah" label="jahiliyah">
+        <attvalues>
+          <attvalue for="0" value="30" />
+          <attvalue for="1" value="0.03846" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.03846" />
+          <attvalue for="6" value="0.0" />
+          <attvalue for="7" value="0.037037" />
+          <attvalue for="8" value="8" />
+        </attvalues>
+      </node>
+      <node id="takfir" label="takfir">
+        <attvalues>
+          <attvalue for="0" value="30" />
+          <attvalue for="1" value="0.03846" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0.0" />
+          <attvalue for="5" value="0.03846" />
+          <attvalue for="6" value="0.0" />
+          <attvalue for="7" value="0.037037" />
+          <attvalue for="8" value="8" />
+        </attvalues>
+      </node>
+    </nodes>
+    <edges>
+      <edge source="jaringan terorisme" target="terorisme" id="0" weight="123" />
+      <edge source="terorisme" target="pendanaan terorisme" id="1" weight="123" />
+      <edge source="terorisme" target="propaganda terorisme" id="2" weight="112" />
+      <edge source="terorisme" target="kontra terorisme" id="3" weight="450" />
+      <edge source="jihad" target="kontra-narasi" id="4" weight="234" />
+      <edge source="jihad" target="moderasi beragama" id="5" weight="234" />
+      <edge source="kontra-narasi" target="moderasi beragama" id="6" weight="234" />
+      <edge source="kontra-narasi" target="legitimasi kekerasan" id="7" weight="229" />
+      <edge source="kontra-narasi" target="propaganda digital" id="8" weight="229" />
+      <edge source="moderasi beragama" target="tauhid" id="9" weight="214" />
+      <edge source="moderasi beragama" target="toleransi" id="10" weight="214" />
+      <edge source="tauhid" target="toleransi" id="11" weight="214" />
+      <edge source="tauhid" target="dakwah" id="12" weight="264" />
+      <edge source="legitimasi kekerasan" target="propaganda digital" id="13" weight="229" />
+      <edge source="demokrasi" target="polarisasi ideologis" id="14" weight="238" />
+      <edge source="polarisasi ideologis" target="identitas kelompok" id="15" weight="81" />
+      <edge source="ekstremisme" target="ekstremisme kekerasan" id="16" weight="83" />
+      <edge source="ekstremisme" target="radikalisasi" id="17" weight="83" />
+      <edge source="ekstremisme kekerasan" target="radikalisasi" id="18" weight="83" />
+      <edge source="hakimiyah" target="khilafah" id="19" weight="106" />
+      <edge source="hijrah" target="kaffah" id="20" weight="309" />
+      <edge source="daulah" target="thaghut" id="21" weight="21" />
+      <edge source="jahiliyah" target="takfir" id="22" weight="30" />
+    </edges>
+  </graph>
+</gexf>

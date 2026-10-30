@@ -1,0 +1,55 @@
+# ===== DRNO — konfigurasi Apache / LiteSpeed (cPanel) =====
+# Semua blok dibungkus <IfModule> agar tidak memicu "500 Internal Server Error" bila modul tidak aktif.
+
+# 1) KATA SANDI — WAJIB sebelum memakai data nyata.
+#    Cara termudah: cPanel > "Directory Privacy" (Privasi Direktori) > pilih folder ini > centang
+#    "Password protect this directory" > buat user. cPanel akan menambahkan baris otomatis di file ini.
+#    Cara manual: hapus tanda # di 4 baris berikut dan ganti USERNAME dengan user cPanel Anda.
+# AuthType Basic
+# AuthName "DRNO - akses terbatas peneliti"
+# AuthUserFile /home/USERNAME/.htpasswds/public_html/drno/passwd
+# Require valid-user
+
+# 2) Jangan tampilkan daftar isi folder
+Options -Indexes
+
+<IfModule mod_headers.c>
+  # 3) Jangan diindeks mesin pencari + header keamanan
+  Header set X-Robots-Tag "noindex, nofollow"
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "no-referrer"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'"
+  # 4) CSV/manifest tidak di-cache agar data baru langsung tampil
+  <FilesMatch "\.(csv|json)$">
+    Header set Cache-Control "no-store"
+  </FilesMatch>
+  <FilesMatch "\.(js|css)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_mime.c>
+  AddType text/csv .csv
+  AddType application/json .json
+  AddType application/javascript .js
+  AddDefaultCharset UTF-8
+</IfModule>
+
+# 5) Tolak berkas yang tidak boleh ada di web
+<FilesMatch "(^\.env|^posts_.*\.csv$|^manual_review_queue\.csv$|\.jsonl$|\.py$|\.sql$)">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# 6) Paksa HTTPS — aktifkan (hapus #) setelah SSL terpasang (cPanel > SSL/TLS Status > Run AutoSSL)
+# <IfModule mod_rewrite.c>
+#   RewriteEngine On
+#   RewriteCond %{HTTPS} !=on
+#   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>

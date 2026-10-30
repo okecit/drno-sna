@@ -1,0 +1,181 @@
+node_id,post_id,day,engagement,sentiment,emotion,text
+page:Page Sintetis 3,syn:001655,2026-02-20,77,netral,anticipation,"Sidang perkara pendanaan terorisme kembali digelar, jaksa menghadirkan saksi"
+page:Page Sintetis 3,syn:001110,2026-02-02,58,positif,netral,"BNPT: program deradikalisasi diikuti mantan napiter, menurut polisi berjalan baik"
+page:Page Sintetis 3,syn:000843,2026-01-27,52,netral,anticipation,"Sidang perkara pendanaan terorisme kembali digelar, jaksa menghadirkan saksi"
+x_a37a77cf8eebd1d0,syn:003324,2026-03-20,16,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+x_a37a77cf8eebd1d0,syn:002415,2026-02-24,9,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+x_a37a77cf8eebd1d0,syn:002417,2026-02-23,8,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+x_88fac5a81fbffd98,syn:001970,2026-02-21,11,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+x_88fac5a81fbffd98,syn:002424,2026-02-25,10,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+x_88fac5a81fbffd98,syn:002779,2026-03-02,5,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+fa_979d8fe0840ff7de,syn:001539,2026-02-15,12,netral,netral,Mereka di dpr harus mendengar kritik kita soal kebijakan kontra terorisme
+fa_979d8fe0840ff7de,syn:001538,2026-02-13,8,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+fa_979d8fe0840ff7de,syn:002373,2026-02-23,4,netral,netral,Mereka di dpr harus mendengar kritik kita soal kebijakan kontra terorisme
+x_f6e720179a958706,syn:003343,2026-03-20,29,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+x_f6e720179a958706,syn:001585,2026-02-13,8,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+x_f6e720179a958706,syn:002458,2026-02-28,5,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+x_e5d3baa5fd0a9aef,syn:001785,2026-02-20,12,positif,netral,Kontra narasi terhadap propaganda digital: kenali legitimasi kekerasan di media sosial
+x_e5d3baa5fd0a9aef,syn:002663,2026-03-08,11,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+x_e5d3baa5fd0a9aef,syn:002252,2026-03-01,8,positif,netral,Kontra narasi terhadap propaganda digital: kenali legitimasi kekerasan di media sosial
+x_03193a77c4f79615,syn:001434,2026-02-15,12,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+x_03193a77c4f79615,syn:001180,2026-02-05,7,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+x_03193a77c4f79615,syn:003464,2026-03-26,7,positif,trust,"Moderasi beragama bukan melemahkan tauhid, justru meneguhkan toleransi"
+fa_b754527c6f980c65,syn:001602,2026-02-12,5,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+fa_b754527c6f980c65,syn:002808,2026-03-07,4,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+fa_b754527c6f980c65,syn:000235,2026-01-05,3,netral,netral,Mereka di dpr harus mendengar kritik kita soal kebijakan kontra terorisme
+x_6ec5b3fd41a63276,syn:003565,2026-03-26,9,netral,fear,"Densus menangkap terduga anggota jaringan terorisme, dilaporkan kepolisian #terorisme"
+x_6ec5b3fd41a63276,syn:001275,2026-02-04,7,netral,netral,Mereka di dpr harus mendengar kritik kita soal kebijakan kontra terorisme
+x_6ec5b3fd41a63276,syn:000474,2026-01-13,6,netral,netral,Mereka di dpr harus mendengar kritik kita soal kebijakan kontra terorisme
+x_8a5a0e6f328857cf,syn:001143,2026-02-05,10,positif,netral,Kontra narasi terhadap propaganda digital: kenali legitimasi kekerasan di media sosial
+x_8a5a0e6f328857cf,syn:003158,2026-03-19,8,positif,trust,"Moderasi beragama bukan melemahkan tauhid, justru meneguhkan toleransi"
+x_8a5a0e6f328857cf,syn:002199,2026-02-28,7,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+x_deb4d9adb70bd90a,syn:001135,2026-02-04,8,negatif,disgust,"Kami menolak kekerasan atas nama agama, terorisme tidak dibenarkan"
+x_deb4d9adb70bd90a,syn:000591,2026-01-25,6,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+x_deb4d9adb70bd90a,syn:003149,2026-03-17,5,positif,netral,Kontra narasi terhadap propaganda digital: kenali legitimasi kekerasan di media sosial
+fa_36ef1cf0b6016ac8,syn:001024,2026-01-27,12,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+fa_36ef1cf0b6016ac8,syn:002411,2026-02-25,10,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+fa_36ef1cf0b6016ac8,syn:002771,2026-03-05,7,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+x_2f74f54d84036e00,syn:000765,2026-01-24,27,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+x_2f74f54d84036e00,syn:003037,2026-03-09,19,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+x_2f74f54d84036e00,syn:002421,2026-02-24,10,netral,netral,Mereka di dpr harus mendengar kritik kita soal kebijakan kontra terorisme
+x_8f674796b431cd40,syn:000216,2026-01-05,34,netral,netral,"Seminar penelitian radikalisasi dan ekstremisme kekerasan di ruang digital, dosen dan mahasiswa"
+x_8f674796b431cd40,syn:002440,2026-02-25,29,netral,netral,Mereka di dpr harus mendengar kritik kita soal kebijakan kontra terorisme
+x_8f674796b431cd40,syn:003583,2026-03-25,11,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+x_e0cd82dcce89cab4,syn:002801,2026-03-03,25,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+x_e0cd82dcce89cab4,syn:001590,2026-02-10,23,netral,netral,Mereka di dpr harus mendengar kritik kita soal kebijakan kontra terorisme
+x_e0cd82dcce89cab4,syn:002477,2026-03-01,16,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+x_b966bf2bcce23fdb,syn:001767,2026-02-18,16,positif,netral,Kontra narasi terhadap propaganda digital: kenali legitimasi kekerasan di media sosial
+x_b966bf2bcce23fdb,syn:002656,2026-03-07,10,positif,trust,"Moderasi beragama bukan melemahkan tauhid, justru meneguhkan toleransi"
+x_b966bf2bcce23fdb,syn:001769,2026-02-16,5,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+x_bad25617db7961d4,syn:002194,2026-02-23,14,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+x_bad25617db7961d4,syn:001719,2026-02-22,10,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+x_bad25617db7961d4,syn:000597,2026-01-19,6,positif,netral,Kontra narasi terhadap propaganda digital: kenali legitimasi kekerasan di media sosial
+x_581e4f9f581fd19f,syn:000053,2026-01-05,13,negatif,anger,"Jangan biarkan mereka menyebar ujaran kebencian, kita menolak kekerasan"
+x_581e4f9f581fd19f,syn:002227,2026-02-23,9,positif,trust,"Moderasi beragama bukan melemahkan tauhid, justru meneguhkan toleransi"
+x_581e4f9f581fd19f,syn:002651,2026-03-07,9,negatif,anger,"Mengecam aksi teror, kekerasan bukan jalan, ujaran kebencian harus dihentikan"
+x_8f96064349aa7ab3,syn:001428,2026-02-12,9,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+x_8f96064349aa7ab3,syn:002244,2026-02-25,6,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+x_8f96064349aa7ab3,syn:003183,2026-03-22,6,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+fa_075e45a8df744b22,syn:000458,2026-01-18,9,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+fa_075e45a8df744b22,syn:001003,2026-01-27,6,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+fa_075e45a8df744b22,syn:001924,2026-02-17,5,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+x_9b2b9f6f57148511,syn:002393,2026-02-27,10,netral,netral,Mereka di dpr harus mendengar kritik kita soal kebijakan kontra terorisme
+x_9b2b9f6f57148511,syn:002391,2026-02-25,9,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+x_9b2b9f6f57148511,syn:001012,2026-01-30,4,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+fa_70e82230a99c748f,syn:003008,2026-03-09,6,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+fa_70e82230a99c748f,syn:001907,2026-02-18,4,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+fa_70e82230a99c748f,syn:000449,2026-01-16,3,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+x_6908d53a03df02b4,syn:000995,2026-01-30,30,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+x_6908d53a03df02b4,syn:002369,2026-02-28,18,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+x_6908d53a03df02b4,syn:001537,2026-02-15,9,netral,netral,"Seminar penelitian radikalisasi dan ekstremisme kekerasan di ruang digital, dosen dan mahasiswa"
+x_9f40a905934f7daf,syn:003418,2026-03-23,13,positif,netral,Kontra narasi terhadap propaganda digital: kenali legitimasi kekerasan di media sosial
+x_9f40a905934f7daf,syn:002172,2026-03-01,10,positif,netral,Kontra narasi terhadap propaganda digital: kenali legitimasi kekerasan di media sosial
+x_9f40a905934f7daf,syn:002173,2026-02-24,8,positif,netral,Kontra narasi terhadap propaganda digital: kenali legitimasi kekerasan di media sosial
+fa_164943a1a71f24a0,syn:001955,2026-02-21,14,netral,netral,Mereka di dpr harus mendengar kritik kita soal kebijakan kontra terorisme
+fa_164943a1a71f24a0,syn:002414,2026-02-24,10,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+fa_164943a1a71f24a0,syn:002773,2026-03-02,6,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+x_b8b994362de05058,syn:002800,2026-03-03,27,negatif,anger,"Jangan biarkan mereka menyebar ujaran kebencian, kita menolak kekerasan"
+x_b8b994362de05058,syn:001307,2026-02-03,6,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+x_b8b994362de05058,syn:000505,2026-01-18,4,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+fa_1820e00435a473b2,syn:002067,2026-02-16,12,negatif,anger,"Mengecam aksi teror, kekerasan bukan jalan, ujaran kebencian harus dihentikan"
+fa_1820e00435a473b2,syn:000248,2026-01-10,5,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+fa_1820e00435a473b2,syn:001613,2026-02-13,3,negatif,anger,"Jangan biarkan mereka menyebar ujaran kebencian, kita menolak kekerasan"
+x_217409fa00dd8b54,syn:002638,2026-03-08,53,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+x_217409fa00dd8b54,syn:001406,2026-02-09,38,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+x_217409fa00dd8b54,syn:000873,2026-01-31,4,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+fa_31b9a505cda31e43,syn:000741,2026-01-25,105,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+fa_31b9a505cda31e43,syn:000453,2026-01-12,22,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+fa_31b9a505cda31e43,syn:003014,2026-03-11,6,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+x_63694bb022c12ebe,syn:001034,2026-01-26,7,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+x_63694bb022c12ebe,syn:003033,2026-03-13,5,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+x_63694bb022c12ebe,syn:003576,2026-03-26,5,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+fa_8ff741e0253ecb68,syn:002784,2026-03-05,71,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+fa_8ff741e0253ecb68,syn:001041,2026-01-27,12,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+fa_8ff741e0253ecb68,syn:001290,2026-02-04,4,netral,netral,Studi teori identitas kelompok dan polarisasi ideologis: kajian akademik terbaru
+x_804ad78c324b9b11,syn:001259,2026-02-05,14,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+x_804ad78c324b9b11,syn:000452,2026-01-14,12,netral,netral,Mereka di dpr harus mendengar kritik kita soal kebijakan kontra terorisme
+x_804ad78c324b9b11,syn:002366,2026-02-24,10,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+x_5a06aa49c57fb105,syn:000488,2026-01-17,19,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+x_5a06aa49c57fb105,syn:001574,2026-02-09,14,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+x_5a06aa49c57fb105,syn:002430,2026-03-01,8,netral,fear,"Densus menangkap terduga anggota jaringan terorisme, dilaporkan kepolisian #terorisme"
+x_06856a21189f414f,syn:001258,2026-02-06,7,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+x_06856a21189f414f,syn:002362,2026-03-01,6,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+x_06856a21189f414f,syn:001906,2026-02-22,4,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+x_3f3fde732788089a,syn:002399,2026-02-25,23,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+x_3f3fde732788089a,syn:003320,2026-03-21,5,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+x_3f3fde732788089a,syn:001017,2026-01-27,4,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+x_38f21e5caea4d341,syn:003312,2026-03-16,8,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+x_38f21e5caea4d341,syn:001931,2026-02-20,7,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+x_38f21e5caea4d341,syn:003021,2026-03-11,5,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+x_ad05660b1301e830,syn:002467,2026-02-24,90,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+x_ad05660b1301e830,syn:000223,2026-01-05,14,netral,fear,"Densus menangkap terduga anggota jaringan terorisme, dilaporkan kepolisian #terorisme"
+x_ad05660b1301e830,syn:001053,2026-01-29,11,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+x_89d69984a32dff12,syn:001270,2026-02-08,10,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+x_89d69984a32dff12,syn:003317,2026-03-20,8,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+x_89d69984a32dff12,syn:001014,2026-01-29,6,netral,netral,"Hijrah kaffah dimulai dari sholat tepat waktu, kajian ba'da maghrib"
+x_46d3977ce320d861,syn:000239,2026-01-06,24,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+x_46d3977ce320d861,syn:000238,2026-01-07,5,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+x_46d3977ce320d861,syn:000524,2026-01-17,5,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+fa_d7c88b620a3c5143,syn:000197,2026-01-08,15,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+fa_d7c88b620a3c5143,syn:001018,2026-01-28,10,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+fa_d7c88b620a3c5143,syn:000755,2026-01-22,9,netral,netral,Mereka di dpr harus mendengar kritik kita soal kebijakan kontra terorisme
+fa_edf359d1b6eded8a,syn:002491,2026-02-24,11,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+fa_edf359d1b6eded8a,syn:000232,2026-01-05,4,positif,netral,Kontra narasi terhadap propaganda digital: kenali legitimasi kekerasan di media sosial
+fa_edf359d1b6eded8a,syn:000519,2026-01-13,4,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+x_cb562398911ff9ef,syn:001303,2026-02-03,17,negatif,anger,"Mengecam aksi teror, kekerasan bukan jalan, ujaran kebencian harus dihentikan"
+x_cb562398911ff9ef,syn:001302,2026-02-04,8,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+x_cb562398911ff9ef,syn:000219,2026-01-10,7,positif,netral,"BNPT: program deradikalisasi diikuti mantan napiter, menurut polisi berjalan baik"
+fa_e5569dc7a3264db4,syn:003596,2026-03-28,10,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+fa_e5569dc7a3264db4,syn:000508,2026-01-12,7,positif,anticipation,"Dakwah yang sejuk itu penting, tauhid dulu baru yang lain"
+fa_e5569dc7a3264db4,syn:003063,2026-03-15,5,netral,netral,Mereka di dpr harus mendengar kritik kita soal kebijakan kontra terorisme
+x_710dfa1922b7cb09,syn:001309,2026-02-03,6,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+x_710dfa1922b7cb09,syn:001310,2026-02-06,6,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+x_710dfa1922b7cb09,syn:001595,2026-02-11,6,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+fa_c4526e9ed8514b3f,syn:001637,2026-02-15,25,negatif,anger,Kutuk keras propaganda terorisme di media sosial
+fa_c4526e9ed8514b3f,syn:002106,2026-02-21,25,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+fa_c4526e9ed8514b3f,syn:002578,2026-02-26,9,negatif,anger,Kutuk keras propaganda terorisme di media sosial
+fa_82fa95b803651f4f,syn:000539,2026-01-18,25,negatif,disgust,"Kami menolak kekerasan atas nama agama, terorisme tidak dibenarkan"
+fa_82fa95b803651f4f,syn:000810,2026-01-20,10,negatif,anger,"Mengecam aksi teror, kekerasan bukan jalan, ujaran kebencian harus dihentikan"
+fa_82fa95b803651f4f,syn:003618,2026-03-29,9,negatif,anger,"Jangan biarkan mereka menyebar ujaran kebencian, kita menolak kekerasan"
+x_e9b1be494a5a54e4,syn:002640,2026-03-03,7,netral,fear,"Densus menangkap terduga anggota jaringan terorisme, dilaporkan kepolisian #terorisme"
+x_e9b1be494a5a54e4,syn:001409,2026-02-12,4,positif,netral,Kontra narasi terhadap propaganda digital: kenali legitimasi kekerasan di media sosial
+x_e9b1be494a5a54e4,syn:002205,2026-02-26,4,positif,netral,Kontra narasi terhadap propaganda digital: kenali legitimasi kekerasan di media sosial
+x_f87294b6bd7353ed,syn:000750,2026-01-21,15,netral,netral,Mereka di dpr harus mendengar kritik kita soal kebijakan kontra terorisme
+x_f87294b6bd7353ed,syn:002765,2026-03-02,4,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+x_f87294b6bd7353ed,syn:000463,2026-01-14,3,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+fa_85f4f7234141a818,syn:001594,2026-02-10,9,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+fa_85f4f7234141a818,syn:003349,2026-03-22,7,netral,netral,Mereka di dpr harus mendengar kritik kita soal kebijakan kontra terorisme
+fa_85f4f7234141a818,syn:002479,2026-03-01,5,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+x_cd3f32d5d7d3d408,syn:002028,2026-02-19,25,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+x_cd3f32d5d7d3d408,syn:000515,2026-01-17,17,netral,netral,Mereka di dpr harus mendengar kritik kita soal kebijakan kontra terorisme
+x_cd3f32d5d7d3d408,syn:003354,2026-03-22,10,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+x_2cf32f0b28b32060,syn:002081,2026-02-21,25,positif,netral,Kontra narasi terhadap propaganda digital: kenali legitimasi kekerasan di media sosial
+x_2cf32f0b28b32060,syn:002552,2026-02-23,8,negatif,anger,Kutuk keras propaganda terorisme di media sosial
+x_2cf32f0b28b32060,syn:001091,2026-01-29,5,negatif,anger,"Jangan biarkan mereka menyebar ujaran kebencian, kita menolak kekerasan"
+x_ed8c30af77f49128,syn:000583,2026-01-24,7,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+x_ed8c30af77f49128,syn:000023,2026-01-05,3,positif,trust,"Moderasi beragama bukan melemahkan tauhid, justru meneguhkan toleransi"
+x_ed8c30af77f49128,syn:000861,2026-01-31,3,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+x_8d46c90a89289f9c,syn:000040,2026-01-05,18,positif,trust,"Moderasi beragama bukan melemahkan tauhid, justru meneguhkan toleransi"
+x_8d46c90a89289f9c,syn:002206,2026-02-27,7,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+x_8d46c90a89289f9c,syn:002642,2026-03-03,4,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+x_27a8883e0b441f92,syn:001743,2026-02-22,13,positif,trust,"Moderasi beragama bukan melemahkan tauhid, justru meneguhkan toleransi"
+x_27a8883e0b441f92,syn:002210,2026-02-27,5,positif,trust,"Moderasi beragama bukan melemahkan tauhid, justru meneguhkan toleransi"
+x_27a8883e0b441f92,syn:002211,2026-02-26,5,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+x_55f87ae0dfeb3ce7,syn:001758,2026-02-21,15,positif,trust,"Moderasi beragama bukan melemahkan tauhid, justru meneguhkan toleransi"
+x_55f87ae0dfeb3ce7,syn:002649,2026-03-08,9,positif,trust,"Moderasi beragama bukan melemahkan tauhid, justru meneguhkan toleransi"
+x_55f87ae0dfeb3ce7,syn:000332,2026-01-14,6,positif,trust,"Moderasi beragama bukan melemahkan tauhid, justru meneguhkan toleransi"
+x_ae5cfa2aba97f88c,syn:003454,2026-03-25,112,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+x_ae5cfa2aba97f88c,syn:000341,2026-01-18,57,positif,trust,"Meluruskan makna jihad: kontra-narasi untuk anak muda, islam rahmatan lil alamin #moderasiberagama"
+x_ae5cfa2aba97f88c,syn:000624,2026-01-22,7,positif,netral,Kontra narasi terhadap propaganda digital: kenali legitimasi kekerasan di media sosial
+yo_045beb6bb4d0c773,syn:003528,2026-03-24,17,positif,anticipation,"Dakwah yang sejuk itu penting, tauhid dulu baru yang lain"
+yo_045beb6bb4d0c773,syn:001240,2026-02-04,11,netral,netral,"Jurnal: konsep hakimiyah dan khilafah dalam sejarah pemikiran politik, sebuah kajian akademik"
+yo_045beb6bb4d0c773,syn:000965,2026-01-26,4,positif,anticipation,"Kajian ustaz pekan ini tentang hijrah dan istiqamah, yuk pengajian"
+fa_3113977f260e072d,syn:000459,2026-01-16,11,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+fa_3113977f260e072d,syn:001925,2026-02-22,11,netral,netral,Mereka di dpr harus mendengar kritik kita soal kebijakan kontra terorisme
+fa_3113977f260e072d,syn:001269,2026-02-08,10,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+fa_ee9988f9909dd4d3,syn:002797,2026-03-03,17,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+fa_ee9988f9909dd4d3,syn:000224,2026-01-11,14,negatif,anger,"Isu khilafah sering dipakai untuk menyerang lawan politik, kritik terhadap pemerintah"
+fa_ee9988f9909dd4d3,syn:003058,2026-03-12,4,negatif,anger,"Ketidakadilan dan korupsi memicu polarisasi ideologis, demokrasi kita diuji"
+x_6c733bc588f1c0c6,syn:002026,2026-02-21,21,negatif,disgust,"Kami menolak kekerasan atas nama agama, terorisme tidak dibenarkan"
+x_6c733bc588f1c0c6,syn:003352,2026-03-20,9,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif
+x_6c733bc588f1c0c6,syn:003597,2026-03-26,6,negatif,fear,Kebijakan pemerintah soal kontra terorisme perlu diawasi dpr agar tidak represif

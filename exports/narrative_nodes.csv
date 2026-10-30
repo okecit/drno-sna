@@ -1,0 +1,28 @@
+term,frequency,group,baseline,cluster
+jaringan terorisme,123,terorisme,False,0
+terorisme,917,terorisme,False,0
+pendanaan terorisme,123,terorisme,False,0
+jihad,234,keagamaan,True,2
+kontra-narasi,463,pencegahan,False,2
+moderasi beragama,448,pencegahan,False,1
+propaganda terorisme,112,terorisme/konflik,False,0
+tauhid,478,keagamaan,True,1
+toleransi,214,pencegahan,False,1
+legitimasi kekerasan,229,narasi_digital/konflik,False,2
+propaganda digital,229,narasi_digital,False,2
+demokrasi,238,politik_keagamaan,False,3
+polarisasi ideologis,319,narasi_digital,False,3
+ekstremisme,83,radikalisasi,False,4
+ekstremisme kekerasan,83,radikalisasi/konflik,False,4
+radikalisasi,83,radikalisasi/konflik,False,4
+kontra terorisme,450,terorisme,False,0
+identitas kelompok,81,narasi_digital,False,3
+hakimiyah,106,ideologis,False,5
+khilafah,360,politik_keagamaan,False,5
+hijrah,584,keagamaan,True,6
+kaffah,309,keagamaan,True,6
+dakwah,264,keagamaan,True,1
+daulah,21,politik_keagamaan,False,7
+thaghut,21,ideologis,False,7
+jahiliyah,30,ideologis,False,8
+takfir,30,ideologis,False,8

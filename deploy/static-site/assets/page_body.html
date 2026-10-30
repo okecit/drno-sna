@@ -1,0 +1,1044 @@
+<style>
+#dash-root { --dash-gutter: var(--cds-pad-lg); }
+.drno { font-family: var(--font-anthropic-sans); color: var(--color-fg); display: flex; flex-direction: column; gap: var(--cds-gap-md); }
+.drno-title { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; }
+.drno-take { color: var(--color-fg-muted); font-size: var(--cds-font-size-body); margin: 0; }
+.drno-banner { border: 1px solid var(--color-warn); color: var(--color-warn); border-radius: var(--cds-radius); padding: var(--cds-pad-sm) var(--cds-pad-md); font-size: var(--cds-font-size-caption); font-weight: var(--cds-font-weight-medium); }
+.drno-tabs { display: flex; gap: var(--cds-gap-xs); flex-wrap: wrap; border-bottom: 1px solid var(--color-border-line); }
+.drno-tab { background: none; border: none; border-bottom: 2px solid transparent; padding: var(--cds-pad-sm) var(--cds-pad-md); font: inherit; color: var(--color-fg-muted); cursor: pointer; }
+.drno-tab[aria-selected="true"] { color: var(--color-fg); border-bottom-color: var(--color-fg); }
+.drno-page { display: none; flex-direction: column; gap: var(--cds-gap-md); }
+.drno-page.on { display: flex; }
+.drno-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: var(--cds-gap-md); }
+.drno-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr)); gap: var(--cds-gap-md); }
+.drno-card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: flex; flex-direction: column; gap: var(--cds-gap-sm); min-width: 0; }
+.drno-card h3 { margin: 0; font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); }
+.drno-note { margin: 0; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.drno-kpi .v { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); font-variant-numeric: tabular-nums; }
+.drno-kpi .l { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.drno-chart { position: relative; min-height: 260px; }
+.drno-chart.tall { min-height: 520px; }
+.drno-tip { position: absolute; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); pointer-events: none; display: none; z-index: 5; white-space: nowrap; }
+.drno-tip .h { color: var(--cds-text-secondary); }
+.drno-sw { display: inline-block; width: .6rem; height: .6rem; border-radius: 2px; margin-right: .35rem; }
+.drno-filters { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm); align-items: end; }
+.drno-filters label { display: flex; flex-direction: column; gap: 2px; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.drno-filters select { font: inherit; font-size: var(--cds-font-size-body); color: var(--color-fg); background: var(--color-bg); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: 2px 6px; }
+.drno-legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm) var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.drno-split { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 1.2fr); gap: var(--cds-gap-md); }
+@media (max-width: 760px) { .drno-split { grid-template-columns: 1fr; } }
+.drno-detail dl { display: grid; grid-template-columns: auto 1fr; gap: 2px var(--cds-gap-sm); margin: 0; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+.drno-detail dt { color: var(--color-fg-muted); }
+.drno-detail dd { margin: 0; overflow-wrap: anywhere; }
+.drno-warn { border-left: 3px solid var(--color-warn); padding-left: var(--cds-pad-sm); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.drno-table-wrap { max-height: 22rem; overflow: auto; }
+.drno table { width: 100%; border-collapse: collapse; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+.drno th { position: sticky; top: 0; background: var(--color-panel); text-align: left; color: var(--color-fg-muted); font-weight: var(--cds-font-weight-medium); padding: 4px 6px; border-bottom: 1px solid var(--color-border-line); }
+.drno td { padding: 4px 6px; border-bottom: 1px solid var(--color-border-line); }
+.drno td.n, .drno th.n { text-align: right; }
+.drno-fail { display: flex; align-items: center; justify-content: center; gap: .4rem; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); height: 100%; min-height: inherit; }
+.drno-fail::before { content: ""; width: .375rem; height: .375rem; border-radius: 50%; background: var(--color-bad); }
+.sx { display: grid; grid-template-columns: 15rem minmax(0, 1fr) 17rem; gap: var(--cds-gap-md); align-items: start; }
+@media (max-width: 1100px) { .sx { grid-template-columns: 1fr; } }
+.sx-panel { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-md); display: flex; flex-direction: column; gap: var(--cds-gap-sm); min-width: 0; }
+.sx-h { font-size: var(--cds-font-size-caption); font-weight: var(--cds-font-weight-medium); letter-spacing: .06em; text-transform: uppercase; color: var(--color-fg-muted); margin: var(--cds-gap-xs) 0 0; }
+.sx-seg { display: grid; grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr)); gap: 4px; }
+.sx-seg button { font: inherit; font-size: var(--cds-font-size-caption); padding: 4px 6px; border-radius: var(--cds-radius); border: 1px solid var(--color-border-line); background: var(--color-bg); color: var(--color-fg-muted); cursor: pointer; }
+.sx-seg button[aria-pressed="true"] { border-color: var(--color-fg); color: var(--color-fg); font-weight: var(--cds-font-weight-medium); }
+.sx-range { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 6px; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.sx-range input { width: 100%; }
+.sx-checks { display: flex; flex-direction: column; gap: 2px; font-size: var(--cds-font-size-caption); }
+.sx-checks label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.sx-apply { font: inherit; font-weight: var(--cds-font-weight-medium); padding: 6px; border-radius: var(--cds-radius); border: 1px solid var(--color-fg); background: var(--color-fg); color: var(--color-bg); cursor: pointer; }
+.sx-apply[data-dirty="true"]::after { content: " •"; }
+.sx-crumb { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.sx-crumb b { color: var(--color-fg); letter-spacing: .04em; }
+.sx-pill { margin-left: auto; font-size: var(--cds-font-size-caption); border: 1px solid var(--color-border-line); border-radius: 999px; padding: 1px 8px; }
+.sx-graph { position: relative; height: 680px; background: var(--color-bg); border-radius: var(--cds-radius); overflow: hidden; }
+.sx-bar { display: grid; grid-template-columns: 6.2rem 1fr 2.6rem; gap: 6px; align-items: center; font-size: var(--cds-font-size-caption); }
+.sx-bar .t { height: 6px; border-radius: 3px; background: var(--color-border-line); overflow: hidden; }
+.sx-bar .t > span { display: block; height: 100%; }
+.sx-bar .v { text-align: right; font-variant-numeric: tabular-nums; color: var(--color-fg-muted); }
+.sx-top { max-height: 18rem; overflow: auto; display: flex; flex-direction: column; gap: 2px; font-size: var(--cds-font-size-caption); }
+.sx-top label { display: grid; grid-template-columns: auto 1fr auto; gap: 6px; align-items: center; cursor: pointer; padding: 2px 0; border-bottom: 1px solid var(--color-border-line); }
+.sx-top .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sx-top .ct { font-variant-numeric: tabular-nums; color: var(--color-fg-muted); }
+.sx-search { font: inherit; font-size: var(--cds-font-size-caption); padding: 4px 6px; border-radius: var(--cds-radius); border: 1px solid var(--color-border-line); background: var(--color-bg); color: var(--color-fg); }
+.sx-post { font-size: var(--cds-font-size-caption); border-left: 2px solid var(--color-border-line); padding-left: 6px; }
+.sx-post .m { color: var(--color-fg-muted); }
+[data-dash-source-state=empty] { color: transparent; }
+[data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+.drno ol, .drno ul { margin: 0; padding-left: 1.2rem; font-size: var(--cds-font-size-body); }
+.drno li { margin-bottom: 4px; }
+</style>
+
+<div class="drno">
+  <h1 class="drno-title" id="judul">DRNO — Digital Radicalization Network Observatory</h1>
+  <div class="drno-banner" id="banner">Memuat status sumber data…</div>
+  <p class="drno-take" id="takeaway">Dashboard riset atas <span data-source="overview" data-field="total_posts" data-row="0" class="dash-skeleton">—</span> unggahan dari <span data-source="overview" data-field="total_accounts" data-row="0" class="dash-skeleton">—</span> akun berpseudonim; <span data-source="overview" data-field="manual_review_queue" data-row="0" class="dash-skeleton">—</span> unggahan menunggu validasi manual peneliti.</p>
+
+  <div class="drno-tabs" role="tablist">
+    <button class="drno-tab" role="tab" data-tab="overview" aria-selected="true">Overview</button>
+    <button class="drno-tab" role="tab" data-tab="platform" aria-selected="false">Per platform</button>
+    <button class="drno-tab" role="tab" data-tab="narasi" aria-selected="false">Narrative intelligence</button>
+    <button class="drno-tab" role="tab" data-tab="sna" aria-selected="false">SNA explorer</button>
+    <button class="drno-tab" role="tab" data-tab="temporal" aria-selected="false">Temporal</button>
+    <button class="drno-tab" role="tab" data-tab="teori" aria-selected="false">Lensa teori</button>
+    <button class="drno-tab" role="tab" data-tab="metode" aria-selected="false">Metode, etika &amp; ekspor</button>
+  </div>
+
+  <!-- OVERVIEW -->
+  <section class="drno-page on" id="overview">
+    <div class="drno-kpis">
+      <div class="drno-card drno-kpi"><span class="l">Total unggahan</span><span class="v dash-skeleton" data-source="overview" data-field="total_posts" data-row="0">—</span></div>
+      <div class="drno-card drno-kpi"><span class="l">Akun berpseudonim</span><span class="v dash-skeleton" data-source="overview" data-field="total_accounts" data-row="0">—</span></div>
+      <div class="drno-card drno-kpi"><span class="l">Interaksi teramati</span><span class="v dash-skeleton" data-source="overview" data-field="total_interactions" data-row="0">—</span></div>
+      <div class="drno-card drno-kpi"><span class="l">Antrean validasi manual</span><span class="v dash-skeleton" data-source="overview" data-field="manual_review_queue" data-row="0">—</span></div>
+      <div class="drno-card drno-kpi"><span class="l">Klasifikasi tidak pasti</span><span class="v dash-skeleton" data-source="overview" data-field="uncertain_share" data-row="0">—</span></div>
+    </div>
+    <div class="drno-card">
+      <h3 id="tren">Tren percakapan per minggu dan platform</h3>
+      <p class="drno-note">Jumlah unggahan per minggu dan platform. Pada data sintetis, lonjakan minggu ke-7 dan ke-8 berasal dari peristiwa fiktif yang disisipkan generator.</p>
+      <div class="drno-legend" id="lg-weekly"></div>
+      <div class="drno-chart" id="ch-weekly" data-source="weekly_platform"></div>
+    </div>
+  </section>
+
+  <!-- PER PLATFORM -->
+  <section class="drno-page" id="platform">
+    <div class="drno-filters" id="plat-filter" data-source="platform_summary">
+      <label>Pilih platform<select id="plat-sel"><option value="">Semua platform</option></select></label>
+      <span class="drno-note" id="plat-sel-note"></span>
+    </div>
+    <div class="drno-card">
+      <h3 id="cakupan">Cakupan dan batas data per platform</h3>
+      <p class="drno-note">Setiap API resmi memberi akses yang berbeda. Bandingkan antarplatform dengan mengingat catatan di kolom terakhir.</p>
+      <div class="drno-table-wrap">
+        <table id="tb-plat" data-source="platform_summary" data-row-key="platform">
+          <thead><tr><th data-field="platform">Platform</th><th data-field="posts" class="n">Unggahan</th><th data-field="accounts" class="n">Akun</th><th data-field="interactions" class="n">Interaksi</th><th data-field="uncertain_share" class="n">Tidak pasti</th><th data-field="violence_flag_review" class="n">Perlu tinjau (kekerasan)</th><th data-field="note">Catatan akses</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="drno-card">
+      <h3 id="konteks-platform">Klasifikasi konteks per platform</h3>
+      <p class="drno-note">Porsi unggahan per label konteks (hasil mesin, belum divalidasi). Angka di kanan = jumlah unggahan.</p>
+      <div class="drno-legend" id="lg-pctx"></div>
+      <div class="drno-chart" id="ch-pctx" data-source="platform_context"></div>
+    </div>
+    <div class="drno-grid">
+      <div class="drno-card">
+        <h3 id="sentimen-platform">Sentimen per platform</h3>
+        <p class="drno-note">Sentimen = nada bahasa. Unggahan yang mengecam terorisme bernada negatif tetapi ber-stance menolak kekerasan.</p>
+        <div class="drno-legend" id="lg-psen"></div>
+        <div class="drno-chart" id="ch-psen" data-source="platform_sentiment"></div>
+      </div>
+      <div class="drno-card">
+        <h3 id="stance-platform">Stance per platform</h3>
+        <p class="drno-note">Sikap terhadap kekerasan: menolak, netral, mendukung, atau tidak dapat ditentukan.</p>
+        <div class="drno-legend" id="lg-psta"></div>
+        <div class="drno-chart" id="ch-psta" data-source="platform_stance"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NARASI -->
+  <section class="drno-page" id="narasi">
+    <div class="drno-grid">
+      <div class="drno-card">
+        <h3 id="konteks">Klasifikasi konteks</h3>
+        <p class="drno-note">Hasil mesin (baseline berbasis aturan, belum divalidasi). Kemunculan istilah tidak pernah cukup untuk label dukungan kekerasan.</p>
+        <div class="drno-chart" id="ch-context" data-source="context_counts"></div>
+      </div>
+      <div class="drno-card">
+        <h3 id="stance">Stance per minggu</h3>
+        <p class="drno-note">Mendukung, menolak, netral, atau tidak dapat ditentukan.</p>
+        <div class="drno-legend" id="lg-stance"></div>
+        <div class="drno-chart" id="ch-stance" data-source="stance_weekly"></div>
+      </div>
+    </div>
+    <div class="drno-card">
+      <h3 id="kata-kunci">Frekuensi dan tren kata kunci</h3>
+      <p class="drno-note">Delapan istilah paling sering. Istilah bertanda “pembanding” adalah istilah keagamaan umum, bukan sinyal ekstremisme.</p>
+      <div class="drno-grid" id="ch-keywords" data-source="keyword_weekly"></div>
+    </div>
+    <div class="drno-grid">
+      <div class="drno-card">
+        <h3 id="wacana">Peta wacana per komunitas percakapan</h3>
+        <p class="drno-note">Komposisi konteks unggahan pada tiap komunitas jaringan interaksi. Komunitas = pola interaksi, bukan kelompok ideologis atau organisasi.</p>
+        <div class="drno-legend" id="lg-comm"></div>
+        <div class="drno-chart" id="ch-comm" data-source="community_context"></div>
+      </div>
+      <div class="drno-card">
+        <h3 id="kookurensi">Jaringan ko-okurensi narasi</h3>
+        <p class="drno-note">Node = istilah; garis = muncul bersama dalam satu unggahan (min. 2 kali). Jaringan ini tidak menyatakan hubungan antarorang.</p>
+        <div class="drno-chart" id="ch-narr" data-source="narrative_nodes narrative_edges"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SNA -->
+  <section class="drno-page" id="sna">
+    <div class="sx">
+      <aside class="sx-panel" id="sx-left" data-source="sna_nodes sna_edges">
+        <div class="sx-h">Settings</div>
+        <div class="sx-h">Max nodes</div>
+        <div class="sx-range"><input type="range" id="sx-max" min="50" max="500" step="10" value="200"><span id="sx-max-v">200</span></div>
+        <div class="sx-h">Edge opacity</div>
+        <div class="sx-range"><input type="range" id="sx-op" min="5" max="100" step="5" value="55"><span id="sx-op-v">55%</span></div>
+        <div class="sx-h">Node centrality</div>
+        <div class="sx-seg" data-key="cent"><button data-v="degree">Degree</button><button data-v="engagement">Engagement</button><button data-v="betweenness">Betweenness</button></div>
+        <div class="sx-h">Node color</div>
+        <div class="sx-seg" data-key="ncol"><button data-v="type">Type</button><button data-v="sentiment">Sentiment</button><button data-v="cluster">Cluster</button></div>
+        <div class="sx-h">Edge color</div>
+        <div class="sx-seg" data-key="ecol"><button data-v="sentiment">Sentiment</button><button data-v="cluster">Cluster</button><button data-v="emotion">Emotion</button><button data-v="channel">Channel</button></div>
+        <div class="sx-h">Edge style</div>
+        <div class="sx-seg" data-key="estyle"><button data-v="line">Line</button><button data-v="curve">Curve</button></div>
+        <div class="sx-h">Node types</div>
+        <div class="sx-checks" id="sx-ntypes"></div>
+        <div class="sx-h">Edge / link types</div>
+        <div class="sx-checks" id="sx-etypes"></div>
+        <div class="sx-h">Channel</div>
+        <div class="sx-checks" id="sx-plats"></div>
+        <div class="sx-h">Date range</div>
+        <div class="sx-seg" data-key="range"><button data-v="7">7 hari</button><button data-v="15">15 hari</button><button data-v="30">1 bulan</button><button data-v="90">3 bulan</button><button data-v="all">Semua</button></div>
+        <button class="sx-apply" id="sx-apply">Apply</button>
+        <div class="sx-h">Legenda</div>
+        <div class="drno-legend" id="sx-legend"></div>
+      </aside>
+      <div class="sx-panel">
+        <div class="sx-crumb"><b>DRNO</b>›<b>SNA GRAPH</b><span id="sx-crumb">—</span><span class="sx-pill" id="sx-pill">—</span></div>
+        <div class="sx-graph" id="sx-graph" data-source="sna_nodes sna_edges"></div>
+        <p class="drno-note">Seret untuk menggeser, gulir untuk memperbesar, klik node untuk insight, klik ganda latar untuk reset. Edge hanya dari interaksi teramati. Sentralitas = posisi struktural, bukan bukti afiliasi, peran, atau keterlibatan kriminal.</p>
+      </div>
+      <aside class="sx-panel" id="sx-right" data-source="sna_nodes sna_edges sna_posts">
+        <div class="sx-h">Node insight</div>
+        <div id="sx-insight"></div>
+        <div class="sx-h" id="sx-top-h">Top nodes</div>
+        <input class="sx-search" id="sx-search" placeholder="Cari node…">
+        <div class="sx-top" id="sx-top"></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- TEMPORAL -->
+  <section class="drno-page" id="temporal">
+    <div class="drno-grid">
+      <div class="drno-card">
+        <h3 id="ukuran">Ukuran jaringan per minggu</h3>
+        <p class="drno-note">Jumlah node aktif dan edge pada graf mingguan.</p>
+        <div class="drno-legend" id="lg-size"></div>
+        <div class="drno-chart" id="ch-size" data-source="temporal"></div>
+      </div>
+      <div class="drno-card">
+        <h3 id="struktur">Density dan modularity per minggu</h3>
+        <p class="drno-note">Density: ikatan teramati ÷ ikatan mungkin. Modularity: kekuatan pemisahan komunitas.</p>
+        <div class="drno-legend" id="lg-struct"></div>
+        <div class="drno-chart" id="ch-struct" data-source="temporal"></div>
+      </div>
+    </div>
+    <div class="drno-card">
+      <h3 id="posisi">Perubahan posisi struktural aktor</h3>
+      <p class="drno-note">Betweenness mingguan delapan node dengan betweenness tertinggi pada jaringan keseluruhan. Deskriptif; bukan inferensi peran.</p>
+      <div class="drno-chart" id="ch-pos" data-source="position_change"></div>
+    </div>
+  </section>
+
+  <!-- LENSA TEORI -->
+  <section class="drno-page" id="teori">
+    <div class="drno-warn">Dua lensa dipilih karena dapat diukur dari data yang benar-benar dimiliki DRNO: interaksi publik teramati dan label hasil mesin. Pada data sintetis, pola yang tampak dibentuk oleh generator; ini demonstrasi metode, bukan temuan.</div>
+    <h2 class="drno-title" style="font-size: var(--cds-font-size-heading)" id="lensa-a">Lensa A · Structural Holes (Burt, 1992) + Strength of Weak Ties (Granovetter, 1973)</h2>
+    <div class="drno-grid">
+      <div class="drno-card">
+        <h3 id="sh-scatter">Constraint vs effective size</h3>
+        <p class="drno-note">Kiri-bawah: akun tertutup dalam kluster rapat. Kanan-bawah: akun menjembatani kontak yang tidak saling terhubung (lubang struktural). Ukuran titik = jumlah triad brokerage.</p>
+        <div class="drno-chart" id="ch-sh" data-source="broker_nodes"></div>
+      </div>
+      <div class="drno-card">
+        <h3 id="weak-ties">Ikatan lemah pada jembatan antarkomunitas</h3>
+        <p class="drno-note">Ikatan lemah = satu interaksi, tidak berbalas. Hipotesis Granovetter: jembatan antarkomunitas lebih sering berupa ikatan lemah.</p>
+        <div class="drno-chart" id="ch-weak" data-source="tie_summary"></div>
+      </div>
+    </div>
+    <div class="drno-card">
+      <h3 id="broker">Peran broker (Gould &amp; Fernandez, 1989)</h3>
+      <p class="drno-note">Jumlah triad a→v→b tanpa a→b, menurut keanggotaan komunitas. Liaison menghubungkan tiga komunitas berbeda; gatekeeper menyaring masuknya arus ke komunitasnya. Posisi struktural, bukan peran organisasi atau pengaruh.</p>
+      <div class="drno-table-wrap">
+        <table id="tb-broker" data-source="broker_nodes" data-row-key="node_id">
+          <thead><tr><th data-field="node_id">Pseudonim</th><th data-field="community" class="n">Kom.</th><th data-field="constraint" class="n">Constraint</th><th data-field="effective_size" class="n">Eff. size</th><th data-field="coordinator" class="n">Coordinator</th><th data-field="itinerant" class="n">Itinerant</th><th data-field="gatekeeper" class="n">Gatekeeper</th><th data-field="representative" class="n">Representative</th><th data-field="liaison" class="n">Liaison</th><th data-field="total" class="n">Total</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <h2 class="drno-title" style="font-size: var(--cds-font-size-heading)" id="lensa-b">Lensa B · Homofili (McPherson dkk., 2001) + Social Identity Theory (Tajfel &amp; Turner, 1979)</h2>
+    <div class="drno-grid">
+      <div class="drno-card">
+        <h3 id="ei">E-I index teramati vs acak</h3>
+        <p class="drno-note">E-I = (eksternal − internal) ÷ total ikatan; −1 = semua ikatan dengan sesama label. Pita = 95% nilai dari 500 pengacakan label. Titik di kiri pita = homofili melebihi kebetulan. Tidak membedakan seleksi dari pengaruh.</p>
+        <div class="drno-chart" id="ch-ei" data-source="homophily"></div>
+      </div>
+      <div class="drno-card">
+        <h3 id="mixing">Matriks pencampuran stance</h3>
+        <p class="drno-note">Jumlah interaksi dari akun dengan stance dominan (baris) ke akun dengan stance dominan (kolom). Stance akun = label mayoritas unggahannya, hasil mesin.</p>
+        <div class="drno-chart" id="ch-mix" data-source="mixing_stance"></div>
+      </div>
+    </div>
+    <div class="drno-card">
+      <h3 id="identitas">Penanda identitas kelompok per komunitas (eksploratif)</h3>
+      <p class="drno-note">Pronomina in-group (kami, kita) dan out-group (mereka, kalian) per 1.000 kata. Indikator linguistik kasar untuk lensa identitas sosial, bukan ukuran identitas seseorang.</p>
+      <div class="drno-legend" id="lg-id"></div>
+      <div class="drno-chart" id="ch-id" data-source="identity_markers"></div>
+    </div>
+  </section>
+
+  <!-- METODE -->
+  <section class="drno-page" id="metode">
+    <div class="drno-grid">
+      <div class="drno-card">
+        <h3 id="alur">Alur pipeline</h3>
+        <ol>
+          <li>Kamus kata kunci berversi (varian transliterasi, hashtag, Boolean)</li>
+          <li>Pengumpulan data via API resmi/RSS, pseudonimisasi, deduplikasi</li>
+          <li>Pembersihan teks dan deteksi bahasa</li>
+          <li>Klasifikasi konteks (8 kategori, termasuk “tidak dapat dipastikan”)</li>
+          <li>Stance, sentimen, topik (BERTopic pada tahap model)</li>
+          <li>Konstruksi jaringan interaksi dan jaringan ko-okurensi narasi, terpisah</li>
+          <li>SNA: centrality, komunitas, perubahan temporal</li>
+          <li>Validasi manual peneliti dan ekspor</li>
+        </ol>
+      </div>
+      <div class="drno-card">
+        <h3 id="lapis">Tiga lapis data yang tidak dicampur</h3>
+        <ul>
+          <li><b>Fakta teramati</b>: unggahan dan interaksi, masing-masing dengan bukti post_id.</li>
+          <li><b>Hasil mesin</b>: label, confidence, nama dan versi model. Di bawah 0,6 = tidak pasti.</li>
+          <li><b>Interpretasi peneliti</b>: anotasi manual dan memo, hanya dari manusia.</li>
+        </ul>
+        <div class="drno-warn">Kaitan dengan presentasi SNA: jaringan interaksi mengoperasionalkan <i>connection</i>, jaringan ko-okurensi narasi mengoperasionalkan <i>contagion</i>/isi (Christakis &amp; Fowler, 2009, hlm. 16). Homofili dan pengaruh tetap tidak dapat dipisahkan pada data observasional ini.</div>
+      </div>
+      <div class="drno-card">
+        <h3 id="etika">Etika dan keterbatasan</h3>
+        <ul>
+          <li>Tidak ada pemeringkatan individu berdasarkan dugaan radikalisme.</li>
+          <li>Istilah keagamaan umum (jihad, kaffah, hijrah, syariat, tauhid, dakwah) diperlakukan sebagai pembanding.</li>
+          <li>Platform yang dapat diakses sah didominasi percakapan <i>tentang</i> ekstremisme, bukan komunikasi ekstremis.</li>
+          <li>Tidak boleh ditautkan dengan informan wawancara studi napiter.</li>
+        </ul>
+      </div>
+      <div class="drno-card">
+        <h3 id="ekspor">Ekspor riset</h3>
+        <ul>
+          <li>CSV setiap sumber data dashboard: unduh dari panel Sources.</li>
+          <li>GraphML dan GEXF (jaringan interaksi dan ko-okurensi), CSV unggahan, ringkasan JSON: dihasilkan pipeline di repositori DRNO (folder exports, berakhiran _SYNTHETIC).</li>
+          <li>Ringkasan PDF: tahap berikut.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  const fmt = d3.format(','), pct = d3.format('.1%'), f3 = d3.format('.3f');
+  const BASELINE = new Set(['jihad', 'kaffah', 'hijrah', 'syariat', 'tauhid', 'dakwah']);
+  const TYPE_DASH = { reply: null, comment: '6,3', mention: '2,3', repost: '1,2', comment_reply: '6,2,1,2' };
+  const CTX_ID = { diskusi_keagamaan_umum: 'Diskusi keagamaan umum', kajian_akademik: 'Kajian akademik', kritik_politik_sosial: 'Kritik politik & sosial', pemberitaan: 'Pemberitaan', dukungan_kekerasan: 'Dukungan kekerasan', penolakan_kekerasan: 'Penolakan kekerasan', kontra_narasi: 'Kontra-narasi', tidak_dapat_dipastikan: 'Tidak dapat dipastikan' };
+  const STANCE_ID = { mendukung: 'Mendukung', menolak: 'Menolak', netral: 'Netral', tidak_dapat_ditentukan: 'Tidak dapat ditentukan' };
+  const root = document.querySelector('.drno');
+  let current = 'overview';
+  const num = (v) => +v;
+
+  // ---------- helpers ----------
+  function st(id) { return dash.data(id); }
+  function allOk(ids) { return ids.every((i) => st(i).status === 'ok'); }
+  function anyErr(ids) { return ids.some((i) => ['error', 'connect', 'declined', 'missing'].includes(st(i).status)); }
+  function prep(el, ids) {
+    el.innerHTML = '';
+    if (window.DRNO_MANIFEST && ids.some((i) => !window.DRNO_MANIFEST.datasets.some((d) => d.id === i))) {
+      el.classList.remove('dash-skeleton'); const d = document.createElement('div'); d.className = 'drno-note'; d.style.padding = '24px 0'; d.style.textAlign = 'center';
+      d.textContent = 'Belum cukup data untuk grafik ini pada periode yang terkumpul.'; el.appendChild(d); return false;
+    }
+    if (anyErr(ids)) { el.classList.remove('dash-skeleton'); const d = document.createElement('div'); d.className = 'drno-fail'; d.textContent = 'Gagal memuat data'; el.appendChild(d); return false; }
+    if (!allOk(ids)) { el.classList.add('dash-skeleton'); return false; }
+    el.classList.remove('dash-skeleton');
+    return true;
+  }
+  function tip(el) {
+    let t = el.querySelector('.drno-tip');
+    if (!t) { t = document.createElement('div'); t.className = 'drno-tip'; el.appendChild(t); }
+    return {
+      show(html, x, y) {
+        t.replaceChildren(...html); t.style.display = 'block';
+        const W = el.clientWidth, w = t.offsetWidth;
+        t.style.left = Math.max(0, Math.min(W - w, x + 12)) + 'px'; t.style.top = Math.max(0, y - 10) + 'px';
+      },
+      hide() { t.style.display = 'none'; },
+    };
+  }
+  function line(text, cls) { const d = document.createElement('div'); if (cls) d.className = cls; d.textContent = text; return d; }
+  function swLine(color, text) { const d = document.createElement('div'); const s = document.createElement('span'); s.className = 'drno-sw'; s.style.background = color; d.append(s, document.createTextNode(text)); return d; }
+  function legend(id, items) {
+    const el = document.getElementById(id); el.innerHTML = '';
+    items.forEach(([c, t, dashArr]) => {
+      const s = document.createElement('span');
+      if (dashArr !== undefined) {
+        const svg = d3.create('svg').attr('width', 22).attr('height', 8).style('margin-right', '4px');
+        svg.append('line').attr('x1', 0).attr('x2', 22).attr('y1', 4).attr('y2', 4).attr('stroke', c).attr('stroke-width', 2).attr('stroke-dasharray', dashArr);
+        s.appendChild(svg.node());
+      } else { const sw = document.createElement('span'); sw.className = 'drno-sw'; sw.style.background = c; s.appendChild(sw); }
+      s.appendChild(document.createTextNode(t)); el.appendChild(s);
+    });
+  }
+  function axisStyle(g) { g.attr('font-size', null).attr('font-family', null); g.selectAll('text').attr('fill', 'var(--color-fg-muted)').style('font-size', 'var(--cds-font-size-caption)'); g.selectAll('.domain').attr('stroke', 'var(--cds-chart-axis)'); g.selectAll('.tick line').attr('stroke', 'var(--cds-chart-grid)'); }
+  function measure(svg, texts) { const t = svg.append('text').style('font-size', 'var(--cds-font-size-caption)'); let m = 0; texts.forEach((s) => { t.text(s); m = Math.max(m, t.node().getComputedTextLength()); }); t.remove(); return m; }
+
+  // Multi-line chart over weeks
+  function lineChart(el, weeks, series, opts = {}) {
+    const W = el.clientWidth || 600, H = opts.h || 260;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+    const maxY = d3.max(series, (s) => d3.max(s.values)) || 1;
+    const y = d3.scaleLinear([0, maxY * 1.08], [H - 28, 10]).nice();
+    const yl = measure(svg, y.ticks(5).map(opts.yfmt || fmt)) + 10;
+    const x = d3.scalePoint(weeks, [yl + 4, W - 10]);
+    const gy = svg.append('g').attr('transform', `translate(${yl},0)`).call(d3.axisLeft(y).ticks(5).tickFormat(opts.yfmt || fmt).tickSize(-(W - yl - 10)));
+    axisStyle(gy); gy.select('.domain').remove();
+    const step = Math.max(1, Math.ceil(weeks.length / Math.max(2, Math.floor((W - yl) / (measure(svg, weeks) + 12)))));
+    const gx = svg.append('g').attr('transform', `translate(0,${H - 28})`).call(d3.axisBottom(x).tickValues(weeks.filter((_, i) => i % step === 0)).tickSize(0).tickPadding(8));
+    axisStyle(gx);
+    series.forEach((s, i) => {
+      svg.append('path').attr('fill', 'none').attr('stroke', s.color || dash.colors[i % 8]).attr('stroke-width', 2).attr('stroke-linecap', 'round').attr('stroke-linejoin', 'round')
+        .attr('d', d3.line().x((_, j) => x(weeks[j])).y((v) => y(v))(s.values));
+    });
+    const T = tip(el), rule = svg.append('line').attr('y1', 10).attr('y2', H - 28).attr('stroke', 'var(--cds-chart-reference)').style('display', 'none');
+    svg.append('rect').attr('x', yl).attr('y', 0).attr('width', W - yl).attr('height', H - 28).attr('fill', 'transparent')
+      .on('mousemove', (ev) => {
+        const [mx] = d3.pointer(ev); const j = d3.leastIndex(weeks, (w) => Math.abs(x(w) - mx));
+        rule.style('display', null).attr('x1', x(weeks[j])).attr('x2', x(weeks[j]));
+        const rect = el.getBoundingClientRect(), sv = svg.node().getBoundingClientRect(); const k = rect.width / W;
+        T.show([line(opts.label ? opts.label(weeks[j]) : weeks[j], 'h'), ...series.map((s, i) => swLine(s.color || dash.colors[i % 8], `${s.name}: ${(opts.yfmt || fmt)(s.values[j])}`))], x(weeks[j]) * k, d3.pointer(ev)[1] * k);
+      })
+      .on('mouseleave', () => { rule.style('display', 'none'); T.hide(); });
+  }
+
+  // Penempatan label tanpa tumpang-tindih: label yang bertabrakan dilewati (tetap terbaca lewat tooltip)
+  function placeLabels(g, items, nodesXY) {
+    const boxes = [];
+    const hit = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+    items.forEach((it) => {
+      const w = it.text.length * 6.6 + 4, h = 13;
+      for (const [dx, anchor] of [[it.r + 3, 'start'], [-(it.r + 3), 'end']]) {
+        const bx = anchor === 'start' ? it.x + dx : it.x + dx - w;
+        const b = { x: bx, y: it.y - 9, w, h };
+        if (boxes.some((o) => hit(o, b))) continue;
+        if ((nodesXY || []).some((n) => n.id !== it.id && hit({ x: n.x - n.r, y: n.y - n.r, w: 2 * n.r, h: 2 * n.r }, b))) continue;
+        boxes.push(b);
+        g.append('text').attr('x', it.x + dx).attr('y', it.y + 4).attr('text-anchor', anchor).text(it.text)
+          .style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg)').attr('paint-order', 'stroke')
+          .attr('stroke', 'var(--color-bg)').attr('stroke-width', 3).style('pointer-events', 'none');
+        break;
+      }
+    });
+  }
+
+  // ---------- overview ----------
+  function drawKPIs() {
+    const o = st('overview');
+    document.querySelectorAll('[data-source="overview"]').forEach((el) => {
+      if (o.status !== 'ok') { if (anyErr(['overview'])) { el.classList.remove('dash-skeleton'); el.textContent = '—'; } return; }
+      el.classList.remove('dash-skeleton');
+      const v = o.data[0][el.dataset.field];
+      el.textContent = el.dataset.field === 'uncertain_share' ? pct(num(v)) : fmt(num(v));
+    });
+  }
+  function weeksFrom(rows) { return [...new Set(rows.map((r) => r.week))].sort(); }
+  function isSynthetic() { const o = st('overview'); return o.status !== 'ok' || String(o.data[0].data_mode || 'synthetic') !== 'real'; }
+  function weekLabel(rows) { const m = new Map(rows.map((r) => [r.week, r.week_start])); return (w) => `${w} · minggu mulai ${d3.utcFormat('%d %b %Y')(new Date(m.get(w)))}${isSynthetic() ? ' (fiktif)' : ''}`; }
+  function drawBanner() {
+    const b = document.getElementById('banner'), o = st('overview');
+    if (o.status !== 'ok') { b.textContent = 'Memuat status sumber data…'; return; }
+    if (isSynthetic()) {
+      b.style.borderColor = 'var(--color-warn)'; b.style.color = 'var(--color-warn)';
+      b.textContent = 'DATA SINTETIS — bukan hasil crawling nyata. Akun, unggahan, dan peristiwa dibangkitkan generator untuk demonstrasi metode; tanggal bersifat fiktif. Konektor API nyata tersedia di paket DRNO dan berjalan dengan kredensial Anda.';
+    } else {
+      b.style.borderColor = 'var(--color-border-line)'; b.style.color = 'var(--color-fg-muted)';
+      b.textContent = 'DATA NYATA dari API resmi (akun individual berpseudonim). Klasifikasi adalah hasil mesin dan wajib divalidasi manual sebelum dikutip.';
+    }
+  }
+  const PLAT_ID = { x: 'X/Twitter', youtube: 'YouTube', instagram: 'Instagram', facebook: 'Facebook', news: 'Berita & web', reddit: 'Reddit' };
+  const SENT_ID = { positif: 'Positif', netral: 'Netral', negatif: 'Negatif' };
+  let platSel = '';
+  function singleBars(el, lgId, rows, labels, colorOf) {
+    const keys = Object.keys(labels).filter((k) => rows.some((r) => r.k === k)).concat([...new Set(rows.map((r) => r.k))].filter((k) => !(k in labels)));
+    const items = keys.map((k, j) => ({ k, j, n: d3.sum(rows.filter((r) => r.k === k), (r) => r.n) })).sort((a, b) => b.n - a.n);
+    const tot = d3.sum(items, (d) => d.n) || 1;
+    const W = el.clientWidth || 500, rowH = 28, H = items.length * rowH + 6;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+    const ll = measure(svg, items.map((d) => labels[d.k] || d.k)) + 10, vl = measure(svg, items.map((d) => `${fmt(d.n)} (${pct(d.n / tot)})`)) + 10;
+    const x = d3.scaleLinear([0, d3.max(items, (d) => d.n) || 1], [0, W - ll - vl]);
+    items.forEach((d, i) => {
+      const yy = i * rowH + 4;
+      svg.append('text').attr('x', 0).attr('y', yy + 15).text(labels[d.k] || d.k).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg)');
+      svg.append('rect').attr('x', ll).attr('y', yy + 3).attr('height', 16).attr('rx', 4).attr('width', Math.max(2, x(d.n))).attr('fill', colorOf(d.k, d.j));
+      svg.append('text').attr('x', ll + x(d.n) + 6).attr('y', yy + 15).text(`${fmt(d.n)} (${pct(d.n / tot)})`).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg-muted)');
+    });
+    legend(lgId, []);
+    el.style.minHeight = H + 'px';
+  }
+  function stack100(elId, lgId, dsId, field, labels, colorOf) {
+    const el = document.getElementById(elId);
+    if (!prep(el, [dsId])) return;
+    const rows = st(dsId).data.map((r) => ({ p: r.platform, k: r[field], n: num(r.posts) })).filter((r) => !platSel || r.p === platSel);
+    if (platSel) { singleBars(el, lgId, rows, labels, colorOf); return; }
+    const plats = [...new Set(rows.map((r) => r.p))].sort((a, b) => d3.sum(rows.filter((r) => r.p === b), (r) => r.n) - d3.sum(rows.filter((r) => r.p === a), (r) => r.n));
+    const keys = Object.keys(labels).filter((k) => rows.some((r) => r.k === k)).concat([...new Set(rows.map((r) => r.k))].filter((k) => !(k in labels)));
+    const W = el.clientWidth || 500, rowH = 32, H = plats.length * rowH + 6;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+    const ll = measure(svg, plats.map((p) => PLAT_ID[p] || p)) + 10;
+    const rl = measure(svg, plats.map((p) => fmt(d3.sum(rows.filter((r) => r.p === p), (r) => r.n)))) + 8;
+    const x = d3.scaleLinear([0, 1], [ll, W - rl]);
+    const T = tip(el), kk = () => el.getBoundingClientRect().width / W;
+    plats.forEach((p, i) => {
+      const rs = rows.filter((r) => r.p === p), tot = d3.sum(rs, (r) => r.n); let acc = 0;
+      svg.append('text').attr('x', 0).attr('y', i * rowH + 20).text(PLAT_ID[p] || p).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg)');
+      keys.forEach((k, j) => {
+        const r = rs.find((q) => q.k === k); if (!r) return; const sh = r.n / tot;
+        svg.append('rect').attr('x', x(acc)).attr('y', i * rowH + 6).attr('height', 20).attr('width', Math.max(0, x(acc + sh) - x(acc) - 1)).attr('fill', colorOf(k, j))
+          .on('mousemove', (ev) => { const [mx, my] = d3.pointer(ev, svg.node()); T.show([line(`${PLAT_ID[p] || p} · ${fmt(tot)} unggahan`, 'h'), swLine(colorOf(k, j), `${labels[k] || k}: ${fmt(r.n)} (${pct(sh)})`)], mx * kk(), my * kk()); })
+          .on('mouseleave', () => T.hide());
+        acc += sh;
+      });
+      svg.append('text').attr('x', W - rl + 6).attr('y', i * rowH + 20).text(fmt(tot)).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg-muted)');
+    });
+    legend(lgId, keys.map((k, j) => [colorOf(k, j), labels[k] || k]));
+    el.style.minHeight = H + 'px';
+  }
+  let platSelReady = false;
+  function setupPlatSel() {
+    if (platSelReady || st('platform_summary').status !== 'ok') return;
+    const sel = document.getElementById('plat-sel');
+    st('platform_summary').data.slice().sort((a, b) => num(b.posts) - num(a.posts)).forEach((r) => {
+      const o = document.createElement('option'); o.value = r.platform; o.textContent = PLAT_ID[r.platform] || r.platform; sel.appendChild(o);
+    });
+    sel.addEventListener('change', () => { platSel = sel.value; drawPlatform(); });
+    platSelReady = true;
+  }
+  function drawPlatform() {
+    setupPlatSel();
+    const tb = document.querySelector('#tb-plat tbody'); tb.innerHTML = '';
+    const note = document.getElementById('plat-sel-note');
+    if (st('platform_summary').status === 'ok') {
+      const sr = st('platform_summary').data.find((r) => r.platform === platSel);
+      note.textContent = sr ? `Menampilkan ${PLAT_ID[platSel] || platSel}: ${fmt(num(sr.posts))} unggahan. ${sr.note}` : 'Menampilkan perbandingan semua platform.';
+      st('platform_summary').data.filter((r) => !platSel || r.platform === platSel).sort((a, b) => num(b.posts) - num(a.posts)).forEach((r) => {
+        const tr = document.createElement('tr'); tr.dataset.key = r.platform;
+        [[PLAT_ID[r.platform] || r.platform], [fmt(num(r.posts)), 1], [fmt(num(r.accounts)), 1], [fmt(num(r.interactions)), 1], [pct(num(r.uncertain_share)), 1], [fmt(num(r.violence_flag_review)), 1], [r.note]]
+          .forEach(([v, isNum]) => { const td = document.createElement('td'); td.textContent = v; if (isNum) td.className = 'n'; tr.appendChild(td); });
+        tb.appendChild(tr);
+      });
+    }
+    const ctxColor = (k, j) => k === 'dukungan_kekerasan' ? 'var(--cds-chart-status-critical)' : k === 'tidak_dapat_dipastikan' ? 'var(--cds-chart-muted)' : dash.colors[j % 8];
+    stack100('ch-pctx', 'lg-pctx', 'platform_context', 'context', CTX_ID, ctxColor);
+    const sc = { positif: dash.colors[0], netral: 'var(--cds-chart-muted)', negatif: dash.colors[3] };
+    stack100('ch-psen', 'lg-psen', 'platform_sentiment', 'sentiment', SENT_ID, (k, j) => sc[k] || dash.colors[j % 8]);
+    const tc = { menolak: dash.colors[0], netral: dash.colors[1], mendukung: 'var(--cds-chart-status-critical)', tidak_dapat_ditentukan: 'var(--cds-chart-muted)' };
+    stack100('ch-psta', 'lg-psta', 'platform_stance', 'stance', STANCE_ID, (k, j) => tc[k] || dash.colors[j % 8]);
+  }
+
+  function drawWeekly() {
+    const el = document.getElementById('ch-weekly');
+    if (!prep(el, ['weekly_platform'])) return;
+    const rows = st('weekly_platform').data; const weeks = weeksFrom(rows);
+    const plats = [...new Set(rows.map((r) => r.platform))].sort();
+    const W = el.clientWidth || 600, H = 260;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+    const byWeek = weeks.map((w) => { const o = { week: w }; plats.forEach((p) => { const r = rows.find((q) => q.week === w && q.platform === p); o[p] = r ? num(r.posts) : 0; }); return o; });
+    const stack = d3.stack().keys(plats)(byWeek);
+    const y = d3.scaleLinear([0, d3.max(stack[stack.length - 1], (d) => d[1]) * 1.08], [H - 28, 10]).nice();
+    const yl = measure(svg, y.ticks(5).map(fmt)) + 10;
+    const x = d3.scaleBand(weeks, [yl + 4, W - 6]).padding(0.25);
+    const gy = svg.append('g').attr('transform', `translate(${yl},0)`).call(d3.axisLeft(y).ticks(5).tickFormat(fmt).tickSize(-(W - yl - 6))); axisStyle(gy); gy.select('.domain').remove();
+    const wlab = measure(svg, weeks) + 12, stepW = Math.max(1, Math.ceil(wlab / x.step()));
+    const gx = svg.append('g').attr('transform', `translate(0,${H - 28})`).call(d3.axisBottom(x).tickValues(weeks.filter((_, i) => i % stepW === 0)).tickSize(0).tickPadding(8)); axisStyle(gx);
+    const T = tip(el), k = () => el.getBoundingClientRect().width / W, lab = weekLabel(rows);
+    stack.forEach((layer, i) => {
+      svg.append('g').attr('fill', dash.colors[i % 8]).selectAll('rect').data(layer).join('rect')
+        .attr('x', (d) => x(d.data.week)).attr('width', x.bandwidth()).attr('y', (d) => y(d[1])).attr('height', (d) => Math.max(0, y(d[0]) - y(d[1])))
+        .on('mousemove', (ev, d) => { const [mx, my] = d3.pointer(ev, svg.node()); T.show([line(lab(d.data.week), 'h'), ...plats.map((p, j) => swLine(dash.colors[j % 8], `${p}: ${fmt(d.data[p])}`))], mx * k(), my * k()); })
+        .on('mouseleave', () => T.hide());
+    });
+    legend('lg-weekly', plats.map((p, i) => [dash.colors[i % 8], p]));
+  }
+
+  // ---------- narasi ----------
+  function drawContext() {
+    const el = document.getElementById('ch-context');
+    if (!prep(el, ['context_counts'])) return;
+    const rows = st('context_counts').data.map((r) => ({ c: r.context, n: num(r.posts) })).sort((a, b) => b.n - a.n);
+    const W = el.clientWidth || 500, rowH = 28, H = rows.length * rowH + 10;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+    const ll = measure(svg, rows.map((r) => CTX_ID[r.c] || r.c)) + 10, vl = measure(svg, rows.map((r) => fmt(r.n))) + 8;
+    const x = d3.scaleLinear([0, d3.max(rows, (r) => r.n)], [0, W - ll - vl - 6]);
+    rows.forEach((r, i) => {
+      const yy = i * rowH + 4;
+      const sensitive = r.c === 'dukungan_kekerasan', unc = r.c === 'tidak_dapat_dipastikan';
+      svg.append('text').attr('x', 0).attr('y', yy + 15).text(CTX_ID[r.c] || r.c).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg)');
+      svg.append('rect').attr('x', ll).attr('y', yy + 3).attr('height', 16).attr('rx', 4).attr('width', Math.max(2, x(r.n)))
+        .attr('fill', sensitive ? 'var(--cds-chart-status-critical)' : unc ? 'var(--cds-chart-muted)' : dash.colors[0]);
+      svg.append('text').attr('x', ll + x(r.n) + 6).attr('y', yy + 15).text(fmt(r.n)).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg-muted)');
+    });
+    el.style.minHeight = H + 'px';
+  }
+  function drawStance() {
+    const el = document.getElementById('ch-stance');
+    if (!prep(el, ['stance_weekly'])) return;
+    const rows = st('stance_weekly').data, weeks = weeksFrom(rows);
+    const stances = ['menolak', 'netral', 'mendukung', 'tidak_dapat_ditentukan'].filter((s) => rows.some((r) => r.stance === s));
+    const colors = { menolak: dash.colors[0], netral: dash.colors[1], mendukung: 'var(--cds-chart-status-critical)', tidak_dapat_ditentukan: 'var(--cds-chart-muted)' };
+    const series = stances.map((s) => ({ name: STANCE_ID[s], color: colors[s], values: weeks.map((w) => { const r = rows.find((q) => q.week === w && q.stance === s); return r ? num(r.posts) : 0; }) }));
+    lineChart(el, weeks, series, { label: weekLabel(rows) });
+    legend('lg-stance', series.map((s) => [s.color, s.name]));
+  }
+  function drawKeywords() {
+    const el = document.getElementById('ch-keywords');
+    if (!prep(el, ['keyword_weekly'])) return;
+    const rows = st('keyword_weekly').data, weeks = weeksFrom(rows);
+    const kws = [...new Set(rows.map((r) => r.keyword))];
+    const all = rows.map((r) => num(r.posts)); const maxY = d3.max(all) || 1;
+    kws.forEach((k) => {
+      const box = document.createElement('div'); box.style.minWidth = '0';
+      const h = document.createElement('div'); h.style.fontSize = 'var(--cds-font-size-caption)';
+      const vals = weeks.map((w) => { const r = rows.find((q) => q.week === w && q.keyword === k); return r ? num(r.posts) : 0; });
+      const b = document.createElement('b'); b.textContent = k; h.appendChild(b);
+      h.appendChild(document.createTextNode(` · ${fmt(d3.sum(vals))} unggahan${BASELINE.has(k) ? ' · pembanding' : ''}`));
+      box.appendChild(h);
+      const c = document.createElement('div'); c.className = 'drno-chart'; c.style.minHeight = '120px'; box.appendChild(c); el.appendChild(box);
+      const W = c.clientWidth || 240, H = 110;
+      const svg = d3.select(c).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+      const x = d3.scalePoint(weeks, [4, W - 4]), y = d3.scaleLinear([0, maxY], [H - 18, 6]);
+      svg.append('line').attr('x1', 4).attr('x2', W - 4).attr('y1', H - 18).attr('y2', H - 18).attr('stroke', 'var(--cds-chart-axis)');
+      svg.append('path').attr('fill', 'none').attr('stroke', BASELINE.has(k) ? 'var(--cds-chart-muted)' : dash.colors[0]).attr('stroke-width', 2).attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round')
+        .attr('d', d3.line().x((_, j) => x(weeks[j])).y((v) => y(v))(vals));
+      svg.append('text').attr('x', 4).attr('y', H - 4).text(weeks[0]).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg-muted)');
+      svg.append('text').attr('x', W - 4).attr('y', H - 4).attr('text-anchor', 'end').text(weeks[weeks.length - 1]).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg-muted)');
+      const T = tip(c);
+      svg.append('rect').attr('width', W).attr('height', H).attr('fill', 'transparent').on('mousemove', (ev) => {
+        const [mx, my] = d3.pointer(ev); const j = d3.leastIndex(weeks, (w) => Math.abs(x(w) - mx)); const kk = c.getBoundingClientRect().width / W;
+        T.show([line(weeks[j], 'h'), line(`${k}: ${fmt(vals[j])}`)], mx * kk, my * kk);
+      }).on('mouseleave', () => T.hide());
+    });
+  }
+  function drawCommunityContext() {
+    const el = document.getElementById('ch-comm');
+    if (!prep(el, ['community_context'])) return;
+    const rows = st('community_context').data.map((r) => ({ c: num(r.community), ctx: r.context, n: num(r.posts) }));
+    const comms = [...new Set(rows.map((r) => r.c))].sort((a, b) => a - b);
+    const ctxs = Object.keys(CTX_ID).filter((k) => rows.some((r) => r.ctx === k));
+    const colorOf = (k, i) => k === 'dukungan_kekerasan' ? 'var(--cds-chart-status-critical)' : k === 'tidak_dapat_dipastikan' ? 'var(--cds-chart-muted)' : dash.colors[i % 8];
+    const W = el.clientWidth || 500, rowH = 30, H = comms.length * rowH + 8;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+    const ll = measure(svg, comms.map((c) => `Komunitas ${c}`)) + 10;
+    const x = d3.scaleLinear([0, 1], [ll, W - 4]);
+    const T = tip(el), k = () => el.getBoundingClientRect().width / W;
+    comms.forEach((c, i) => {
+      const rs = rows.filter((r) => r.c === c), tot = d3.sum(rs, (r) => r.n); let acc = 0;
+      svg.append('text').attr('x', 0).attr('y', i * rowH + 19).text(`Komunitas ${c}`).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg)');
+      ctxs.forEach((ctx, j) => {
+        const r = rs.find((q) => q.ctx === ctx); if (!r) return; const share = r.n / tot;
+        svg.append('rect').attr('x', x(acc)).attr('y', i * rowH + 6).attr('height', 18).attr('width', Math.max(0, x(acc + share) - x(acc) - 1)).attr('fill', colorOf(ctx, j))
+          .on('mousemove', (ev) => { const [mx, my] = d3.pointer(ev, svg.node()); T.show([line(`Komunitas ${c} · ${fmt(tot)} unggahan`, 'h'), swLine(colorOf(ctx, j), `${CTX_ID[ctx]}: ${fmt(r.n)} (${pct(share)})`)], mx * k(), my * k()); })
+          .on('mouseleave', () => T.hide());
+        acc += share;
+      });
+    });
+    legend('lg-comm', ctxs.map((c, j) => [colorOf(c, j), CTX_ID[c]]));
+    el.style.minHeight = H + 'px';
+  }
+  function drawNarr() {
+    const el = document.getElementById('ch-narr');
+    if (!prep(el, ['narrative_nodes', 'narrative_edges'])) return;
+    const nodes = st('narrative_nodes').data.map((r) => ({ id: r.term, f: num(r.frequency), base: String(r.baseline) === 'True', cl: num(r.cluster) }));
+    const links = st('narrative_edges').data.map((r) => ({ source: r.source, target: r.target, w: num(r.weight) }));
+    const W = el.clientWidth || 500, H = 320;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+    const r = d3.scaleSqrt([0, d3.max(nodes, (n) => n.f)], [3, 16]);
+    const sim = d3.forceSimulation(nodes).force('link', d3.forceLink(links).id((d) => d.id).distance(55)).force('charge', d3.forceManyBody().strength(-90))
+      .force('x', d3.forceX(W / 2).strength(0.06)).force('y', d3.forceY(H / 2).strength(0.09)).force('col', d3.forceCollide((d) => r(d.f) + 2)).stop();
+    for (let i = 0; i < 300; i++) sim.tick();
+    nodes.forEach((n) => { n.x = Math.max(20, Math.min(W - 20, n.x)); n.y = Math.max(14, Math.min(H - 14, n.y)); });
+    const lw = d3.scaleLinear([1, d3.max(links, (l) => l.w) || 1], [1, 5]);
+    svg.append('g').selectAll('line').data(links).join('line').attr('x1', (d) => d.source.x).attr('y1', (d) => d.source.y).attr('x2', (d) => d.target.x).attr('y2', (d) => d.target.y)
+      .attr('stroke', 'var(--cds-chart-grid)').attr('stroke-width', (d) => lw(d.w));
+    const g = svg.append('g').selectAll('g').data(nodes).join('g').attr('transform', (d) => `translate(${d.x},${d.y})`);
+    g.append('circle').attr('r', (d) => r(d.f)).attr('fill', (d) => d.base ? 'var(--cds-chart-muted)' : dash.colors[d.cl % 8]);
+    placeLabels(svg.append('g'), nodes.slice().sort((a, b) => b.f - a.f).map((d) => ({ id: d.id, x: d.x, y: d.y, r: r(d.f), text: d.id })),
+      nodes.map((d) => ({ id: d.id, x: d.x, y: d.y, r: r(d.f) })));
+    const T = tip(el), k = () => el.getBoundingClientRect().width / W;
+    g.on('mousemove', (ev, d) => { const [mx, my] = d3.pointer(ev, svg.node()); T.show([line(d.id, 'h'), line(`Frekuensi: ${fmt(d.f)}${d.base ? ' · pembanding' : ''}`)], mx * k(), my * k()); }).on('mouseleave', () => T.hide());
+  }
+
+  // ---------- SNA Explorer ----------
+  const EMO = ['anger', 'fear', 'sadness', 'anticipation', 'joy', 'trust', 'surprise', 'disgust', 'netral'];
+  const EMO_ID = { anger: 'Anger', fear: 'Fear', sadness: 'Sadness', anticipation: 'Anticipation', joy: 'Joy', trust: 'Trust', surprise: 'Surprise', disgust: 'Disgust', netral: 'Netral' };
+  const emoColor = (e) => e === 'netral' ? 'var(--cds-chart-muted)' : dash.colors[EMO.indexOf(e) % 8];
+  const sentColor = (s) => s === 'positif' ? dash.colors[0] : s === 'negatif' ? dash.colors[3] : 'var(--cds-chart-muted)';
+  const TYPE_ID = { account: 'Account', media: 'Media', page: 'Page' };
+  const ET_ID = { reply: 'Reply', mention: 'Mention', repost: 'Repost/Quote', comment: 'Comment', comment_reply: 'Comment reply' };
+  const GLYPH = { x: 'X', youtube: 'YT', facebook: 'FB', instagram: 'IG', news: 'N' };
+  const SX = { maxN: 200, op: 55, cent: 'degree', ncol: 'sentiment', ecol: 'emotion', estyle: 'curve', range: 'all', ntypes: null, etypes: null, plats: null };
+  let sxReady = false, sxDirty = false, sxSel = null, sxHi = new Set(), sxView = null;
+
+  function sxSetupControls() {
+    if (sxReady || !allOk(['sna_nodes', 'sna_edges'])) return;
+    const N = st('sna_nodes').data, E = st('sna_edges').data;
+    const box = (id, vals, labels, key) => {
+      const el = document.getElementById(id); el.innerHTML = '';
+      SX[key] = new Set(vals);
+      vals.forEach((v) => {
+        const l = document.createElement('label'); const c = document.createElement('input'); c.type = 'checkbox'; c.checked = true;
+        c.addEventListener('change', () => { c.checked ? SX[key].add(v) : SX[key].delete(v); sxMarkDirty(); });
+        l.append(c, document.createTextNode(labels[v] || v)); el.appendChild(l);
+      });
+    };
+    box('sx-ntypes', [...new Set(N.map((n) => n.node_type))].sort(), TYPE_ID, 'ntypes');
+    box('sx-etypes', [...new Set(E.map((e) => e.type))].sort(), ET_ID, 'etypes');
+    box('sx-plats', [...new Set(E.map((e) => e.platform))].sort(), PLAT_ID, 'plats');
+    document.querySelectorAll('#sna .sx-seg').forEach((g) => {
+      const key = g.dataset.key;
+      g.querySelectorAll('button').forEach((b) => {
+        b.setAttribute('aria-pressed', String(String(SX[key]) === b.dataset.v));
+        b.addEventListener('click', () => {
+          SX[key] = b.dataset.v; g.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+          if (key === 'range' || key === 'cent') sxMarkDirty(); else sxRestyle();
+        });
+      });
+    });
+    const mx = document.getElementById('sx-max'), op = document.getElementById('sx-op');
+    mx.addEventListener('input', () => { SX.maxN = +mx.value; document.getElementById('sx-max-v').textContent = mx.value; sxMarkDirty(); });
+    op.addEventListener('input', () => { SX.op = +op.value; document.getElementById('sx-op-v').textContent = op.value + '%'; sxRestyle(); });
+    document.getElementById('sx-apply').addEventListener('click', () => { sxDirty = false; document.getElementById('sx-apply').dataset.dirty = 'false'; sxDraw(); });
+    document.getElementById('sx-search').addEventListener('input', sxTopList);
+    sxReady = true;
+  }
+  function sxMarkDirty() { sxDirty = true; document.getElementById('sx-apply').dataset.dirty = 'true'; }
+
+  function sxCompute() {
+    const N = st('sna_nodes').data, E = st('sna_edges').data;
+    const maxDay = d3.max(E, (e) => e.day);
+    let from = null;
+    if (SX.range !== 'all') { const d = new Date(maxDay); d.setUTCDate(d.getUTCDate() - (+SX.range) + 1); from = d.toISOString().slice(0, 10); }
+    const nodeById = new Map(N.map((n) => [n.node_id, n]));
+    const agg = new Map(), emo = new Map();
+    E.forEach((e) => {
+      if (from && e.day < from) return;
+      if (!SX.etypes.has(e.type) || !SX.plats.has(e.platform)) return;
+      const s = nodeById.get(e.source), t = nodeById.get(e.target); if (!s || !t) return;
+      if (!SX.ntypes.has(s.node_type) || !SX.ntypes.has(t.node_type)) return;
+      const k = e.source + '|' + e.target, c = num(e.count);
+      const a = agg.get(k) || { source: e.source, target: e.target, w: 0, emo: {}, sen: {}, plat: e.platform };
+      a.w += c; a.emo[e.emotion] = (a.emo[e.emotion] || 0) + c; a.sen[e.sentiment] = (a.sen[e.sentiment] || 0) + c; agg.set(k, a);
+      emo.set(e.emotion, (emo.get(e.emotion) || 0) + c);
+    });
+    const deg = new Map();
+    agg.forEach((l) => { deg.set(l.source, (deg.get(l.source) || 0) + l.w); deg.set(l.target, (deg.get(l.target) || 0) + l.w); });
+    const score = (n) => SX.cent === 'degree' ? (deg.get(n.node_id) || 0) : SX.cent === 'engagement' ? num(n.engagement) : num(n.betweenness);
+    const keep = new Set([...deg.keys()].map((id) => nodeById.get(id)).sort((a, b) => score(b) - score(a)).slice(0, SX.maxN).map((n) => n.node_id));
+    const links = [...agg.values()].filter((l) => keep.has(l.source) && keep.has(l.target)).map((l) => ({ ...l,
+      mainEmo: Object.entries(l.emo).sort((a, b) => b[1] - a[1])[0][0], mainSen: Object.entries(l.sen).sort((a, b) => b[1] - a[1])[0][0] }));
+    const used = new Set(links.flatMap((l) => [l.source, l.target]));
+    const nodes = [...used].map((id) => { const n = nodeById.get(id); return { id, row: n, c: num(n.community), sc: score(n), deg: deg.get(id) || 0 }; });
+    return { nodes, links, emo, from: from || d3.min(E, (e) => e.day), to: maxDay };
+  }
+
+  function sxNodeColor(d) {
+    if (SX.ncol === 'type') return d.row.node_type === 'account' ? dash.colors[1] : d.row.node_type === 'media' ? dash.colors[4] : dash.colors[5];
+    if (SX.ncol === 'cluster') return dash.colors[d.c % 8];
+    return sentColor(d.row.sentiment);
+  }
+  function sxEdgeColor(l, srcRow) {
+    if (SX.ecol === 'sentiment') return sentColor(l.mainSen);
+    if (SX.ecol === 'emotion') return emoColor(l.mainEmo);
+    if (SX.ecol === 'cluster') return dash.colors[num(srcRow.community) % 8];
+    return dash.colors[['x', 'youtube', 'facebook', 'instagram', 'news'].indexOf(l.plat) % 8];
+  }
+  function sxPath(l) {
+    const sx = l.source.x, sy = l.source.y, tx = l.target.x, ty = l.target.y;
+    if (SX.estyle === 'line') return `M${sx},${sy}L${tx},${ty}`;
+    const mx = (sx + tx) / 2, my = (sy + ty) / 2, dx = tx - sx, dy = ty - sy;
+    return `M${sx},${sy}Q${mx - dy * 0.2},${my + dx * 0.2} ${tx},${ty}`;
+  }
+  function sxLegend() {
+    let items = [];
+    if (SX.ncol === 'sentiment') items = ['positif', 'netral', 'negatif'].map((s) => [sentColor(s), `Node ${SENT_ID[s].toLowerCase()}`]);
+    if (SX.ncol === 'type') items = [[dash.colors[1], 'Account'], [dash.colors[4], 'Media'], [dash.colors[5], 'Page']];
+    if (SX.ecol === 'emotion') items = items.concat(EMO.map((e) => [emoColor(e), `Edge ${EMO_ID[e]}`]));
+    if (SX.ecol === 'channel') items = items.concat(['x', 'youtube', 'facebook'].map((p, i) => [dash.colors[i], `Edge ${PLAT_ID[p]}`]));
+    if (SX.ecol === 'sentiment' && SX.ncol !== 'sentiment') items = items.concat(['positif', 'netral', 'negatif'].map((s) => [sentColor(s), `Edge ${SENT_ID[s].toLowerCase()}`]));
+    if (SX.ncol === 'cluster' || SX.ecol === 'cluster') items.push(['var(--color-fg-muted)', 'Warna = komunitas (Louvain)']);
+    legend('sx-legend', items);
+  }
+  function sxRestyle() {
+    sxLegend();
+    if (!sxView) return;
+    const { ls, cs, nodeById } = sxView;
+    ls.attr('d', sxPath).attr('stroke', (l) => sxEdgeColor(l, nodeById.get(l.source.id))).attr('stroke-opacity', (l) => sxDim(l) ? 0.04 : SX.op / 100);
+    cs.attr('fill', sxNodeColor).attr('opacity', (d) => sxFocus() && !sxFocus().has(d.id) ? 0.15 : 1).attr('stroke', (d) => (d.id === sxSel || sxHi.has(d.id)) ? 'var(--color-fg)' : 'none');
+  }
+  function sxFocus() {
+    if (!sxView || (!sxSel && !sxHi.size)) return null;
+    const f = new Set([...sxHi, ...(sxSel ? [sxSel] : [])]);
+    sxView.links.forEach((l) => { if (f.has(l.source.id) || f.has(l.target.id)) { f.add(l.source.id); f.add(l.target.id); } });
+    return f;
+  }
+  function sxDim(l) { const f = sxFocus(); if (!f) return false; const seed = new Set([...sxHi, ...(sxSel ? [sxSel] : [])]); return !(seed.has(l.source.id) || seed.has(l.target.id)); }
+
+  function sxDraw() {
+    const el = document.getElementById('sx-graph');
+    if (!prep(el, ['sna_nodes', 'sna_edges'])) { sxView = null; return; }
+    sxSetupControls();
+    const R = sxCompute();
+    const plats = [...SX.plats].map((p) => PLAT_ID[p] || p).join(' · ');
+    document.getElementById('sx-crumb').textContent = `— Wacana radikalisasi & ekstremisme — ${plats} — ${d3.utcFormat('%d %b %Y')(new Date(R.from))} s.d. ${d3.utcFormat('%d %b %Y')(new Date(R.to))}`;
+    document.getElementById('sx-pill').textContent = isSynthetic() ? '● SINTETIS' : '● DATA NYATA';
+    const W = el.clientWidth || 800, H = 680;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('height', H).attr('viewBox', `0 0 ${W} ${H}`);
+    svg.append('text').attr('x', 10).attr('y', 18).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg-muted)')
+      .text(`${fmt(R.nodes.length)} node · ${fmt(R.links.length)} edge · ${fmt(d3.sum(R.links, (l) => l.w))} interaksi`);
+    if (!R.nodes.length) { sxView = null; sxInsight(R); return; }
+    const r = d3.scaleSqrt([0, d3.max(R.nodes, (d) => d.sc) || 1], [2, 18]);
+    const sim = d3.forceSimulation(R.nodes)
+      .force('link', d3.forceLink(R.links).id((d) => d.id).distance((l) => 18 + 4 * Math.sqrt(Math.min(l.source.deg || 1, l.target.deg || 1))).strength(0.6))
+      .force('charge', d3.forceManyBody().strength((d) => -12 - 3 * Math.sqrt(d.deg))).force('col', d3.forceCollide((d) => r(d.sc) + 1.5))
+      .force('x', d3.forceX(W / 2).strength(0.03)).force('y', d3.forceY(H / 2).strength(0.04)).stop();
+    for (let i = 0; i < 320; i++) sim.tick();
+    const z = svg.append('g');
+    svg.call(d3.zoom().scaleExtent([0.3, 8]).on('zoom', (ev) => z.attr('transform', ev.transform)));
+    const nodeById = new Map(R.nodes.map((n) => [n.id, n.row]));
+    const lw = d3.scaleLinear([1, d3.max(R.links, (l) => l.w) || 1], [0.6, 3]);
+    const ls = z.append('g').attr('fill', 'none').selectAll('path').data(R.links).join('path').attr('stroke-width', (l) => lw(l.w));
+    const cs = z.append('g').selectAll('circle').data(R.nodes).join('circle').attr('cx', (d) => d.x).attr('cy', (d) => d.y).attr('r', (d) => r(d.sc)).attr('stroke-width', 2).style('cursor', 'pointer');
+    const top = R.nodes.slice().sort((a, b) => b.sc - a.sc).slice(0, 12);
+    placeLabels(z.append('g'), top.map((d) => ({ id: d.id, x: d.x, y: d.y, r: r(d.sc), text: `${GLYPH[d.row.platform] || ''} ${d.id.length > 20 ? d.id.slice(0, 20) + '…' : d.id}` })),
+      R.nodes.filter((d) => r(d.sc) > 5).map((d) => ({ id: d.id, x: d.x, y: d.y, r: r(d.sc) })));
+    const T = tip(el), k = () => el.getBoundingClientRect().width / W;
+    cs.on('mousemove', (ev, d) => { const [mx, my] = d3.pointer(ev, svg.node()); T.show([line(d.id, 'h'), line(`${PLAT_ID[d.row.platform] || d.row.platform} · komunitas ${d.c}`), line(`Interaksi (filter): ${fmt(d.deg)}`), line(`Sentimen dominan: ${SENT_ID[d.row.sentiment] || d.row.sentiment}`)], mx * k(), my * k()); })
+      .on('mouseleave', () => T.hide())
+      .on('click', (ev, d) => { ev.stopPropagation(); sxSel = d.id; sxRestyle(); sxInsight(R); });
+    svg.on('dblclick.zoom', null).on('dblclick', () => { sxSel = null; sxHi.clear(); sxRestyle(); sxInsight(R); sxTopList(); });
+    sxView = { ls, cs, links: R.links, nodeById, R };
+    sxRestyle(); sxInsight(R); sxTopList();
+  }
+
+  function sxBars(box, counts) {
+    const tot = d3.sum(EMO, (e) => counts[e] || 0) || 1;
+    EMO.filter((e) => e !== 'netral').concat(['netral']).sort((a, b) => (counts[b] || 0) - (counts[a] || 0)).forEach((e) => {
+      const row = document.createElement('div'); row.className = 'sx-bar';
+      const n = document.createElement('span'); const sw = document.createElement('span'); sw.className = 'drno-sw'; sw.style.background = emoColor(e); n.append(sw, document.createTextNode(EMO_ID[e]));
+      const t = document.createElement('div'); t.className = 't'; const f = document.createElement('span'); f.style.width = `${100 * (counts[e] || 0) / tot}%`; f.style.background = emoColor(e); t.appendChild(f);
+      const v = document.createElement('span'); v.className = 'v'; v.textContent = d3.format('.0%')((counts[e] || 0) / tot);
+      row.append(n, t, v); box.appendChild(row);
+    });
+  }
+  function sxInsight(R) {
+    const box = document.getElementById('sx-insight'); box.innerHTML = '';
+    if (!allOk(['sna_nodes', 'sna_edges'])) { box.classList.add('dash-skeleton'); return; }
+    box.classList.remove('dash-skeleton');
+    if (!sxSel) {
+      box.append(line('Distribusi emosi interaksi pada graf terfilter', 'drno-note'));
+      sxBars(box, Object.fromEntries(R.emo));
+    } else {
+      const n = st('sna_nodes').data.find((x) => x.node_id === sxSel); if (!n) return;
+      const h = document.createElement('div'); h.style.fontWeight = 'var(--cds-font-weight-medium)'; h.style.overflowWrap = 'anywhere'; h.textContent = `${GLYPH[n.platform] || ''} ${n.node_id}`; box.appendChild(h);
+      const dl = document.createElement('dl'); dl.className = 'drno-detail'; const dlw = document.createElement('div'); dlw.className = 'drno-detail';
+      const inner = document.createElement('dl');
+      [['Platform', PLAT_ID[n.platform] || n.platform], ['Komunitas', n.community], ['Unggahan', fmt(num(n.posts))], ['Engagement', fmt(num(n.engagement))], ['In / out', `${fmt(num(n.in_degree))} / ${fmt(num(n.out_degree))}`],
+        ['Betweenness', f3(num(n.betweenness))], ['PageRank', d3.format('.4f')(num(n.pagerank))], ['Sentimen dominan', SENT_ID[n.sentiment] || n.sentiment]]
+        .forEach(([a, b]) => { const dt = document.createElement('dt'); dt.textContent = a; const dd = document.createElement('dd'); dd.textContent = b; inner.append(dt, dd); });
+      dlw.appendChild(inner); box.appendChild(dlw);
+      box.append(line('Emosi unggahan akun ini', 'drno-note'));
+      sxBars(box, Object.fromEntries(EMO.map((e) => [e, num(n['e_' + e])])));
+      if (st('sna_posts').status === 'ok') {
+        const ps = st('sna_posts').data.filter((p) => p.node_id === sxSel);
+        if (ps.length) box.append(line('Unggahan dengan engagement tertinggi', 'sx-h'));
+        ps.forEach((p) => { const d = document.createElement('div'); d.className = 'sx-post'; d.append(line(p.text), line(`${p.day} · ${fmt(num(p.engagement))} engagement · ${SENT_ID[p.sentiment] || p.sentiment} · ${EMO_ID[p.emotion] || p.emotion}`, 'm')); box.appendChild(d); });
+      }
+    }
+    const w = document.createElement('div'); w.className = 'drno-warn'; w.textContent = 'Emosi dan sentimen adalah hasil leksikon baseline; wajib divalidasi manual sebelum dikutip.'; box.appendChild(w);
+  }
+  function sxTopList() {
+    const box = document.getElementById('sx-top'); box.innerHTML = '';
+    if (!sxView) return;
+    const q = document.getElementById('sx-search').value.trim().toLowerCase();
+    const lab = { degree: 'interaksi', engagement: 'engagement', betweenness: 'betweenness' }[SX.cent];
+    const all = sxView.R.nodes.slice().sort((a, b) => b.sc - a.sc).slice(0, 50);
+    document.getElementById('sx-top-h').textContent = `Top nodes (${all.length}) · ${lab}`;
+    all.filter((d) => !q || d.id.toLowerCase().includes(q)).forEach((d) => {
+      const l = document.createElement('label'); const c = document.createElement('input'); c.type = 'checkbox'; c.checked = sxHi.has(d.id);
+      c.addEventListener('change', () => { c.checked ? sxHi.add(d.id) : sxHi.delete(d.id); sxRestyle(); });
+      const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = `${GLYPH[d.row.platform] || ''} ${d.id}`; nm.addEventListener('click', (ev) => { ev.preventDefault(); sxSel = d.id; sxRestyle(); sxInsight(sxView.R); });
+      const ct = document.createElement('span'); ct.className = 'ct'; ct.textContent = SX.cent === 'betweenness' ? f3(d.sc) : fmt(d.sc);
+      l.append(c, nm, ct); box.appendChild(l);
+    });
+  }
+  function drawSX() { sxSetupControls(); sxLegend(); sxDraw(); }
+
+  // ---------- temporal ----------
+  function drawTemporal() {
+    const a = document.getElementById('ch-size'), b = document.getElementById('ch-struct');
+    const okA = prep(a, ['temporal']); const okB = prep(b, ['temporal']);
+    if (!okA || !okB) return;
+    const rows = st('temporal').data.slice().sort((p, q) => p.week.localeCompare(q.week)), weeks = rows.map((r) => r.week), lab = weekLabel(rows);
+    const s1 = [{ name: 'Node aktif', values: rows.map((r) => num(r.n_nodes)) }, { name: 'Edge', values: rows.map((r) => num(r.n_edges)) }];
+    lineChart(a, weeks, s1, { label: lab }); legend('lg-size', s1.map((s, i) => [dash.colors[i], s.name]));
+    const s2 = [{ name: 'Density', values: rows.map((r) => num(r.density)) }, { name: 'Modularity', values: rows.map((r) => num(r.modularity)) }];
+    lineChart(b, weeks, s2, { label: lab, yfmt: d3.format('.2f') }); legend('lg-struct', s2.map((s, i) => [dash.colors[i], s.name]));
+  }
+  function drawPos() {
+    const el = document.getElementById('ch-pos');
+    if (!prep(el, ['position_change'])) return;
+    const rows = st('position_change').data, weeks = weeksFrom(rows), ids = [...new Set(rows.map((r) => r.node_id))];
+    const series = ids.map((id) => ({ name: id, values: weeks.map((w) => { const r = rows.find((q) => q.week === w && q.node_id === id); return r ? num(r.betweenness) : 0; }) }));
+    lineChart(el, weeks, series, { label: weekLabel(rows), yfmt: d3.format('.3f'), h: 300 });
+  }
+
+  // ---------- lensa teori ----------
+  function drawSH() {
+    const el = document.getElementById('ch-sh');
+    if (!prep(el, ['broker_nodes'])) return;
+    const rows = st('broker_nodes').data.filter((r) => r.constraint !== '' && r.effective_size !== '').map((r) => ({ id: r.node_id, c: num(r.community), x: num(r.effective_size), y: num(r.constraint), t: num(r.total) }));
+    const W = el.clientWidth || 500, H = 280;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+    const y = d3.scaleLinear([0, d3.max(rows, (r) => r.y) * 1.05], [H - 34, 10]).nice();
+    const yl = measure(svg, y.ticks(5).map(d3.format('.2f'))) + 10;
+    const x = d3.scaleLinear([0, d3.max(rows, (r) => r.x) * 1.05], [yl + 4, W - 10]).nice();
+    const gy = svg.append('g').attr('transform', `translate(${yl},0)`).call(d3.axisLeft(y).ticks(5).tickFormat(d3.format('.2f')).tickSize(-(W - yl - 10))); axisStyle(gy); gy.select('.domain').remove();
+    const gx = svg.append('g').attr('transform', `translate(0,${H - 34})`).call(d3.axisBottom(x).ticks(6).tickSize(0).tickPadding(8)); axisStyle(gx);
+    svg.append('text').attr('x', W - 10).attr('y', H - 4).attr('text-anchor', 'end').text('effective size →').style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg-muted)');
+    svg.append('text').attr('x', yl + 6).attr('y', 20).text('↑ constraint').style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg-muted)');
+    const r = d3.scaleSqrt([0, d3.max(rows, (d) => d.t) || 1], [2.5, 11]);
+    const T = tip(el), k = () => el.getBoundingClientRect().width / W;
+    svg.append('g').selectAll('circle').data(rows).join('circle').attr('cx', (d) => x(d.x)).attr('cy', (d) => y(d.y)).attr('r', (d) => r(d.t))
+      .attr('fill', (d) => dash.colors[d.c % 8]).attr('fill-opacity', 0.75)
+      .on('mousemove', (ev, d) => { const [mx, my] = d3.pointer(ev, svg.node()); T.show([line(d.id, 'h'), swLine(dash.colors[d.c % 8], `Komunitas ${d.c}`), line(`Constraint ${f3(d.y)} · effective size ${d3.format('.2f')(d.x)}`), line(`Triad brokerage: ${fmt(d.t)}`)], mx * k(), my * k()); })
+      .on('mouseleave', () => T.hide());
+    el.style.minHeight = H + 'px';
+  }
+  function drawBrokerTable() {
+    const tb = document.querySelector('#tb-broker tbody'); tb.innerHTML = '';
+    if (st('broker_nodes').status !== 'ok') return;
+    st('broker_nodes').data.slice().sort((a, b) => num(b.total) - num(a.total)).slice(0, 12).forEach((n) => {
+      const tr = document.createElement('tr');
+      [[n.node_id], [n.community, 1], [n.constraint === '' ? '—' : f3(num(n.constraint)), 1], [n.effective_size === '' ? '—' : d3.format('.2f')(num(n.effective_size)), 1],
+        ...['coordinator', 'itinerant', 'gatekeeper', 'representative', 'liaison', 'total'].map((f) => [fmt(num(n[f])), 1])]
+        .forEach(([v, isNum]) => { const td = document.createElement('td'); td.textContent = v; if (isNum) td.className = 'n'; tr.appendChild(td); });
+      tb.appendChild(tr);
+    });
+  }
+  function drawWeak() {
+    const el = document.getElementById('ch-weak');
+    if (!prep(el, ['tie_summary'])) return;
+    const rows = st('tie_summary').data.map((r) => ({ t: r.tie_type, s: num(r.weak_share), n: num(r.ties), w: num(r.weak) }));
+    const W = el.clientWidth || 500, rowH = 46, H = rows.length * rowH + 30;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+    const ll = measure(svg, rows.map((r) => r.t)) + 10, vl = measure(svg, ['100,0%']) + 8;
+    const x = d3.scaleLinear([0, 1], [ll, W - vl]);
+    const gx = svg.append('g').attr('transform', `translate(0,${H - 22})`).call(d3.axisBottom(x).ticks(4).tickFormat(d3.format('.0%')).tickSize(-(H - 30))); axisStyle(gx); gx.select('.domain').remove();
+    rows.forEach((r, i) => {
+      const yy = i * rowH + 8;
+      svg.append('text').attr('x', 0).attr('y', yy + 15).text(r.t).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg)');
+      svg.append('text').attr('x', 0).attr('y', yy + 30).text(`${fmt(r.w)} lemah dari ${fmt(r.n)} ikatan`).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg-muted)');
+      svg.append('rect').attr('x', ll).attr('y', yy + 4).attr('height', 22).attr('rx', 4).attr('width', Math.max(2, x(r.s) - ll)).attr('fill', i === 0 ? dash.colors[0] : 'var(--cds-chart-muted)');
+      svg.append('text').attr('x', x(r.s) + 6).attr('y', yy + 20).text(pct(r.s)).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg-muted)');
+    });
+    el.style.minHeight = H + 'px';
+  }
+  function drawEI() {
+    const el = document.getElementById('ch-ei');
+    if (!prep(el, ['homophily'])) return;
+    const rows = st('homophily').data.map((r) => ({ a: r.attribute, o: num(r.ei_observed), lo: num(r.ei_null_low), hi: num(r.ei_null_high), m: num(r.ei_null_mean), p: num(r.p_value), as: r.assortativity === '' ? null : num(r.assortativity) }));
+    const W = el.clientWidth || 500, rowH = 58, H = rows.length * rowH + 34;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+    const ll = measure(svg, rows.map((r) => r.a)) + 14;
+    const x = d3.scaleLinear([-1, 1], [ll, W - 12]);
+    const gx = svg.append('g').attr('transform', `translate(0,${H - 22})`).call(d3.axisBottom(x).ticks(5).tickFormat(d3.format('.1f')).tickSize(-(H - 30))); axisStyle(gx); gx.select('.domain').remove();
+    svg.append('line').attr('x1', x(0)).attr('x2', x(0)).attr('y1', 4).attr('y2', H - 22).attr('stroke', 'var(--cds-chart-reference)').attr('stroke-dasharray', '4,3');
+    rows.forEach((r, i) => {
+      const yy = i * rowH + 18;
+      svg.append('text').attr('x', 0).attr('y', yy + 4).text(r.a).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg)');
+      svg.append('rect').attr('x', x(r.lo)).attr('y', yy - 8).attr('width', Math.max(2, x(r.hi) - x(r.lo))).attr('height', 16).attr('rx', 4).attr('fill', 'var(--cds-chart-muted)').attr('opacity', 0.6);
+      svg.append('circle').attr('cx', x(r.o)).attr('cy', yy).attr('r', 6).attr('fill', dash.colors[0]);
+      svg.append('text').attr('x', ll).attr('y', yy + 24).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg-muted)')
+        .text(`teramati ${d3.format('.2f')(r.o)} · acak ${d3.format('.2f')(r.lo)} s.d. ${d3.format('.2f')(r.hi)} · p ${r.p < 0.002 ? '< 0,002' : d3.format('.3f')(r.p)}${r.as !== null ? ' · assortativity ' + d3.format('.2f')(r.as) : ''}`);
+    });
+    el.style.minHeight = H + 'px';
+  }
+  function drawMix() {
+    const el = document.getElementById('ch-mix');
+    if (!prep(el, ['mixing_stance'])) return;
+    const rows = st('mixing_stance').data.map((r) => ({ s: r.source_attr, t: r.target_attr, n: num(r.ties) }));
+    const labs = [...new Set(rows.flatMap((r) => [r.s, r.t]))];
+    const name = (k) => STANCE_ID[k] || (k === 'tidak_cukup_data' ? 'Data tak cukup' : k);
+    const W = el.clientWidth || 500;
+    const svg0 = d3.select(el).append('svg').attr('width', '100%');
+    const ll = measure(svg0, labs.map(name)) + 10; const cell = Math.min(70, (W - ll - 10) / labs.length), H = ll * 0 + cell * labs.length + 40;
+    svg0.attr('viewBox', `0 0 ${W} ${H}`);
+    const c = d3.scaleSqrt([0, d3.max(rows, (r) => r.n) || 1], [0.08, 1]);
+    const T = tip(el), k = () => el.getBoundingClientRect().width / W;
+    labs.forEach((a, i) => {
+      svg0.append('text').attr('x', ll - 6).attr('y', 34 + i * cell + cell / 2 + 4).attr('text-anchor', 'end').text(name(a)).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg)');
+      svg0.append('text').attr('x', ll + i * cell + cell / 2).attr('y', 22).attr('text-anchor', 'middle').text(name(a).split(' ')[0]).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg-muted)');
+      labs.forEach((b, j) => {
+        const r = rows.find((q) => q.s === a && q.t === b); const n = r ? r.n : 0;
+        svg0.append('rect').attr('x', ll + j * cell + 1).attr('y', 30 + i * cell + 1).attr('width', cell - 2).attr('height', cell - 2).attr('rx', 4)
+          .attr('fill', dash.colors[0]).attr('fill-opacity', n ? c(n) : 0.04)
+          .on('mousemove', (ev) => { const [mx, my] = d3.pointer(ev, svg0.node()); T.show([line(`${name(a)} → ${name(b)}`, 'h'), line(`${fmt(n)} interaksi`)], mx * k(), my * k()); })
+          .on('mouseleave', () => T.hide());
+        svg0.append('text').attr('x', ll + j * cell + cell / 2).attr('y', 30 + i * cell + cell / 2 + 4).attr('text-anchor', 'middle').text(fmt(n)).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg)').style('pointer-events', 'none');
+      });
+    });
+    el.style.minHeight = H + 'px';
+  }
+  function drawIdentity() {
+    const el = document.getElementById('ch-id');
+    if (!prep(el, ['identity_markers'])) return;
+    const rows = st('identity_markers').data.map((r) => ({ c: `Kom. ${r.community}`, i: num(r.in_group_per_1k), o: num(r.out_group_per_1k), p: num(r.posts) }));
+    const W = el.clientWidth || 600, H = 240;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+    const y = d3.scaleLinear([0, d3.max(rows, (r) => Math.max(r.i, r.o)) * 1.1 || 1], [H - 28, 10]).nice();
+    const yl = measure(svg, y.ticks(5).map(d3.format('.0f'))) + 10;
+    const x0 = d3.scaleBand(rows.map((r) => r.c), [yl + 4, W - 6]).padding(0.25), x1 = d3.scaleBand(['i', 'o'], [0, x0.bandwidth()]).padding(0.1);
+    const gy = svg.append('g').attr('transform', `translate(${yl},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(W - yl - 6))); axisStyle(gy); gy.select('.domain').remove();
+    const gx = svg.append('g').attr('transform', `translate(0,${H - 28})`).call(d3.axisBottom(x0).tickSize(0).tickPadding(8)); axisStyle(gx);
+    const T = tip(el), k = () => el.getBoundingClientRect().width / W;
+    rows.forEach((r) => {
+      [['i', r.i, dash.colors[0]], ['o', r.o, dash.colors[3]]].forEach(([key, v, col]) => {
+        svg.append('rect').attr('x', x0(r.c) + x1(key)).attr('width', x1.bandwidth()).attr('y', y(v)).attr('height', Math.max(0, y(0) - y(v))).attr('rx', 3).attr('fill', col)
+          .on('mousemove', (ev) => { const [mx, my] = d3.pointer(ev, svg.node()); T.show([line(`${r.c} · ${fmt(r.p)} unggahan`, 'h'), swLine(dash.colors[0], `In-group: ${d3.format('.1f')(r.i)} per 1.000 kata`), swLine(dash.colors[3], `Out-group: ${d3.format('.1f')(r.o)} per 1.000 kata`)], mx * k(), my * k()); })
+          .on('mouseleave', () => T.hide());
+      });
+    });
+    legend('lg-id', [[dash.colors[0], 'In-group (kami, kita)'], [dash.colors[3], 'Out-group (mereka, kalian)']]);
+  }
+  function drawTheory() { drawSH(); drawWeak(); drawBrokerTable(); drawEI(); drawMix(); drawIdentity(); }
+
+  // ---------- tabs ----------
+  function drawCurrent() {
+    drawKPIs(); drawBanner();
+    if (current === 'overview') drawWeekly();
+    if (current === 'platform') drawPlatform();
+    if (current === 'narasi') { drawContext(); drawStance(); drawKeywords(); drawCommunityContext(); drawNarr(); }
+    if (current === 'sna') drawSX();
+    if (current === 'temporal') { drawTemporal(); drawPos(); }
+    if (current === 'teori') drawTheory();
+  }
+  root.querySelectorAll('.drno-tab').forEach((b) => b.addEventListener('click', () => {
+    current = b.dataset.tab;
+    root.querySelectorAll('.drno-tab').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+    root.querySelectorAll('.drno-page').forEach((p) => p.classList.toggle('on', p.id === current));
+    dash.setLink(current);
+    drawCurrent();
+  }));
+  const startTab = location.hash.slice(1);
+  if (['overview', 'platform', 'narasi', 'sna', 'temporal', 'teori', 'metode'].includes(startTab)) { const b = root.querySelector(`.drno-tab[data-tab="${startTab}"]`); if (b) b.click(); }
+  dash.onData(drawCurrent);
+})();
+</script>

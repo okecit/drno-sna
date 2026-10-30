@@ -1,0 +1,9 @@
+# Web server mode login (PHP + Apache, .htaccess aktif). TLS ditangani Caddy di depannya.
+FROM php:8.3-apache-bookworm
+RUN a2enmod rewrite headers remoteip \
+ && sed -ri 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf \
+ && printf 'ServerTokens Prod\nServerSignature Off\nTraceEnable Off\nRemoteIPHeader X-Forwarded-For\nRemoteIPInternalProxy 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16\n' > /etc/apache2/conf-enabled/zz-drno.conf \
+ && mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+ && printf 'expose_php=Off\nsession.cookie_httponly=1\nsession.use_strict_mode=1\nsession.gc_maxlifetime=43200\ndate.timezone=Asia/Jakarta\n' > "$PHP_INI_DIR/conf.d/zz-drno.ini"
+# Folder private/ (akun, log, kunci percobaan) harus bisa ditulis PHP
+CMD ["bash", "-c", "mkdir -p /var/www/html/private && chown www-data:www-data /var/www/html/private && exec apache2-foreground"]

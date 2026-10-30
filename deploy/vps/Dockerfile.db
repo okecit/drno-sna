@@ -1,0 +1,5 @@
+FROM postgres:16.4-bookworm
+
+# Salin schema ke image agar initdb tidak bergantung pada mode file host
+# (arsip yang dibuat di Windows dapat menghasilkan permission berbeda).
+COPY --chmod=0444 db/schema.sql /docker-entrypoint-initdb.d/01_schema.sql

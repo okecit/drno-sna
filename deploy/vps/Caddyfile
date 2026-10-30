@@ -1,0 +1,32 @@
+# LEGACY / TIDAK DIPAKAI PADA VPS 103.247.8.105.
+# VPS tersebut sudah memakai Nginx dan Certbot untuk Directus serta drno.site.
+# Berkas ini dipertahankan hanya sebagai referensi paket upstream. Jangan menjalankan
+# service Caddy bersamaan dengan Nginx karena keduanya memakai port 80 dan 443.
+{
+	email {$DRNO_ACME_EMAIL}
+	servers {
+		trusted_proxies static private_ranges
+	}
+}
+
+{$DRNO_DOMAIN} {
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Robots-Tag "noindex, nofollow"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		Permissions-Policy "geolocation=(), camera=(), microphone=()"
+		-Server
+	}
+	request_body {
+		max_size 64KB
+	}
+	reverse_proxy web:80 {
+		header_up X-Forwarded-Proto {scheme}
+	}
+	log {
+		output stdout
+		format console
+	}
+}

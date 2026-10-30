@@ -1,0 +1,382 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d11" for="edge" attr.name="weight" attr.type="long"/>
+<key id="d10" for="node" attr.name="community" attr.type="long"/>
+<key id="d9" for="node" attr.name="pagerank" attr.type="double"/>
+<key id="d8" for="node" attr.name="eigenvector" attr.type="double"/>
+<key id="d7" for="node" attr.name="closeness" attr.type="double"/>
+<key id="d6" for="node" attr.name="betweenness" attr.type="double"/>
+<key id="d5" for="node" attr.name="out_degree" attr.type="long"/>
+<key id="d4" for="node" attr.name="in_degree" attr.type="long"/>
+<key id="d3" for="node" attr.name="degree" attr.type="double"/>
+<key id="d2" for="node" attr.name="frequency" attr.type="long"/>
+<key id="d1" for="graph" attr.name="community_algorithm" attr.type="string"/>
+<key id="d0" for="graph" attr.name="kind" attr.type="string"/>
+<graph edgedefault="undirected"><data key="d0">narrative_cooccurrence</data>
+<data key="d1">louvain</data>
+<node id="jaringan terorisme">
+  <data key="d2">123</data>
+  <data key="d3">0.03846</data>
+  <data key="d4">1</data>
+  <data key="d5">1</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.08791</data>
+  <data key="d8">1e-05</data>
+  <data key="d9">0.016954</data>
+  <data key="d10">0</data>
+</node>
+<node id="terorisme">
+  <data key="d2">917</data>
+  <data key="d3">0.15385</data>
+  <data key="d4">4</data>
+  <data key="d5">4</data>
+  <data key="d6">0.01846</data>
+  <data key="d7">0.15385</data>
+  <data key="d8">1e-05</data>
+  <data key="d9">0.088084</data>
+  <data key="d10">0</data>
+</node>
+<node id="pendanaan terorisme">
+  <data key="d2">123</data>
+  <data key="d3">0.03846</data>
+  <data key="d4">1</data>
+  <data key="d5">1</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.08791</data>
+  <data key="d8">1e-05</data>
+  <data key="d9">0.016954</data>
+  <data key="d10">0</data>
+</node>
+<node id="jihad">
+  <data key="d2">234</data>
+  <data key="d3">0.07692</data>
+  <data key="d4">2</data>
+  <data key="d5">2</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.14497</data>
+  <data key="d8">0.36903</data>
+  <data key="d9">0.029689</data>
+  <data key="d10">2</data>
+</node>
+<node id="kontra-narasi">
+  <data key="d2">463</data>
+  <data key="d3">0.15385</data>
+  <data key="d4">4</data>
+  <data key="d5">4</data>
+  <data key="d6">0.03077</data>
+  <data key="d7">0.17133</data>
+  <data key="d8">0.51461</data>
+  <data key="d9">0.055881</data>
+  <data key="d10">2</data>
+</node>
+<node id="moderasi beragama">
+  <data key="d2">448</data>
+  <data key="d3">0.15385</data>
+  <data key="d4">4</data>
+  <data key="d5">4</data>
+  <data key="d6">0.03692</data>
+  <data key="d7">0.18846</data>
+  <data key="d8">0.50879</data>
+  <data key="d9">0.054645</data>
+  <data key="d10">1</data>
+</node>
+<node id="propaganda terorisme">
+  <data key="d2">112</data>
+  <data key="d3">0.03846</data>
+  <data key="d4">1</data>
+  <data key="d5">1</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.08791</data>
+  <data key="d8">0.0</data>
+  <data key="d9">0.015935</data>
+  <data key="d10">0</data>
+</node>
+<node id="tauhid">
+  <data key="d2">478</data>
+  <data key="d3">0.11538</data>
+  <data key="d4">3</data>
+  <data key="d5">3</data>
+  <data key="d6">0.01846</data>
+  <data key="d7">0.14497</data>
+  <data key="d8">0.30744</data>
+  <data key="d9">0.046433</data>
+  <data key="d10">1</data>
+</node>
+<node id="toleransi">
+  <data key="d2">214</data>
+  <data key="d3">0.07692</data>
+  <data key="d4">2</data>
+  <data key="d5">2</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.13462</data>
+  <data key="d8">0.26917</data>
+  <data key="d9">0.028855</data>
+  <data key="d10">1</data>
+</node>
+<node id="legitimasi kekerasan">
+  <data key="d2">229</data>
+  <data key="d3">0.07692</data>
+  <data key="d4">2</data>
+  <data key="d5">2</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.11779</data>
+  <data key="d8">0.28063</data>
+  <data key="d9">0.03009</data>
+  <data key="d10">2</data>
+</node>
+<node id="propaganda digital">
+  <data key="d2">229</data>
+  <data key="d3">0.07692</data>
+  <data key="d4">2</data>
+  <data key="d5">2</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.11779</data>
+  <data key="d8">0.28063</data>
+  <data key="d9">0.03009</data>
+  <data key="d10">2</data>
+</node>
+<node id="demokrasi">
+  <data key="d2">238</data>
+  <data key="d3">0.03846</data>
+  <data key="d4">1</data>
+  <data key="d5">1</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.05128</data>
+  <data key="d8">0.0</data>
+  <data key="d9">0.039836</data>
+  <data key="d10">3</data>
+</node>
+<node id="polarisasi ideologis">
+  <data key="d2">319</data>
+  <data key="d3">0.07692</data>
+  <data key="d4">2</data>
+  <data key="d5">2</data>
+  <data key="d6">0.00308</data>
+  <data key="d7">0.07692</data>
+  <data key="d8">0.0</data>
+  <data key="d9">0.054053</data>
+  <data key="d10">3</data>
+</node>
+<node id="ekstremisme">
+  <data key="d2">83</data>
+  <data key="d3">0.07692</data>
+  <data key="d4">2</data>
+  <data key="d5">2</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.07692</data>
+  <data key="d8">0.0</data>
+  <data key="d9">0.037037</data>
+  <data key="d10">4</data>
+</node>
+<node id="ekstremisme kekerasan">
+  <data key="d2">83</data>
+  <data key="d3">0.07692</data>
+  <data key="d4">2</data>
+  <data key="d5">2</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.07692</data>
+  <data key="d8">0.0</data>
+  <data key="d9">0.037037</data>
+  <data key="d10">4</data>
+</node>
+<node id="radikalisasi">
+  <data key="d2">83</data>
+  <data key="d3">0.07692</data>
+  <data key="d4">2</data>
+  <data key="d5">2</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.07692</data>
+  <data key="d8">0.0</data>
+  <data key="d9">0.037037</data>
+  <data key="d10">4</data>
+</node>
+<node id="kontra terorisme">
+  <data key="d2">450</data>
+  <data key="d3">0.03846</data>
+  <data key="d4">1</data>
+  <data key="d5">1</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.08791</data>
+  <data key="d8">2e-05</data>
+  <data key="d9">0.047258</data>
+  <data key="d10">0</data>
+</node>
+<node id="identitas kelompok">
+  <data key="d2">81</data>
+  <data key="d3">0.03846</data>
+  <data key="d4">1</data>
+  <data key="d5">1</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.05128</data>
+  <data key="d8">0.0</data>
+  <data key="d9">0.017222</data>
+  <data key="d10">3</data>
+</node>
+<node id="hakimiyah">
+  <data key="d2">106</data>
+  <data key="d3">0.03846</data>
+  <data key="d4">1</data>
+  <data key="d5">1</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.03846</data>
+  <data key="d8">0.0</data>
+  <data key="d9">0.037037</data>
+  <data key="d10">5</data>
+</node>
+<node id="khilafah">
+  <data key="d2">360</data>
+  <data key="d3">0.03846</data>
+  <data key="d4">1</data>
+  <data key="d5">1</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.03846</data>
+  <data key="d8">0.0</data>
+  <data key="d9">0.037037</data>
+  <data key="d10">5</data>
+</node>
+<node id="hijrah">
+  <data key="d2">584</data>
+  <data key="d3">0.03846</data>
+  <data key="d4">1</data>
+  <data key="d5">1</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.03846</data>
+  <data key="d8">0.0</data>
+  <data key="d9">0.037037</data>
+  <data key="d10">6</data>
+</node>
+<node id="kaffah">
+  <data key="d2">309</data>
+  <data key="d3">0.03846</data>
+  <data key="d4">1</data>
+  <data key="d5">1</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.03846</data>
+  <data key="d8">0.0</data>
+  <data key="d9">0.037037</data>
+  <data key="d10">6</data>
+</node>
+<node id="dakwah">
+  <data key="d2">264</data>
+  <data key="d3">0.03846</data>
+  <data key="d4">1</data>
+  <data key="d5">1</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.09919</data>
+  <data key="d8">0.12507</data>
+  <data key="d9">0.020613</data>
+  <data key="d10">1</data>
+</node>
+<node id="daulah">
+  <data key="d2">21</data>
+  <data key="d3">0.03846</data>
+  <data key="d4">1</data>
+  <data key="d5">1</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.03846</data>
+  <data key="d8">0.0</data>
+  <data key="d9">0.037037</data>
+  <data key="d10">7</data>
+</node>
+<node id="thaghut">
+  <data key="d2">21</data>
+  <data key="d3">0.03846</data>
+  <data key="d4">1</data>
+  <data key="d5">1</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.03846</data>
+  <data key="d8">0.0</data>
+  <data key="d9">0.037037</data>
+  <data key="d10">7</data>
+</node>
+<node id="jahiliyah">
+  <data key="d2">30</data>
+  <data key="d3">0.03846</data>
+  <data key="d4">1</data>
+  <data key="d5">1</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.03846</data>
+  <data key="d8">0.0</data>
+  <data key="d9">0.037037</data>
+  <data key="d10">8</data>
+</node>
+<node id="takfir">
+  <data key="d2">30</data>
+  <data key="d3">0.03846</data>
+  <data key="d4">1</data>
+  <data key="d5">1</data>
+  <data key="d6">0.0</data>
+  <data key="d7">0.03846</data>
+  <data key="d8">0.0</data>
+  <data key="d9">0.037037</data>
+  <data key="d10">8</data>
+</node>
+<edge source="jaringan terorisme" target="terorisme">
+  <data key="d11">123</data>
+</edge>
+<edge source="terorisme" target="pendanaan terorisme">
+  <data key="d11">123</data>
+</edge>
+<edge source="terorisme" target="propaganda terorisme">
+  <data key="d11">112</data>
+</edge>
+<edge source="terorisme" target="kontra terorisme">
+  <data key="d11">450</data>
+</edge>
+<edge source="jihad" target="kontra-narasi">
+  <data key="d11">234</data>
+</edge>
+<edge source="jihad" target="moderasi beragama">
+  <data key="d11">234</data>
+</edge>
+<edge source="kontra-narasi" target="moderasi beragama">
+  <data key="d11">234</data>
+</edge>
+<edge source="kontra-narasi" target="legitimasi kekerasan">
+  <data key="d11">229</data>
+</edge>
+<edge source="kontra-narasi" target="propaganda digital">
+  <data key="d11">229</data>
+</edge>
+<edge source="moderasi beragama" target="tauhid">
+  <data key="d11">214</data>
+</edge>
+<edge source="moderasi beragama" target="toleransi">
+  <data key="d11">214</data>
+</edge>
+<edge source="tauhid" target="toleransi">
+  <data key="d11">214</data>
+</edge>
+<edge source="tauhid" target="dakwah">
+  <data key="d11">264</data>
+</edge>
+<edge source="legitimasi kekerasan" target="propaganda digital">
+  <data key="d11">229</data>
+</edge>
+<edge source="demokrasi" target="polarisasi ideologis">
+  <data key="d11">238</data>
+</edge>
+<edge source="polarisasi ideologis" target="identitas kelompok">
+  <data key="d11">81</data>
+</edge>
+<edge source="ekstremisme" target="ekstremisme kekerasan">
+  <data key="d11">83</data>
+</edge>
+<edge source="ekstremisme" target="radikalisasi">
+  <data key="d11">83</data>
+</edge>
+<edge source="ekstremisme kekerasan" target="radikalisasi">
+  <data key="d11">83</data>
+</edge>
+<edge source="hakimiyah" target="khilafah">
+  <data key="d11">106</data>
+</edge>
+<edge source="hijrah" target="kaffah">
+  <data key="d11">309</data>
+</edge>
+<edge source="daulah" target="thaghut">
+  <data key="d11">21</data>
+</edge>
+<edge source="jahiliyah" target="takfir">
+  <data key="d11">30</data>
+</edge>
+</graph></graphml>

@@ -1,0 +1,23 @@
+# Rahasia dan konfigurasi produksi
+.env
+.env.*
+!.env.example
+config/sources.json
+backups/
+
+# Data/runtime yang tidak boleh masuk repo
+private/
+deploy/dist/
+*.dump
+*.tgz
+*.tar.gz
+
+# Python dan editor
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.idea/
+.vscode/
+.DS_Store

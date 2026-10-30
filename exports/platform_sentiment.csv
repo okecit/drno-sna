@@ -1,0 +1,16 @@
+platform,sentiment,posts
+facebook,negatif,581
+facebook,netral,205
+facebook,positif,144
+instagram,negatif,32
+instagram,netral,209
+instagram,positif,514
+news,negatif,16
+news,netral,191
+news,positif,110
+x,negatif,536
+x,netral,241
+x,positif,425
+youtube,negatif,18
+youtube,netral,187
+youtube,positif,228

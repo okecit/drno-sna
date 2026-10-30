@@ -1,0 +1,3 @@
+attribute,ei_observed,external_ties,internal_ties,ei_null_low,ei_null_mean,ei_null_high,p_value,assortativity,labelled_nodes,n_perm
+stance,-0.843,84,986,-0.0542,0.0201,0.086,0.0,0.8349,197,500
+konteks,-0.7121,153,910,0.5616,0.6113,0.6519,0.0,0.8131,196,500

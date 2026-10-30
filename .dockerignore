@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+backups/
+data/
+exports_real/
+deploy/dist/
+**/__pycache__/
+**/.pytest_cache/
+*.zip
+logs/

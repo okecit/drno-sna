@@ -1,0 +1,43 @@
+# ===== DRNO (mode login PHP) — Apache / LiteSpeed (cPanel) =====
+DirectoryIndex index.php
+Options -Indexes
+
+# Folder internal tidak boleh diakses langsung dari browser
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^(private|inc|data)(/|$) - [F,L]
+  # Paksa HTTPS — aktifkan (hapus #) setelah SSL terpasang (cPanel > SSL/TLS Status > Run AutoSSL)
+  # RewriteCond %{HTTPS} !=on
+  # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# Berkas sensitif
+<FilesMatch "(^\.env|\.jsonl$|\.py$|\.sql$|\.tsv$|\.txt$|\.html$)">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+<Files "robots.txt">
+  <IfModule mod_authz_core.c>
+    Require all granted
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Allow from all
+  </IfModule>
+</Files>
+
+<IfModule mod_headers.c>
+  Header set X-Robots-Tag "noindex, nofollow"
+  Header set X-Content-Type-Options "nosniff"
+  <FilesMatch "\.(js|css)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+</IfModule>
+<IfModule mod_mime.c>
+  AddType application/javascript .js
+  AddDefaultCharset UTF-8
+</IfModule>

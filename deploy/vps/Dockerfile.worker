@@ -1,0 +1,20 @@
+FROM python:3.12-slim-bookworm
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+WORKDIR /app
+COPY backend/requirements.txt backend/requirements.txt
+# Paket NLP berat tidak dipasang di worker produksi (klasifikasi baseline). Tambahkan bila memakai model Transformer.
+RUN grep -v -E "transformers|sentence-transformers|bertopic|spacy|igraph|leidenalg|pytest|uvicorn|fastapi" backend/requirements.txt > /tmp/req.txt \
+ && ok=0 \
+ && for attempt in 1 2 3; do \
+      pip install --no-cache-dir --retries 10 --timeout 120 -r /tmp/req.txt \
+        && ok=1 && break; \
+      echo "pip gagal/unduhan terpotong; percobaan ulang ${attempt}/3" >&2; \
+      sleep $((attempt * 3)); \
+    done \
+ && [ "$ok" = 1 ]
+COPY backend/drno backend/drno
+COPY scripts scripts
+COPY deploy/static-site deploy/static-site
+COPY exports exports
+COPY deploy/vps/worker_loop.sh /worker_loop.sh
+CMD ["bash", "/worker_loop.sh"]

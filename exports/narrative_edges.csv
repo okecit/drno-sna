@@ -1,0 +1,24 @@
+source,target,weight
+jaringan terorisme,terorisme,123
+terorisme,pendanaan terorisme,123
+terorisme,propaganda terorisme,112
+terorisme,kontra terorisme,450
+jihad,kontra-narasi,234
+jihad,moderasi beragama,234
+kontra-narasi,moderasi beragama,234
+kontra-narasi,legitimasi kekerasan,229
+kontra-narasi,propaganda digital,229
+moderasi beragama,tauhid,214
+moderasi beragama,toleransi,214
+tauhid,toleransi,214
+tauhid,dakwah,264
+legitimasi kekerasan,propaganda digital,229
+demokrasi,polarisasi ideologis,238
+polarisasi ideologis,identitas kelompok,81
+ekstremisme,ekstremisme kekerasan,83
+ekstremisme,radikalisasi,83
+ekstremisme kekerasan,radikalisasi,83
+hakimiyah,khilafah,106
+hijrah,kaffah,309
+daulah,thaghut,21
+jahiliyah,takfir,30

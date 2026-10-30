@@ -1,0 +1,27 @@
+{
+  "_petunjuk": [
+    "Salin menjadi config/sources.json, lalu aktifkan (enabled: true) HANYA sumber yang ketentuan penggunaannya sudah Anda baca.",
+    "legal_basis wajib: ringkas dasar izin (mis. 'robots.txt mengizinkan; ToS tidak melarang pengumpulan untuk riset non-komersial; persetujuan etik No. ...').",
+    "Utamakan sitemaps (sitemap berita) karena disediakan situs untuk mesin. listing_urls + link_pattern dipakai bila sitemap tidak ada.",
+    "Opsi penyamaran/penembusan (stealth, impersonate, solve_cloudflare, proxy) DITOLAK oleh sistem."
+  ],
+  "sources": [
+    {
+      "name": "Contoh Portal Berita A",
+      "enabled": false,
+      "legal_basis": "",
+      "sitemaps": ["https://www.contoh-portal-a.co.id/sitemap-news.xml"],
+      "body_selector": "article p",
+      "max_articles": 50
+    },
+    {
+      "name": "Contoh Situs Lembaga B",
+      "enabled": false,
+      "legal_basis": "",
+      "listing_urls": ["https://www.contoh-lembaga-b.go.id/berita"],
+      "link_pattern": "/berita/\\d{4}/",
+      "body_selector": ".content p",
+      "max_articles": 30
+    }
+  ]
+}

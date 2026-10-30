@@ -1,0 +1,10 @@
+source_attr,target_attr,ties
+menolak,menolak,375
+menolak,netral,44
+menolak,tidak_dapat_ditentukan,7
+netral,menolak,21
+netral,netral,761
+netral,tidak_dapat_ditentukan,10
+tidak_dapat_ditentukan,menolak,1
+tidak_dapat_ditentukan,netral,1
+tidak_dapat_ditentukan,tidak_dapat_ditentukan,37
