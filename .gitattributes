@@ -1,0 +1,8 @@
+# Pertahankan byte CSV produksi (CRLF) agar sama dengan rilis VPS.
+*.csv -text
+
+# Skrip dan konfigurasi container harus tetap LF saat digunakan di Linux.
+*.sh text eol=lf
+Dockerfile* text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
