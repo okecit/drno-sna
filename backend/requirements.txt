@@ -2,6 +2,8 @@ fastapi>=0.110
 uvicorn[standard]>=0.29
 httpx>=0.27
 networkx>=3.2
+# networkx.pagerank memakai scipy; wajib di worker produksi
+scipy>=1.11
 pandas>=2.1
 psycopg[binary]>=3.1
 sqlalchemy>=2.0
