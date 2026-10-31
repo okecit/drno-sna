@@ -6,7 +6,12 @@
 .drno-banner { border: 1px solid var(--color-warn); color: var(--color-warn); border-radius: var(--cds-radius); padding: var(--cds-pad-sm) var(--cds-pad-md); font-size: var(--cds-font-size-caption); font-weight: var(--cds-font-weight-medium); }
 .drno-tabs { display: flex; gap: var(--cds-gap-xs); flex-wrap: wrap; border-bottom: 1px solid var(--color-border-line); }
 .drno-tab { background: none; border: none; border-bottom: 2px solid transparent; padding: var(--cds-pad-sm) var(--cds-pad-md); font: inherit; color: var(--color-fg-muted); cursor: pointer; }
-.drno-tab[aria-selected="true"] { color: var(--color-fg); border-bottom-color: var(--color-fg); }
+.drno-tab[aria-selected="true"] { color: var(--color-fg); font-weight: var(--cds-font-weight-medium); border-image: var(--brand-grad) 1; border-bottom-width: 3px; }
+.drno-tab:hover { color: var(--brand-accent); }
+.drno-kpi { box-shadow: inset 0 3px 0 var(--brand-teal); }
+.drno-kpi .v { color: var(--brand-accent); }
+.drno-card h3 { color: var(--color-fg); }
+.sx-apply { background: var(--brand-grad) !important; border-color: transparent !important; color: #fff !important; }
 .drno-page { display: none; flex-direction: column; gap: var(--cds-gap-md); }
 .drno-page.on { display: flex; }
 .drno-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: var(--cds-gap-md); }
@@ -66,6 +71,10 @@
 .sx-search { font: inherit; font-size: var(--cds-font-size-caption); padding: 4px 6px; border-radius: var(--cds-radius); border: 1px solid var(--color-border-line); background: var(--color-bg); color: var(--color-fg); }
 .sx-post { font-size: var(--cds-font-size-caption); border-left: 2px solid var(--color-border-line); padding-left: 6px; }
 .sx-post .m { color: var(--color-fg-muted); }
+.vos-bar { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm); align-items: center; justify-content: space-between; }
+.vos-bar .sx-seg { grid-template-columns: repeat(2, minmax(6rem, auto)); }
+.vos-map { position: relative; height: 560px; background: var(--color-bg); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); overflow: hidden; }
+.vos-chip { display: inline-block; font-size: var(--cds-font-size-caption); border-radius: 999px; padding: 0 7px; border: 1px solid currentColor; white-space: nowrap; }
 [data-dash-source-state=empty] { color: transparent; }
 [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
 .drno ol, .drno ul { margin: 0; padding-left: 1.2rem; font-size: var(--cds-font-size-body); }
@@ -73,7 +82,10 @@
 </style>
 
 <div class="drno">
-  <h1 class="drno-title" id="judul">DRNO — Digital Radicalization Network Observatory</h1>
+  <header class="drno-head">
+    <h1 id="judul"><img class="drno-logo" src="assets/drno-logo.webp" alt="DRNO — Digital Radicalization Network Observatory" width="900" height="162"></h1>
+    <div class="drno-head-meta"><b>Observatorium riset</b><span>Jaringan &amp; narasi radikalisasi digital · Indonesia</span><span class="drno-badge" id="drno-mode-badge">Memuat data…</span></div>
+  </header>
   <div class="drno-banner" id="banner">Memuat status sumber data…</div>
   <p class="drno-take" id="takeaway">Dashboard riset atas <span data-source="overview" data-field="total_posts" data-row="0" class="dash-skeleton">—</span> unggahan dari <span data-source="overview" data-field="total_accounts" data-row="0" class="dash-skeleton">—</span> akun berpseudonim; <span data-source="overview" data-field="manual_review_queue" data-row="0" class="dash-skeleton">—</span> unggahan menunggu validasi manual peneliti.</p>
 
@@ -162,18 +174,31 @@
       <p class="drno-note">Delapan istilah paling sering. Istilah bertanda “pembanding” adalah istilah keagamaan umum, bukan sinyal ekstremisme.</p>
       <div class="drno-grid" id="ch-keywords" data-source="keyword_weekly"></div>
     </div>
-    <div class="drno-grid">
-      <div class="drno-card">
-        <h3 id="wacana">Peta wacana per komunitas percakapan</h3>
-        <p class="drno-note">Komposisi konteks unggahan pada tiap komunitas jaringan interaksi. Komunitas = pola interaksi, bukan kelompok ideologis atau organisasi.</p>
-        <div class="drno-legend" id="lg-comm"></div>
-        <div class="drno-chart" id="ch-comm" data-source="community_context"></div>
+    <div class="drno-card">
+      <h3 id="pemicu">Kata kunci pemicu: penanda ideologis &amp; jaringan</h3>
+      <p class="drno-note">Istilah khas wacana takfiri (mis. thaghut/thogut, kafir harbi, al-wala' wal-bara') dan nama jaringan (JI, JAD/Anshorut Daulah, ISIS). Varian ejaan ikut dihitung. Kemunculan istilah = kriteria pengambilan data, <b>bukan</b> bukti sikap: banyak berasal dari pemberitaan, kajian, atau kontra-narasi.</p>
+      <div class="drno-legend" id="lg-trig"></div>
+      <div class="drno-chart" id="ch-trig" data-source="trigger_terms"></div>
+    </div>
+    <div class="drno-card">
+      <h3 id="tersembunyi">Kata kunci tersembunyi: usulan untuk ditinjau</h3>
+      <p class="drno-note"><b>Samaran</b> = ejaan terselubung atau salah ketik istilah pemicu (angka pengganti huruf, mis. th0gut; selisih vokal/huruf h, mis. thoghut). <b>Asosiasi</b> = kata yang jauh lebih sering muncul pada unggahan berpenanda pemicu daripada unggahan lain (z log-odds ≥ 2). Semua berstatus usulan; masukkan ke kamus hanya setelah ditinjau peneliti.</p>
+      <div id="ch-hidden" data-source="hidden_terms"></div>
+    </div>
+    <div class="drno-card">
+      <div class="vos-bar">
+        <h3 id="kookurensi">Peta istilah ko-okurensi (gaya VOSviewer)</h3>
+        <div class="sx-seg" id="narr-mode"><button data-v="network" aria-pressed="true">Network</button><button data-v="density" aria-pressed="false">Density</button></div>
       </div>
-      <div class="drno-card">
-        <h3 id="kookurensi">Jaringan ko-okurensi narasi</h3>
-        <p class="drno-note">Node = istilah; garis = muncul bersama dalam satu unggahan (min. 2 kali). Jaringan ini tidak menyatakan hubungan antarorang.</p>
-        <div class="drno-chart" id="ch-narr" data-source="narrative_nodes narrative_edges"></div>
-      </div>
+      <p class="drno-note">Node = istilah; ukuran = frekuensi; warna = klaster (Louvain); garis = muncul bersama dalam satu unggahan (min. 2 kali). Lingkar merah = kata kunci pemicu; abu-abu = istilah keagamaan pembanding. Mode Density: kuning = area istilah paling padat. Gulir untuk memperbesar, seret untuk menggeser. Jaringan ini tidak menyatakan hubungan antarorang.</p>
+      <div class="drno-legend" id="lg-narr"></div>
+      <div class="vos-map" id="ch-narr" data-source="narrative_nodes narrative_edges"></div>
+    </div>
+    <div class="drno-card">
+      <h3 id="wacana">Peta wacana per komunitas percakapan</h3>
+      <p class="drno-note">Komposisi konteks unggahan pada tiap komunitas jaringan interaksi. Komunitas = pola interaksi, bukan kelompok ideologis atau organisasi.</p>
+      <div class="drno-legend" id="lg-comm"></div>
+      <div class="drno-chart" id="ch-comm" data-source="community_context"></div>
     </div>
   </section>
 
@@ -182,6 +207,8 @@
     <div class="sx">
       <aside class="sx-panel" id="sx-left" data-source="sna_nodes sna_edges">
         <div class="sx-h">Settings</div>
+        <div class="sx-h">Tampilan</div>
+        <div class="sx-seg" data-key="view"><button data-v="vos">VOSviewer</button><button data-v="density">Density</button><button data-v="graph">Graf</button></div>
         <div class="sx-h">Max nodes</div>
         <div class="sx-range"><input type="range" id="sx-max" min="50" max="500" step="10" value="200"><span id="sx-max-v">200</span></div>
         <div class="sx-h">Edge opacity</div>
@@ -461,8 +488,10 @@
       b.textContent = 'DATA SINTETIS — bukan hasil crawling nyata. Akun, unggahan, dan peristiwa dibangkitkan generator untuk demonstrasi metode; tanggal bersifat fiktif. Konektor API nyata tersedia di paket DRNO dan berjalan dengan kredensial Anda.';
     } else {
       b.style.borderColor = 'var(--color-border-line)'; b.style.color = 'var(--color-fg-muted)';
-      b.textContent = 'DATA NYATA dari API resmi (akun individual berpseudonim). Klasifikasi adalah hasil mesin dan wajib divalidasi manual sebelum dikutip.';
+      b.textContent = 'DATA NYATA dari API resmi & Scrapling (akun individual berpseudonim; hanya media dan kanal publik yang bernama). Klasifikasi adalah hasil mesin dan wajib divalidasi manual sebelum dikutip.';
     }
+    const badge = document.getElementById('drno-mode-badge');
+    if (badge) badge.textContent = isSynthetic() ? '● Data sintetis' : `● Data nyata · ${fmt(num(o.data[0].total_posts))} unggahan`;
   }
   const PLAT_ID = { x: 'X/Twitter', youtube: 'YouTube', instagram: 'Instagram', facebook: 'Facebook', news: 'Berita & web', reddit: 'Reddit' };
   const SENT_ID = { positif: 'Positif', netral: 'Netral', negatif: 'Negatif' };
@@ -653,27 +682,148 @@
     legend('lg-comm', ctxs.map((c, j) => [colorOf(c, j), CTX_ID[c]]));
     el.style.minHeight = H + 'px';
   }
+  // ---------- gaya VOSviewer ----------
+  // Warna klaster ala VOSviewer; tata letak menarik node ke pusat klasternya agar klaster terpisah jelas.
+  const VOS = ['#d62728', '#2ca02c', '#1f77b4', '#d4a017', '#9467bd', '#17becf', '#ff7f0e', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#3366cc'];
+  const vosColor = (c) => VOS[((+c % VOS.length) + VOS.length) % VOS.length];
+  const VOS_DENSITY = d3.interpolateRgbBasis(['#24307a', '#2f6db5', '#3fa98f', '#a9d23c', '#fde725']);
+  const TRIGGER_GROUPS = ['ideologis', 'jaringan_ekstrem'];
+  const isTrigger = (grp) => TRIGGER_GROUPS.some((g) => String(grp || '').split('/').includes(g));
+  function vosLayout(nodes, links, W, H, rOf, opts = {}) {
+    const cls = [...new Set(nodes.map((n) => n.c))];
+    const R0 = Math.min(W, H) * 0.22;
+    const ctr = new Map(cls.map((c, i) => [c, cls.length < 2 ? [W / 2, H / 2] : [W / 2 + R0 * Math.cos(2 * Math.PI * i / cls.length), H / 2 + R0 * Math.sin(2 * Math.PI * i / cls.length)]]));
+    const sim = d3.forceSimulation(nodes)
+      .force('link', d3.forceLink(links).id((d) => d.id).distance(opts.dist || 40).strength((l) => (l.source.c === l.target.c ? 0.45 : 0.06)))
+      .force('charge', d3.forceManyBody().strength(opts.charge || -60))
+      .force('cx', d3.forceX((d) => ctr.get(d.c)[0]).strength(0.08)).force('cy', d3.forceY((d) => ctr.get(d.c)[1]).strength(0.08))
+      .force('col', d3.forceCollide((d) => rOf(d) + 2)).stop();
+    for (let i = 0; i < 360; i++) sim.tick();
+    // Margin lebar agar label di tepi (bisa sampai ~10 karakter besar) tidak terpotong
+    const [x0, x1] = d3.extent(nodes, (d) => d.x), [y0, y1] = d3.extent(nodes, (d) => d.y), pad = opts.pad || Math.min(110, W * 0.14);
+    const s = Math.min((W - 2 * pad) / Math.max(1, x1 - x0), (H - 2 * pad) / Math.max(1, y1 - y0), 2.5);
+    nodes.forEach((d) => { d.x = W / 2 + (d.x - (x0 + x1) / 2) * s; d.y = H / 2 + (d.y - (y0 + y1) / 2) * s; });
+  }
+  // Label di tengah node, ukuran huruf mengikuti bobot; label yang bertabrakan dilewati (tetap ada di tooltip)
+  function vosLabels(g, nodes, wOf, textOf, opts = {}) {
+    const maxW = d3.max(nodes, wOf) || 1, boxes = [];
+    const hit = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+    const pri = opts.priority || (() => 0);
+    nodes.slice().sort((a, b) => pri(b) - pri(a) || wOf(b) - wOf(a)).slice(0, opts.max || 400).forEach((d) => {
+      const fs = 10 + 9 * Math.sqrt(wOf(d) / maxW), t = textOf(d), w = t.length * fs * 0.56, h = fs;
+      const b = { x: d.x - w / 2, y: d.y - h / 2, w, h };
+      if (boxes.some((o) => hit(o, b))) return;
+      boxes.push(b);
+      g.append('text').attr('x', d.x).attr('y', d.y).attr('text-anchor', 'middle').attr('dominant-baseline', 'central').text(t)
+        .style('font-size', fs + 'px').style('pointer-events', 'none').attr('fill', opts.dark ? '#111' : 'var(--color-fg)')
+        .attr('paint-order', 'stroke').attr('stroke', opts.dark ? 'rgba(255,255,255,.55)' : 'var(--color-bg)').attr('stroke-width', opts.dark ? 2 : 3);
+    });
+  }
+  function vosDensity(g, nodes, W, H, wOf) {
+    const dens = d3.contourDensity().x((d) => d.x).y((d) => d.y).weight(wOf).size([W, H]).bandwidth(Math.max(14, Math.min(W, H) / 16)).thresholds(28)(nodes);
+    const col = d3.scaleSequential(VOS_DENSITY).domain([0, d3.max(dens, (d) => d.value) || 1]);
+    g.append('rect').attr('x', -W).attr('y', -H).attr('width', 3 * W).attr('height', 3 * H).attr('fill', VOS_DENSITY(0));
+    g.append('g').selectAll('path').data(dens).join('path').attr('d', d3.geoPath()).attr('fill', (d) => col(d.value));
+  }
+  function vosCurve(l) {
+    const sx = l.source.x, sy = l.source.y, tx = l.target.x, ty = l.target.y, mx = (sx + tx) / 2, my = (sy + ty) / 2;
+    return `M${sx},${sy}Q${mx - (ty - sy) * 0.15},${my + (tx - sx) * 0.15} ${tx},${ty}`;
+  }
+
+  let narrMode = 'network';
+  document.querySelectorAll('#narr-mode button').forEach((b) => b.addEventListener('click', () => {
+    narrMode = b.dataset.v; document.querySelectorAll('#narr-mode button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); drawNarr();
+  }));
   function drawNarr() {
     const el = document.getElementById('ch-narr');
     if (!prep(el, ['narrative_nodes', 'narrative_edges'])) return;
-    const nodes = st('narrative_nodes').data.map((r) => ({ id: r.term, f: num(r.frequency), base: String(r.baseline) === 'True', cl: num(r.cluster) }));
-    const links = st('narrative_edges').data.map((r) => ({ source: r.source, target: r.target, w: num(r.weight) }));
-    const W = el.clientWidth || 500, H = 320;
-    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
-    const r = d3.scaleSqrt([0, d3.max(nodes, (n) => n.f)], [3, 16]);
-    const sim = d3.forceSimulation(nodes).force('link', d3.forceLink(links).id((d) => d.id).distance(55)).force('charge', d3.forceManyBody().strength(-90))
-      .force('x', d3.forceX(W / 2).strength(0.06)).force('y', d3.forceY(H / 2).strength(0.09)).force('col', d3.forceCollide((d) => r(d.f) + 2)).stop();
-    for (let i = 0; i < 300; i++) sim.tick();
-    nodes.forEach((n) => { n.x = Math.max(20, Math.min(W - 20, n.x)); n.y = Math.max(14, Math.min(H - 14, n.y)); });
-    const lw = d3.scaleLinear([1, d3.max(links, (l) => l.w) || 1], [1, 5]);
-    svg.append('g').selectAll('line').data(links).join('line').attr('x1', (d) => d.source.x).attr('y1', (d) => d.source.y).attr('x2', (d) => d.target.x).attr('y2', (d) => d.target.y)
-      .attr('stroke', 'var(--cds-chart-grid)').attr('stroke-width', (d) => lw(d.w));
-    const g = svg.append('g').selectAll('g').data(nodes).join('g').attr('transform', (d) => `translate(${d.x},${d.y})`);
-    g.append('circle').attr('r', (d) => r(d.f)).attr('fill', (d) => d.base ? 'var(--cds-chart-muted)' : dash.colors[d.cl % 8]);
-    placeLabels(svg.append('g'), nodes.slice().sort((a, b) => b.f - a.f).map((d) => ({ id: d.id, x: d.x, y: d.y, r: r(d.f), text: d.id })),
-      nodes.map((d) => ({ id: d.id, x: d.x, y: d.y, r: r(d.f) })));
+    const nodes = st('narrative_nodes').data.map((r) => ({ id: r.term, f: num(r.frequency), base: String(r.baseline) === 'True', c: num(r.cluster), trig: isTrigger(r.group), grp: r.group }));
+    const ids = new Set(nodes.map((n) => n.id));
+    const links = st('narrative_edges').data.filter((r) => ids.has(r.source) && ids.has(r.target)).map((r) => ({ source: r.source, target: r.target, w: num(r.weight) }));
+    const W = el.clientWidth || 800, H = el.clientHeight || 560;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('height', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+    const z = svg.append('g');
+    svg.call(d3.zoom().scaleExtent([0.4, 8]).on('zoom', (ev) => z.attr('transform', ev.transform)));
+    const r = d3.scaleSqrt([0, d3.max(nodes, (n) => n.f) || 1], [4, 24]), rOf = (d) => r(d.f);
+    vosLayout(nodes, links, W, H, rOf, { dist: 70, charge: -160 });
     const T = tip(el), k = () => el.getBoundingClientRect().width / W;
-    g.on('mousemove', (ev, d) => { const [mx, my] = d3.pointer(ev, svg.node()); T.show([line(d.id, 'h'), line(`Frekuensi: ${fmt(d.f)}${d.base ? ' · pembanding' : ''}`)], mx * k(), my * k()); }).on('mouseleave', () => T.hide());
+    const show = (ev, d) => { const [mx, my] = d3.pointer(ev, el); T.show([line(d.id, 'h'), line(`Frekuensi: ${fmt(d.f)} unggahan · klaster ${d.c}`),
+      line(d.trig ? 'Kata kunci pemicu' : d.base ? 'Istilah pembanding (keagamaan umum)' : `Kelompok: ${d.grp || '—'}`)], mx, my); };
+    if (narrMode === 'density') {
+      vosDensity(z, nodes, W, H, (d) => d.f);
+      z.append('g').selectAll('circle').data(nodes).join('circle').attr('cx', (d) => d.x).attr('cy', (d) => d.y).attr('r', (d) => Math.max(6, rOf(d))).attr('fill', 'transparent')
+        .on('mousemove', show).on('mouseleave', () => T.hide());
+      vosLabels(z, nodes, (d) => d.f, (d) => d.id, { dark: true });
+      legend('lg-narr', [[VOS_DENSITY(0.15), 'Jarang'], [VOS_DENSITY(0.55), 'Sedang'], [VOS_DENSITY(1), 'Padat (istilah sering & saling terkait)']]);
+      return;
+    }
+    const lw = d3.scaleLinear([1, d3.max(links, (l) => l.w) || 1], [0.8, 6]);
+    z.append('g').attr('fill', 'none').selectAll('path').data(links).join('path').attr('d', vosCurve)
+      .attr('stroke', (l) => vosColor(l.source.c)).attr('stroke-opacity', 0.32).attr('stroke-width', (l) => lw(l.w));
+    z.append('g').selectAll('circle').data(nodes).join('circle').attr('cx', (d) => d.x).attr('cy', (d) => d.y).attr('r', rOf)
+      .attr('fill', (d) => (d.base ? 'var(--cds-chart-muted)' : vosColor(d.c))).attr('fill-opacity', 0.9)
+      .attr('stroke', (d) => (d.trig ? 'var(--cds-chart-status-critical)' : 'var(--color-bg)')).attr('stroke-width', (d) => (d.trig ? 3 : 1.2))
+      .style('cursor', 'default').on('mousemove', show).on('mouseleave', () => T.hide());
+    vosLabels(z.append('g'), nodes, (d) => d.f, (d) => d.id);
+    const cls = [...new Set(nodes.filter((n) => !n.base).map((n) => n.c))].sort((a, b) => a - b);
+    legend('lg-narr', [...cls.map((c) => [vosColor(c), `Klaster ${c}`]), ['var(--cds-chart-muted)', 'Pembanding'], ['var(--cds-chart-status-critical)', 'Lingkar = pemicu']]);
+  }
+
+  // ---------- kata kunci pemicu & tersembunyi ----------
+  const GROUP_ID = { ideologis: 'Penanda ideologis', jaringan_ekstrem: 'Jaringan / aksi', terorisme: 'Terorisme' };
+  function drawTriggers() {
+    const el = document.getElementById('ch-trig');
+    if (!prep(el, ['trigger_terms'])) return;
+    const rows = st('trigger_terms').data.map((r) => ({ t: r.term, g: String(r.group).split('/')[0], n: num(r.posts), yt: num(r.youtube), nw: num(r.news), o: num(r.other), f: r.first_seen, l: r.last_seen }));
+    if (!rows.length) { el.appendChild(line('Belum ada unggahan yang memuat kata kunci pemicu pada periode ini.', 'drno-note')); legend('lg-trig', []); return; }
+    const segs = [['yt', 'YouTube', dash.colors[3]], ['nw', 'Berita & web', dash.colors[0]], ['o', 'Platform lain', dash.colors[4]]];
+    const W = el.clientWidth || 600, rowH = 26, H = rows.length * rowH + 6;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+    const ll = measure(svg, rows.map((d) => d.t)) + 14, vl = measure(svg, rows.map((d) => `${fmt(d.n)} · ${GROUP_ID[d.g] || d.g}`)) + 12;
+    const x = d3.scaleLinear([0, d3.max(rows, (d) => d.n) || 1], [0, Math.max(40, W - ll - vl)]);
+    const T = tip(el), kk = () => el.getBoundingClientRect().width / W;
+    rows.forEach((d, i) => {
+      const yy = i * rowH + 3;
+      svg.append('text').attr('x', 0).attr('y', yy + 14).text(d.t).style('font-size', 'var(--cds-font-size-caption)').style('font-weight', 'var(--cds-font-weight-medium)').attr('fill', 'var(--color-fg)');
+      let acc = 0;
+      segs.forEach(([k, lab, c]) => {
+        if (!d[k]) return;
+        svg.append('rect').attr('x', ll + x(acc)).attr('y', yy + 3).attr('height', 15).attr('width', Math.max(1.5, x(d[k]) - 1)).attr('fill', c)
+          .on('mousemove', (ev) => { const [mx, my] = d3.pointer(ev, svg.node()); T.show([line(d.t, 'h'), swLine(c, `${lab}: ${fmt(d[k])} unggahan`), line(`Pertama ${d.f} · terakhir ${d.l}`)], mx * kk(), my * kk()); })
+          .on('mouseleave', () => T.hide());
+        acc += d[k];
+      });
+      svg.append('text').attr('x', ll + x(d.n) + 6).attr('y', yy + 14).text(`${fmt(d.n)} · ${GROUP_ID[d.g] || d.g}`).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg-muted)');
+    });
+    legend('lg-trig', segs.filter(([k]) => rows.some((d) => d[k])).map(([, lab, c]) => [c, lab]));
+    el.style.minHeight = H + 'px';
+  }
+  function hiddenTable(title, rows, cols) {
+    const wrap = document.createElement('div'); wrap.style.minWidth = '0';
+    const h = document.createElement('div'); h.className = 'sx-h'; h.textContent = `${title} (${rows.length})`; wrap.appendChild(h);
+    if (!rows.length) { wrap.appendChild(line('Belum ada usulan pada data saat ini.', 'drno-note')); return wrap; }
+    const tw = document.createElement('div'); tw.className = 'drno-table-wrap'; const tb = document.createElement('table');
+    const tr = document.createElement('tr'); cols.forEach(([lab, , n]) => { const th = document.createElement('th'); th.textContent = lab; if (n) th.className = 'n'; tr.appendChild(th); });
+    const thead = document.createElement('thead'); thead.appendChild(tr); tb.appendChild(thead);
+    const body = document.createElement('tbody');
+    rows.forEach((r) => { const row = document.createElement('tr'); cols.forEach(([, f, n]) => { const td = document.createElement('td'); td.textContent = f(r); if (n) td.className = 'n'; row.appendChild(td); }); body.appendChild(row); });
+    tb.appendChild(body); tw.appendChild(tb); wrap.appendChild(tw); return wrap;
+  }
+  function drawHidden() {
+    const el = document.getElementById('ch-hidden');
+    if (!prep(el, ['hidden_terms'])) return;
+    const rows = st('hidden_terms').data;
+    const DET = { angka_pengganti: 'angka pengganti huruf', salah_eja: 'selisih ejaan', kata: 'kata', bigram: 'frasa' };
+    const grid = document.createElement('div'); grid.className = 'drno-grid';
+    grid.appendChild(hiddenTable('Varian samaran', rows.filter((r) => r.kind === 'samaran'),
+      [['Istilah', (r) => r.term], ['Samaran dari', (r) => r.related_to], ['Jenis', (r) => DET[r.detail] || r.detail], ['Unggahan', (r) => fmt(num(r.posts_total)), true]]));
+    grid.appendChild(hiddenTable('Istilah berasosiasi dengan pemicu', rows.filter((r) => r.kind === 'asosiasi'),
+      [['Istilah', (r) => r.term], ['Muncul bersama', (r) => String(r.related_to).replaceAll('/', ', ')], ['Dgn pemicu / total', (r) => `${fmt(num(r.posts_with_trigger))} / ${fmt(num(r.posts_total))}`, true],
+        ['Lift', (r) => d3.format('.1f')(num(r.lift)) + '×', true], ['z', (r) => d3.format('.1f')(num(r.zscore)), true]]));
+    el.appendChild(grid);
+    const w = document.createElement('div'); w.className = 'drno-warn';
+    w.textContent = 'Usulan otomatis, bukan temuan. Asosiasi tinggi bisa berasal dari pemberitaan penangkapan atau ceramah kontra-narasi. Tinjau konteks unggahan di data internal sebelum menambahkan istilah ke kamus.';
+    el.appendChild(w);
   }
 
   // ---------- SNA Explorer ----------
@@ -681,10 +831,14 @@
   const EMO_ID = { anger: 'Anger', fear: 'Fear', sadness: 'Sadness', anticipation: 'Anticipation', joy: 'Joy', trust: 'Trust', surprise: 'Surprise', disgust: 'Disgust', netral: 'Netral' };
   const emoColor = (e) => e === 'netral' ? 'var(--cds-chart-muted)' : dash.colors[EMO.indexOf(e) % 8];
   const sentColor = (s) => s === 'positif' ? dash.colors[0] : s === 'negatif' ? dash.colors[3] : 'var(--cds-chart-muted)';
-  const TYPE_ID = { account: 'Account', media: 'Media', page: 'Page' };
+  const TYPE_ID = { account: 'Akun (pseudonim)', media: 'Media', page: 'Page', channel: 'Kanal publik' };
+  const isPublic = (row) => ['media', 'page', 'channel'].includes(row.node_type);
+  // Nama tampilan: entitas publik memakai nama publiknya; akun individu tetap pseudonim
+  const nodeName = (row) => (row.display_name ? row.display_name : row.node_id);
   const ET_ID = { reply: 'Reply', mention: 'Mention', repost: 'Repost/Quote', comment: 'Comment', comment_reply: 'Comment reply' };
   const GLYPH = { x: 'X', youtube: 'YT', facebook: 'FB', instagram: 'IG', news: 'N' };
-  const SX = { maxN: 200, op: 55, cent: 'degree', ncol: 'sentiment', ecol: 'emotion', estyle: 'curve', range: 'all', ntypes: null, etypes: null, plats: null };
+  const SX = { view: 'vos', maxN: 200, op: 55, cent: 'degree', ncol: 'sentiment', ecol: 'emotion', estyle: 'curve', range: 'all', ntypes: null, etypes: null, plats: null };
+  const vosView = () => SX.view !== 'graph';
   let sxReady = false, sxDirty = false, sxSel = null, sxHi = new Set(), sxView = null;
 
   function sxSetupControls() {
@@ -708,7 +862,7 @@
         b.setAttribute('aria-pressed', String(String(SX[key]) === b.dataset.v));
         b.addEventListener('click', () => {
           SX[key] = b.dataset.v; g.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-          if (key === 'range' || key === 'cent') sxMarkDirty(); else sxRestyle();
+          if (key === 'range' || key === 'cent') sxMarkDirty(); else if (key === 'view') sxDraw(); else sxRestyle();
         });
       });
     });
@@ -750,11 +904,13 @@
   }
 
   function sxNodeColor(d) {
-    if (SX.ncol === 'type') return d.row.node_type === 'account' ? dash.colors[1] : d.row.node_type === 'media' ? dash.colors[4] : dash.colors[5];
+    if (vosView()) return vosColor(d.c);
+    if (SX.ncol === 'type') return d.row.node_type === 'account' ? dash.colors[1] : d.row.node_type === 'media' ? dash.colors[4] : d.row.node_type === 'channel' ? dash.colors[0] : dash.colors[5];
     if (SX.ncol === 'cluster') return dash.colors[d.c % 8];
     return sentColor(d.row.sentiment);
   }
   function sxEdgeColor(l, srcRow) {
+    if (vosView()) return vosColor(num(srcRow.community));
     if (SX.ecol === 'sentiment') return sentColor(l.mainSen);
     if (SX.ecol === 'emotion') return emoColor(l.mainEmo);
     if (SX.ecol === 'cluster') return dash.colors[num(srcRow.community) % 8];
@@ -768,8 +924,13 @@
   }
   function sxLegend() {
     let items = [];
+    if (SX.view === 'density') { legend('sx-legend', [[VOS_DENSITY(0.15), 'Jarang'], [VOS_DENSITY(0.55), 'Sedang'], [VOS_DENSITY(1), 'Padat (pusat interaksi)']]); return; }
+    if (SX.view === 'vos') {
+      const cls = sxView ? [...new Set(sxView.R.nodes.map((n) => n.c))].sort((a, b) => a - b).slice(0, 12) : [];
+      legend('sx-legend', [...cls.map((c) => [vosColor(c), `Klaster ${c}`]), ['var(--brand-navy)', 'Cincin = kanal/media publik (bernama)'], ['var(--color-fg-muted)', 'Ukuran = sentralitas terpilih']]); return;
+    }
     if (SX.ncol === 'sentiment') items = ['positif', 'netral', 'negatif'].map((s) => [sentColor(s), `Node ${SENT_ID[s].toLowerCase()}`]);
-    if (SX.ncol === 'type') items = [[dash.colors[1], 'Account'], [dash.colors[4], 'Media'], [dash.colors[5], 'Page']];
+    if (SX.ncol === 'type') items = [[dash.colors[1], 'Akun (pseudonim)'], [dash.colors[0], 'Kanal publik'], [dash.colors[4], 'Media'], [dash.colors[5], 'Page']];
     if (SX.ecol === 'emotion') items = items.concat(EMO.map((e) => [emoColor(e), `Edge ${EMO_ID[e]}`]));
     if (SX.ecol === 'channel') items = items.concat(['x', 'youtube', 'facebook'].map((p, i) => [dash.colors[i], `Edge ${PLAT_ID[p]}`]));
     if (SX.ecol === 'sentiment' && SX.ncol !== 'sentiment') items = items.concat(['positif', 'netral', 'negatif'].map((s) => [sentColor(s), `Edge ${SENT_ID[s].toLowerCase()}`]));
@@ -781,7 +942,9 @@
     if (!sxView) return;
     const { ls, cs, nodeById } = sxView;
     ls.attr('d', sxPath).attr('stroke', (l) => sxEdgeColor(l, nodeById.get(l.source.id))).attr('stroke-opacity', (l) => sxDim(l) ? 0.04 : SX.op / 100);
-    cs.attr('fill', sxNodeColor).attr('opacity', (d) => sxFocus() && !sxFocus().has(d.id) ? 0.15 : 1).attr('stroke', (d) => (d.id === sxSel || sxHi.has(d.id)) ? 'var(--color-fg)' : 'none');
+    cs.attr('fill', sxNodeColor).attr('opacity', (d) => sxFocus() && !sxFocus().has(d.id) ? 0.15 : 1)
+      .attr('stroke', (d) => (d.id === sxSel || sxHi.has(d.id)) ? 'var(--color-fg)' : isPublic(d.row) ? 'var(--brand-navy)' : 'none')
+      .attr('stroke-width', (d) => (d.id === sxSel || sxHi.has(d.id)) ? 3 : isPublic(d.row) ? 2.5 : 0);
   }
   function sxFocus() {
     if (!sxView || (!sxSel && !sxHi.size)) return null;
@@ -804,23 +967,36 @@
     svg.append('text').attr('x', 10).attr('y', 18).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg-muted)')
       .text(`${fmt(R.nodes.length)} node · ${fmt(R.links.length)} edge · ${fmt(d3.sum(R.links, (l) => l.w))} interaksi`);
     if (!R.nodes.length) { sxView = null; sxInsight(R); return; }
-    const r = d3.scaleSqrt([0, d3.max(R.nodes, (d) => d.sc) || 1], [2, 18]);
-    const sim = d3.forceSimulation(R.nodes)
-      .force('link', d3.forceLink(R.links).id((d) => d.id).distance((l) => 18 + 4 * Math.sqrt(Math.min(l.source.deg || 1, l.target.deg || 1))).strength(0.6))
-      .force('charge', d3.forceManyBody().strength((d) => -12 - 3 * Math.sqrt(d.deg))).force('col', d3.forceCollide((d) => r(d.sc) + 1.5))
-      .force('x', d3.forceX(W / 2).strength(0.03)).force('y', d3.forceY(H / 2).strength(0.04)).stop();
-    for (let i = 0; i < 320; i++) sim.tick();
+    const r = d3.scaleSqrt([0, d3.max(R.nodes, (d) => d.sc) || 1], vosView() ? [3, 24] : [2, 18]);
+    if (vosView()) {
+      vosLayout(R.nodes, R.links, W, H, (d) => r(d.sc), { dist: 24, charge: -30 });
+    } else {
+      const sim = d3.forceSimulation(R.nodes)
+        .force('link', d3.forceLink(R.links).id((d) => d.id).distance((l) => 18 + 4 * Math.sqrt(Math.min(l.source.deg || 1, l.target.deg || 1))).strength(0.6))
+        .force('charge', d3.forceManyBody().strength((d) => -12 - 3 * Math.sqrt(d.deg))).force('col', d3.forceCollide((d) => r(d.sc) + 1.5))
+        .force('x', d3.forceX(W / 2).strength(0.03)).force('y', d3.forceY(H / 2).strength(0.04)).stop();
+      for (let i = 0; i < 320; i++) sim.tick();
+    }
     const z = svg.append('g');
     svg.call(d3.zoom().scaleExtent([0.3, 8]).on('zoom', (ev) => z.attr('transform', ev.transform)));
     const nodeById = new Map(R.nodes.map((n) => [n.id, n.row]));
-    const lw = d3.scaleLinear([1, d3.max(R.links, (l) => l.w) || 1], [0.6, 3]);
-    const ls = z.append('g').attr('fill', 'none').selectAll('path').data(R.links).join('path').attr('stroke-width', (l) => lw(l.w));
-    const cs = z.append('g').selectAll('circle').data(R.nodes).join('circle').attr('cx', (d) => d.x).attr('cy', (d) => d.y).attr('r', (d) => r(d.sc)).attr('stroke-width', 2).style('cursor', 'pointer');
-    const top = R.nodes.slice().sort((a, b) => b.sc - a.sc).slice(0, 12);
-    placeLabels(z.append('g'), top.map((d) => ({ id: d.id, x: d.x, y: d.y, r: r(d.sc), text: `${GLYPH[d.row.platform] || ''} ${d.id.length > 20 ? d.id.slice(0, 20) + '…' : d.id}` })),
-      R.nodes.filter((d) => r(d.sc) > 5).map((d) => ({ id: d.id, x: d.x, y: d.y, r: r(d.sc) })));
+    const shortId = (d) => { const nm = nodeName(d.row); return `${vosView() ? '' : (GLYPH[d.row.platform] || '') + ' '}${nm.length > 26 ? nm.slice(0, 26) + '…' : nm}`; };
+    if (SX.view === 'density') vosDensity(z, R.nodes, W, H, (d) => Math.max(1, d.sc));
+    const lw = d3.scaleLinear([1, d3.max(R.links, (l) => l.w) || 1], vosView() ? [0.5, 4] : [0.6, 3]);
+    const ls = z.append('g').attr('fill', 'none').selectAll('path').data(SX.view === 'density' ? [] : R.links).join('path').attr('stroke-width', (l) => lw(l.w));
+    const cs = z.append('g').selectAll('circle').data(R.nodes).join('circle').attr('cx', (d) => d.x).attr('cy', (d) => d.y)
+      .attr('r', (d) => (SX.view === 'density' ? Math.max(4, r(d.sc) * 0.5) : r(d.sc))).attr('stroke-width', 2).style('cursor', 'pointer');
+    if (SX.view === 'density') cs.attr('fill-opacity', 0);
+    if (vosView()) {
+      // Label: entitas publik bernama didahulukan, lalu akun dengan sentralitas tertinggi
+      vosLabels(z.append('g'), R.nodes, (d) => d.sc, shortId, { max: 60, dark: SX.view === 'density', priority: (d) => (d.row.display_name ? 1 : 0) });
+    } else {
+      const top = R.nodes.slice().sort((a, b) => (b.row.display_name ? 1 : 0) - (a.row.display_name ? 1 : 0) || b.sc - a.sc).slice(0, 16);
+      placeLabels(z.append('g'), top.map((d) => ({ id: d.id, x: d.x, y: d.y, r: r(d.sc), text: shortId(d) })),
+        R.nodes.filter((d) => r(d.sc) > 5).map((d) => ({ id: d.id, x: d.x, y: d.y, r: r(d.sc) })));
+    }
     const T = tip(el), k = () => el.getBoundingClientRect().width / W;
-    cs.on('mousemove', (ev, d) => { const [mx, my] = d3.pointer(ev, svg.node()); T.show([line(d.id, 'h'), line(`${PLAT_ID[d.row.platform] || d.row.platform} · komunitas ${d.c}`), line(`Interaksi (filter): ${fmt(d.deg)}`), line(`Sentimen dominan: ${SENT_ID[d.row.sentiment] || d.row.sentiment}`)], mx * k(), my * k()); })
+    cs.on('mousemove', (ev, d) => { const [mx, my] = d3.pointer(ev, svg.node()); T.show([line(nodeName(d.row), 'h'), line(`${TYPE_ID[d.row.node_type] || d.row.node_type} · ${PLAT_ID[d.row.platform] || d.row.platform} · komunitas ${d.c}`), line(`Interaksi (filter): ${fmt(d.deg)}`), line(`Sentimen dominan: ${SENT_ID[d.row.sentiment] || d.row.sentiment}`)], mx * k(), my * k()); })
       .on('mouseleave', () => T.hide())
       .on('click', (ev, d) => { ev.stopPropagation(); sxSel = d.id; sxRestyle(); sxInsight(R); });
     svg.on('dblclick.zoom', null).on('dblclick', () => { sxSel = null; sxHi.clear(); sxRestyle(); sxInsight(R); sxTopList(); });
@@ -847,10 +1023,10 @@
       sxBars(box, Object.fromEntries(R.emo));
     } else {
       const n = st('sna_nodes').data.find((x) => x.node_id === sxSel); if (!n) return;
-      const h = document.createElement('div'); h.style.fontWeight = 'var(--cds-font-weight-medium)'; h.style.overflowWrap = 'anywhere'; h.textContent = `${GLYPH[n.platform] || ''} ${n.node_id}`; box.appendChild(h);
+      const h = document.createElement('div'); h.style.fontWeight = 'var(--cds-font-weight-medium)'; h.style.overflowWrap = 'anywhere'; h.textContent = `${GLYPH[n.platform] || ''} ${nodeName(n)}`; box.appendChild(h);
       const dl = document.createElement('dl'); dl.className = 'drno-detail'; const dlw = document.createElement('div'); dlw.className = 'drno-detail';
       const inner = document.createElement('dl');
-      [['Platform', PLAT_ID[n.platform] || n.platform], ['Komunitas', n.community], ['Unggahan', fmt(num(n.posts))], ['Engagement', fmt(num(n.engagement))], ['In / out', `${fmt(num(n.in_degree))} / ${fmt(num(n.out_degree))}`],
+      [['Jenis', TYPE_ID[n.node_type] || n.node_type], ['Platform', PLAT_ID[n.platform] || n.platform], ['Komunitas', n.community], ['Unggahan', fmt(num(n.posts))], ['Engagement', fmt(num(n.engagement))], ['In / out', `${fmt(num(n.in_degree))} / ${fmt(num(n.out_degree))}`],
         ['Betweenness', f3(num(n.betweenness))], ['PageRank', d3.format('.4f')(num(n.pagerank))], ['Sentimen dominan', SENT_ID[n.sentiment] || n.sentiment]]
         .forEach(([a, b]) => { const dt = document.createElement('dt'); dt.textContent = a; const dd = document.createElement('dd'); dd.textContent = b; inner.append(dt, dd); });
       dlw.appendChild(inner); box.appendChild(dlw);
@@ -871,10 +1047,10 @@
     const lab = { degree: 'interaksi', engagement: 'engagement', betweenness: 'betweenness' }[SX.cent];
     const all = sxView.R.nodes.slice().sort((a, b) => b.sc - a.sc).slice(0, 50);
     document.getElementById('sx-top-h').textContent = `Top nodes (${all.length}) · ${lab}`;
-    all.filter((d) => !q || d.id.toLowerCase().includes(q)).forEach((d) => {
+    all.filter((d) => !q || d.id.toLowerCase().includes(q) || nodeName(d.row).toLowerCase().includes(q)).forEach((d) => {
       const l = document.createElement('label'); const c = document.createElement('input'); c.type = 'checkbox'; c.checked = sxHi.has(d.id);
       c.addEventListener('change', () => { c.checked ? sxHi.add(d.id) : sxHi.delete(d.id); sxRestyle(); });
-      const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = `${GLYPH[d.row.platform] || ''} ${d.id}`; nm.addEventListener('click', (ev) => { ev.preventDefault(); sxSel = d.id; sxRestyle(); sxInsight(sxView.R); });
+      const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = `${GLYPH[d.row.platform] || ''} ${nodeName(d.row)}`; if (isPublic(d.row)) nm.style.fontWeight = 'var(--cds-font-weight-medium)'; nm.addEventListener('click', (ev) => { ev.preventDefault(); sxSel = d.id; sxRestyle(); sxInsight(sxView.R); });
       const ct = document.createElement('span'); ct.className = 'ct'; ct.textContent = SX.cent === 'betweenness' ? f3(d.sc) : fmt(d.sc);
       l.append(c, nm, ct); box.appendChild(l);
     });
@@ -1025,7 +1201,7 @@
     drawKPIs(); drawBanner();
     if (current === 'overview') drawWeekly();
     if (current === 'platform') drawPlatform();
-    if (current === 'narasi') { drawContext(); drawStance(); drawKeywords(); drawCommunityContext(); drawNarr(); }
+    if (current === 'narasi') { drawContext(); drawStance(); drawKeywords(); drawTriggers(); drawHidden(); drawNarr(); drawCommunityContext(); }
     if (current === 'sna') drawSX();
     if (current === 'temporal') { drawTemporal(); drawPos(); }
     if (current === 'teori') drawTheory();

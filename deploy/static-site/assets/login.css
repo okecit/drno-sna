@@ -1,21 +1,29 @@
-.lg { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box; }
-.lg-card { width: 100%; max-width: 420px; background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: 12px; padding: 28px; box-sizing: border-box; }
+.lg { min-height: 100vh; display: flex; flex-direction: column; gap: 14px; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box;
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(30,99,184,.14), transparent 60%), radial-gradient(900px 500px at 110% 110%, rgba(61,187,122,.16), transparent 60%), var(--color-bg); }
+.lg-card { width: 100%; max-width: 460px; background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: 14px; padding: 0 30px 26px; box-sizing: border-box;
+  overflow: hidden; box-shadow: 0 10px 40px rgba(20,48,107,.12); }
+.lg-card::before { content: ""; display: block; height: 5px; margin: 0 -30px 0; background: var(--brand-grad); }
 .lg-card:has(.lg-table) { max-width: 640px; }
+/* Pelat putih: logo navy tetap kontras di mode gelap */
+.lg-logo-plate { background: #fff; margin: 0 -30px 16px; padding: 22px 30px 18px; border-bottom: 1px solid var(--color-border-line); }
+.lg-logo { width: 100%; height: auto; display: block; }
 .lg-brand { font-family: var(--font-anthropic-serif); font-size: 32px; }
 .lg-sub { color: var(--color-fg-muted); font-size: 13px; margin-bottom: 18px; }
+.lg-copy { color: var(--color-fg-muted); font-size: 11px; margin: 0; letter-spacing: .02em; }
 .lg-h { font-size: 18px; margin: 4px 0 8px; } .lg-h2 { font-size: 15px; margin: 18px 0 6px; }
 .lg-note, .lg-foot { color: var(--color-fg-muted); font-size: 12px; }
 .lg-foot { margin: 18px 0 0; }
 .lg form { display: flex; flex-direction: column; gap: 12px; }
 .lg label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--color-fg-muted); }
 .lg input, .lg select { font: inherit; font-size: 15px; padding: 9px 10px; border-radius: 8px; border: 1px solid var(--color-border-line); background: var(--color-bg); color: var(--color-fg); }
-.lg input:focus, .lg select:focus { outline: 2px solid var(--color-fg); outline-offset: 1px; }
-.lg button { font: inherit; font-weight: 600; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--color-fg); background: var(--color-fg); color: var(--color-bg); cursor: pointer; }
+.lg input:focus, .lg select:focus { outline: 2px solid var(--brand-accent); outline-offset: 1px; }
+.lg button { font: inherit; font-weight: 600; padding: 10px 12px; border-radius: 8px; border: 0; background: var(--brand-grad); color: #fff; cursor: pointer; letter-spacing: .02em; }
+.lg button:hover { filter: brightness(1.08); }
 .lg-err { border: 1px solid var(--color-bad); color: var(--color-bad); border-radius: 8px; padding: 8px 10px; font-size: 13px; margin-bottom: 12px; }
 .lg-ok { border: 1px solid var(--color-border-line); border-radius: 8px; padding: 8px 10px; font-size: 13px; margin-bottom: 12px; }
 .lg-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 8px; }
 .lg-table th, .lg-table td { text-align: left; padding: 6px; border-bottom: 1px solid var(--color-border-line); }
-.lg-act { display: flex; gap: 6px; } .lg-act form { flex-direction: row; } .lg-act button { padding: 4px 8px; font-size: 12px; font-weight: 400; background: var(--color-bg); color: var(--color-fg); }
+.lg-act { display: flex; gap: 6px; } .lg-act form { flex-direction: row; } .lg-act button { padding: 4px 8px; font-size: 12px; font-weight: 400; background: var(--color-bg); color: var(--color-fg); border: 1px solid var(--color-border-line); }
 .lg a { color: var(--color-fg); }
 .drno-userbar { display: flex; justify-content: flex-end; align-items: center; gap: 12px; font-size: 12px; color: var(--color-fg-muted); margin-bottom: 6px; }
 .drno-userbar form { margin: 0; } .drno-userbar a { color: var(--color-fg); }

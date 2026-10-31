@@ -40,7 +40,16 @@ class JsonlStore:
                "duplicates": report.duplicates + (len(records) - len(new)), "errors": report.errors}
         self._append("runs.jsonl", [run])
         self._append("audit.jsonl", [{"at": run["at"], "actor": os.environ.get("DRNO_ACTOR", "peneliti"), "action": "collect", "detail": run}])
+        self._append("authors.jsonl", [{"author": r["author_id_pseudonym"], "type": r["author_type"], "name": r["public_entity_name"]}
+                                       for r in records if r.get("public_entity_name") and r.get("author_type") != "individual"])
         return run
+
+    def load_public_names(self) -> dict:
+        p = self.root / "authors.jsonl"
+        if not p.exists():
+            return {}
+        rows = [json.loads(l) for l in p.open(encoding="utf-8") if l.strip()]
+        return {r["author"]: {"type": r["type"], "name": r["name"]} for r in rows}
 
     def load(self):
         def rd(n):
@@ -68,11 +77,15 @@ class PostgresStore:  # pragma: no cover - memerlukan server PostgreSQL
             inserted, new_ids = 0, set()
             for r in records:
                 a = r["author_id_pseudonym"]
-                atype = "media" if a.startswith("media:") else "organization_public" if a.startswith("page:") else "individual"
-                cur.execute("""INSERT INTO author(author_pseudonym, platform, author_type, first_seen, last_seen)
-                               VALUES (%s,%s,%s,%s,%s) ON CONFLICT (author_pseudonym) DO UPDATE
-                               SET last_seen = GREATEST(author.last_seen, EXCLUDED.last_seen)""",
-                            (a, r["platform"], atype, r["timestamp"], r["timestamp"]))
+                atype = r.get("author_type") or ("media" if a.startswith("media:") else "organization_public" if a.startswith("page:") else "individual")
+                name = r.get("public_entity_name") if atype != "individual" else None
+                # Akun yang sekali terbukti publik (mis. kanal pemilik video) tidak diturunkan lagi menjadi individu
+                cur.execute("""INSERT INTO author(author_pseudonym, platform, author_type, public_entity_name, first_seen, last_seen)
+                               VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (author_pseudonym) DO UPDATE
+                               SET last_seen = GREATEST(author.last_seen, EXCLUDED.last_seen),
+                                   author_type = CASE WHEN EXCLUDED.author_type <> 'individual' THEN EXCLUDED.author_type ELSE author.author_type END,
+                                   public_entity_name = COALESCE(EXCLUDED.public_entity_name, author.public_entity_name)""",
+                            (a, r["platform"], atype, name, r["timestamp"], r["timestamp"]))
                 cur.execute("""INSERT INTO post(post_id, platform, timestamp, text, url, author_id_pseudonym, language, keyword_matched,
                                reply_to, mention, repost_of, engagement_count, source_method, is_synthetic, run_id, content_hash, retention_until)
                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,false,%s,%s,%s) ON CONFLICT DO NOTHING""",
@@ -104,6 +117,12 @@ class PostgresStore:  # pragma: no cover - memerlukan server PostgreSQL
             cols = [d.name for d in cur.description]
             inter = [dict(zip(cols, r)) for r in cur.fetchall()]
         return posts, inter, []
+
+    def load_public_names(self) -> dict:
+        with self.conn.cursor() as cur:
+            cur.execute("""SELECT author_pseudonym, author_type, public_entity_name FROM author
+                           WHERE author_type <> 'individual' AND public_entity_name IS NOT NULL""")
+            return {a: {"type": t, "name": n} for a, t, n in cur.fetchall()}
 
 
 def get_store():

@@ -13,6 +13,10 @@
   --cds-font-weight-medium: 600;
   --cds-radius: 8px; --cds-gap-xs: 4px; --cds-gap-sm: 8px; --cds-gap-md: 14px;
   --cds-pad-xs: 4px; --cds-pad-sm: 8px; --cds-pad-md: 12px; --cds-pad-lg: 16px; --cds-dur-slow: .3s;
+  /* Warna merek dari logo DRNO: navy -> biru -> teal -> hijau */
+  --brand-navy: #14306b; --brand-blue: #1e63b8; --brand-teal: #13998c; --brand-green: #3dbb7a;
+  --brand-grad: linear-gradient(90deg, var(--brand-navy), var(--brand-blue) 35%, var(--brand-teal) 70%, var(--brand-green));
+  --brand-accent: var(--brand-blue);
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -20,6 +24,7 @@
     --color-border-line: #3a3936; --color-warn: #f59e0b;
     --cds-surface-popover: #2b2b28; --cds-border: #45443f; --cds-text-secondary: #a3a19a;
     --cds-chart-axis: #4a4944; --cds-chart-grid: #34332f; --cds-chart-reference: #7c7a73; --cds-chart-muted: #5f5e58;
+    --brand-accent: #5aa2f0;
   }
 }
 html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); font-family: var(--font-anthropic-sans); }
@@ -28,3 +33,13 @@ html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); fon
 @keyframes drno-sk { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 #drno-boot-error { display: none; border: 1px solid var(--color-bad); color: var(--color-bad); padding: 10px 12px; border-radius: 8px; margin-bottom: 12px; font-size: 14px; }
 #drno-meta { font-size: 12px; color: var(--color-fg-muted); margin: 0 0 8px; }
+/* Header merek: pelat putih agar logo (navy) tetap kontras di mode gelap */
+.drno-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; background: #fff; border-radius: 12px;
+  padding: 14px 22px; position: relative; overflow: hidden; box-shadow: 0 1px 2px rgba(20,48,107,.06), 0 6px 24px rgba(20,48,107,.07); }
+.drno-head::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: var(--brand-grad); }
+.drno-head h1 { margin: 0; line-height: 0; }
+.drno-logo { height: 58px; width: auto; display: block; }
+.drno-head-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-size: 12px; color: #4b5563; text-align: right; }
+.drno-head-meta b { color: var(--brand-navy); letter-spacing: .04em; text-transform: uppercase; font-size: 11px; }
+.drno-badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 3px 10px; font-size: 11px; font-weight: 600; color: #fff; background: var(--brand-grad); }
+@media (max-width: 640px) { .drno-logo { height: 40px; } .drno-head { padding: 10px 14px; } .drno-head-meta { align-items: flex-start; text-align: left; } }

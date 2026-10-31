@@ -50,11 +50,19 @@ run_cycle() {
   cd "$APP/backend" || return 1
   local FROM TO Q
   FROM=$(date -d "-7 days" +%F); TO=$(date +%F)
-  Q=${DRNO_QUERY:-'(radikalisasi OR terorisme OR ekstremisme OR deradikalisasi OR "kontra-narasi") AND NOT lowongan'}
+  # Satu sumber kebenaran: DEFAULT_QUERY di drno/keywords.py (termasuk penanda ideologis v1.1)
+  Q=${DRNO_QUERY:-$(python -c 'from drno.keywords import DEFAULT_QUERY; print(DEFAULT_QUERY)')}
   # YouTube tidak memahami AND/OR/NOT: pakai sintaks aslinya (| = OR, - = NOT)
   local YQ=${DRNO_YT_QUERY:-'radikalisasi|terorisme|ekstremisme|deradikalisasi|"kontra narasi" -lowongan'}
+  # Penanda ideologis berejaan khas Indonesia; diurutkan menurut relevansi karena istilahnya jarang
+  local YQI=${DRNO_YT_QUERY_IDEO:-'thogut|"pemerintah thaghut"|"aparat thaghut"|"kafir harbi"|"anshorut daulah"|"ansharut daulah"|"jamaah islamiyah"|"simpatisan ISIS"|"eks napiter"|"paham takfiri"|"mantan teroris" -lowongan -film -movie -horor'}
   # Kegagalan satu platform tidak menggagalkan siklus
-  if [ -n "${YOUTUBE_API_KEY:-}" ]; then python -m drno.crawl youtube --query "$Q" --native-query "$YQ" --from "$FROM" --to "$TO" --max-videos "${DRNO_YT_VIDEOS:-20}" || log "youtube gagal"; fi
+  if [ -n "${YOUTUBE_API_KEY:-}" ]; then
+    python -m drno.crawl youtube --query "$Q" --native-query "$YQ" --from "$FROM" --to "$TO" --max-videos "${DRNO_YT_VIDEOS:-20}" || log "youtube gagal"
+    DRNO_YT_ORDER=relevance python -m drno.crawl youtube --query "$Q" --native-query "$YQI" --from "$FROM" --to "$TO" --max-videos "${DRNO_YT_VIDEOS:-20}" || log "youtube (ideologis) gagal"
+    # Nama publik hanya untuk kanal >= DRNO_PUBLIC_CHANNEL_MIN_SUBS subscriber; sisanya tetap pseudonim
+    python -m drno.maintenance label-channels >/dev/null || log "label kanal gagal"
+  fi
   if [ -n "${X_BEARER_TOKEN:-}" ]; then python -m drno.crawl x --query "$Q" --from "$FROM" --to "$TO" --max "${DRNO_X_MAX:-200}" || log "x gagal"; fi
   if [ -n "${META_ACCESS_TOKEN:-}" ] && [ -n "${FB_PAGE_IDS:-}" ]; then python -m drno.crawl facebook --query "$Q" --from "$FROM" --to "$TO" || log "facebook gagal"; fi
   if [ -n "${META_ACCESS_TOKEN:-}" ] && [ -n "${IG_USER_ID:-}" ]; then python -m drno.crawl instagram --hashtags "${IG_HASHTAGS:-}" --from "$(date -d '-1 days' +%F)" --to "$TO" || log "instagram gagal"; fi

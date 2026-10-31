@@ -16,13 +16,15 @@ API = "https://www.googleapis.com/youtube/v3"
 class YouTubeCollector(Collector):
     platform = "youtube"
 
-    def __init__(self, api_key: str | None = None, transport=None, max_videos: int = 50, **kw):
+    def __init__(self, api_key: str | None = None, transport=None, max_videos: int = 50, order: str | None = None, **kw):
         super().__init__(**kw)
         self.key = api_key or os.environ.get("YOUTUBE_API_KEY")
         if not self.key:
             raise NotConfigured("YOUTUBE_API_KEY belum diisi")
         self.http = make_client(transport)
         self.max_videos = max_videos
+        # date = video terbaru; relevance = lebih tepat untuk istilah ideologis yang jarang
+        self.order = order or os.environ.get("DRNO_YT_ORDER", "date")
 
     def _get(self, path, params):
         r = self.http.get(f"{API}/{path}", params={**params, "key": self.key})
@@ -36,7 +38,7 @@ class YouTubeCollector(Collector):
         page, n = None, 0
         while n < self.max_videos:
             res = self.with_backoff(self._get, "search", {
-                "part": "snippet", "q": job.query_native or job.query, "type": "video", "maxResults": 50, "order": "date",
+                "part": "snippet", "q": job.query_native or job.query, "type": "video", "maxResults": 50, "order": self.order,
                 "publishedAfter": f"{job.date_from}T00:00:00Z", "publishedBefore": f"{job.date_to}T23:59:59Z",
                 "relevanceLanguage": job.language, "regionCode": "ID", **({"pageToken": page} if page else {})})
             for it in res.get("items", []):
@@ -74,6 +76,8 @@ class YouTubeCollector(Collector):
                 break
 
     def to_record(self, raw, job, matched):
+        # Semua penulis disimpan sebagai pseudonim. Kanal pemilik video baru diberi nama publik oleh
+        # `drno.maintenance label-channels` bila memenuhi ambang aktor publik (jumlah subscriber).
         return self.base_record(native_post_id=raw["id"], native_author_id=raw["author"], ts=raw["ts"], text=raw["text"],
                                 url=raw["url"], job=job, matched=matched, reply_to=raw.get("reply_to"),
                                 engagement_count=raw.get("likes", 0))

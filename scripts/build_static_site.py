@@ -19,7 +19,7 @@ SRC = ROOT / "deploy" / "static-site"
 DATASETS = ["overview", "weekly_platform", "context_counts", "stance_weekly", "keyword_weekly", "nodes", "edges_weekly",
             "temporal", "community_context", "narrative_nodes", "narrative_edges", "position_change", "platform_context",
             "platform_sentiment", "platform_stance", "platform_summary", "broker_nodes", "tie_summary", "homophily",
-            "mixing_stance", "identity_markers", "sna_nodes", "sna_edges", "sna_posts"]
+            "mixing_stance", "identity_markers", "sna_nodes", "sna_edges", "sna_posts", "trigger_terms", "hidden_terms"]
 # Berkas yang TIDAK pernah diunggah ke web (teks lengkap / antrean internal)
 NEVER_PUBLISH = {"posts_REAL.csv", "posts_SYNTHETIC.csv", "manual_review_queue.csv"}
 
@@ -29,7 +29,7 @@ HTML = """<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%95%B8%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" href="assets/drno-icon.png">
 <title>DRNO — Digital Radicalization Network Observatory</title>
 <link rel="stylesheet" href="assets/drno-theme.css?v={ver}">
 <script src="assets/d3.v7.min.js"></script>
@@ -59,7 +59,7 @@ def main():
         shutil.rmtree(out)
     (out / "assets").mkdir(parents=True)
     (out / "data").mkdir()
-    for f in ["d3.v7.min.js", "drno-runtime.js", "drno-theme.css"]:
+    for f in ["d3.v7.min.js", "drno-runtime.js", "drno-theme.css", "drno-logo.webp", "drno-logo.png", "drno-mark.png", "drno-icon.png"]:
         shutil.copy(SRC / "assets" / f, out / "assets" / f)
     ver = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
     body = (SRC / "assets" / "page_body.html").read_text(encoding="utf-8")

@@ -14,7 +14,7 @@ from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
-from . import nlp, sna
+from . import discovery, nlp, sna
 from .keywords import KeywordDictionary
 
 PLATFORM_NOTES = {
@@ -60,7 +60,9 @@ def annotate_all(posts, sentiment_model=None):
     return ann
 
 
-def export_dashboard(posts, inter, out, mode: str, sentiment_model=None):
+def export_dashboard(posts, inter, out, mode: str, sentiment_model=None, public_names: dict | None = None):
+    """public_names: {pseudonim: {"type", "name"}} hanya untuk entitas publik (kanal, media, Page)."""
+    public_names = public_names or {}
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
     if not posts:
@@ -98,6 +100,10 @@ def export_dashboard(posts, inter, out, mode: str, sentiment_model=None):
     kw = Counter(k for p in posts for k in p["keyword_matched"]); top = [k for k, _ in kw.most_common(8)]
     kwc = Counter((lab(p["timestamp"]), k) for p in posts for k in p["keyword_matched"] if k in top)
     w("keyword_weekly.csv", [{"week": wlab[x], "week_start": x.isoformat(), "keyword": k, "posts": kwc.get((wlab[x], k), 0)} for x in weeks for k in top], ["week", "week_start", "keyword", "posts"])
+    # --- Kata kunci pemicu & usulan istilah tersembunyi (wajib ditinjau peneliti) ---
+    w("trigger_terms.csv", discovery.trigger_counts(posts, kd), ["term", "group", "posts", "youtube", "news", "other", "first_seen", "last_seen"])
+    w("hidden_terms.csv", discovery.hidden_terms(posts, kd),
+      ["term", "kind", "detail", "related_to", "posts_with_trigger", "posts_total", "lift", "zscore", "platforms"])
 
     # --- Rincian per platform ---
     for field, name in (("context", "platform_context.csv"), ("sentiment", "platform_sentiment.csv"), ("stance", "platform_stance.csv")):
@@ -121,7 +127,11 @@ def export_dashboard(posts, inter, out, mode: str, sentiment_model=None):
         for i in inter:
             plat_of.setdefault(i["target"], i["platform"])
         def atype(n):
-            return "media" if n.startswith("media:") else "organization_public" if n.startswith("page:") else "individual"
+            if n.startswith("media:"):
+                return "media"
+            if n.startswith("page:"):
+                return "organization_public"
+            return "channel" if public_names.get(n, {}).get("type") == "channel" else "individual"
         w("nodes.csv", [{"node_id": n, "platform": plat_of.get(n), "author_type": atype(n), "community": comm[n], **metrics[n]} for n in G.nodes], nf)
         ew = Counter((i["source"], i["target"], lab(i["timestamp"]), i["type"]) for i in inter)
         w("edges_weekly.csv", [{"source": k[0], "target": k[1], "week": k[2], "type": k[3], "count": v} for k, v in ew.items()], ["source", "target", "week", "type", "count"])
@@ -135,7 +145,7 @@ def export_dashboard(posts, inter, out, mode: str, sentiment_model=None):
         w("position_change.csv", [{"week": s["period"], "week_start": s["start"], "node_id": n, "betweenness": s["metrics"].get(n, {}).get("betweenness", 0)} for s in snaps for n in topb],
           ["week", "week_start", "node_id", "betweenness"])
         sna.export_graph(G, str(out / f"interaction_network_{mode.upper()}"))
-        export_sna_explorer(posts, inter, G, metrics, comm, w, real=(mode == "real"))
+        export_sna_explorer(posts, inter, G, metrics, comm, w, real=(mode == "real"), public_names=public_names)
         # --- Lensa teori (v0.3) ---
         from .theory import ROLES, run_lenses
         L = run_lenses(G, posts, comm, metrics)
@@ -161,9 +171,11 @@ def export_dashboard(posts, inter, out, mode: str, sentiment_model=None):
     return {"posts": len(posts), "interactions": len(inter), "review_queue": len(queue), "weeks": len(weeks), "graph": summary}
 
 
-def export_sna_explorer(posts, inter, G, metrics, comm, w, real: bool = False):
+def export_sna_explorer(posts, inter, G, metrics, comm, w, real: bool = False, public_names: dict | None = None):
     """Dataset untuk SNA Explorer (gaya graf interaktif): node teragregasi, edge harian dengan
-    sentimen/emosi unggahan pembentuknya, dan contoh unggahan per node teratas."""
+    sentimen/emosi unggahan pembentuknya, dan contoh unggahan per node teratas.
+    display_name hanya diisi untuk entitas publik (media, Page, kanal pemilik video); akun individu kosong."""
+    public_names = public_names or {}
     by_post = {p["post_id"]: p for p in posts}
     agg = defaultdict(lambda: {"posts": 0, "engagement": 0, "sent": Counter(), "emo": Counter()})
     for p in posts:
@@ -177,17 +189,26 @@ def export_sna_explorer(posts, inter, G, metrics, comm, w, real: bool = False):
         plat_of.setdefault(i["source"], i["platform"])
         plat_of.setdefault(i["target"], i["platform"])
     def atype(n):
-        return "media" if n.startswith("media:") else "page" if n.startswith("page:") else "account"
+        if n.startswith("media:"):
+            return "media"
+        if n.startswith("page:"):
+            return "page"
+        return "channel" if public_names.get(n, {}).get("type") == "channel" else "account"
+
+    def display(n):
+        if n.startswith(("media:", "page:")):
+            return n.split(":", 1)[1]
+        return public_names.get(n, {}).get("name", "") if atype(n) == "channel" else ""
     rows = []
     for n in G.nodes:
         a = agg[n]
         m = metrics[n]
-        rows.append({"node_id": n, "platform": plat_of.get(n), "node_type": atype(n), "community": comm[n],
+        rows.append({"node_id": n, "display_name": display(n), "platform": plat_of.get(n), "node_type": atype(n), "community": comm[n],
                      "degree": G.in_degree(n) + G.out_degree(n), "in_degree": m["in_degree"], "out_degree": m["out_degree"],
                      "betweenness": m["betweenness"], "pagerank": m["pagerank"], "engagement": a["engagement"], "posts": a["posts"],
                      "sentiment": a["sent"].most_common(1)[0][0] if a["sent"] else "tidak_ada_unggahan",
                      **{f"e_{e}": a["emo"].get(e, 0) for e in nlp.EMOTIONS + ["netral"]}})
-    w("sna_nodes.csv", rows, ["node_id", "platform", "node_type", "community", "degree", "in_degree", "out_degree", "betweenness", "pagerank",
+    w("sna_nodes.csv", rows, ["node_id", "display_name", "platform", "node_type", "community", "degree", "in_degree", "out_degree", "betweenness", "pagerank",
                               "engagement", "posts", "sentiment", *[f"e_{e}" for e in nlp.EMOTIONS + ["netral"]]])
     ec = Counter()
     for i in inter:
@@ -197,10 +218,11 @@ def export_sna_explorer(posts, inter, G, metrics, comm, w, real: bool = False):
                         for k, v in ec.items()], ["source", "target", "day", "type", "platform", "sentiment", "emotion", "count"])
     # Privasi (data nyata): teks unggahan hanya untuk entitas publik (media/Page); akun individu tidak ditampilkan teksnya
     public_only = any(not p.get("is_synthetic") for p in posts)
-    top = sorted((r for r in rows if not public_only or r["node_type"] in ("media", "page")), key=lambda r: -r["degree"])[:60]
+    PUBLIC = ("media", "page", "channel")
+    top = sorted((r for r in rows if not public_only or r["node_type"] in PUBLIC), key=lambda r: -r["degree"])[:60]
     # Aturan privasi: pada data NYATA, teks unggahan akun individu tidak diekspor ke dashboard;
-    # hanya media/Page publik yang teksnya ditampilkan. Individu tetap terlihat sebagai agregat.
-    show_text = lambda r: (not real) or r["node_type"] in ("media", "page")
+    # hanya media/Page/kanal publik yang teksnya ditampilkan. Individu tetap terlihat sebagai agregat.
+    show_text = lambda r: (not real) or r["node_type"] in PUBLIC
     out = []
     for r in top:
         ps = sorted((p for p in posts if p["author_id_pseudonym"] == r["node_id"]), key=lambda p: -int(p.get("engagement_count") or 0))[:3]
@@ -218,9 +240,10 @@ def main(argv=None):
     ap.add_argument("--sentiment-model", default=None, help="Model HuggingFace sentimen bahasa Indonesia (opsional)")
     a = ap.parse_args(argv)
     from .storage import get_store
-    posts, inter, _ = get_store().load()
+    store = get_store()
+    posts, inter, _ = store.load()
     posts = [p for p in posts if not p.get("is_synthetic")]
-    print(export_dashboard(posts, inter, a.out, "real", a.sentiment_model))
+    print(export_dashboard(posts, inter, a.out, "real", a.sentiment_model, public_names=store.load_public_names()))
 
 
 if __name__ == "__main__":

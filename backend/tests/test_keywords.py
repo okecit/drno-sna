@@ -34,6 +34,14 @@ def test_semantic_suggestion_requires_review_and_versions():
     assert "konten provokatif" not in kd.versions[0].terms  # versi lama tidak berubah
 
 
+def test_v11_ideological_markers_versioned():
+    kd = KeywordDictionary.baseline()
+    assert [v.label for v in kd.versions] == ["v1.0-baseline", "v1.1-penanda-ideologis"]
+    assert "ansharut daulah" not in kd.versions[0].terms  # v1.0 tetap utuh
+    assert {"ansharut daulah", "isis"} <= set(kd.match("Simpatisan Anshorut Daulah dan DAESH ditangkap"))
+    assert "thaghut" in kd.match("menyebut aparat sebagai thogut")
+
+
 def test_religious_terms_marked_baseline():
     kd = KeywordDictionary.baseline()
     assert kd.current.terms["jihad"]["baseline"] is True

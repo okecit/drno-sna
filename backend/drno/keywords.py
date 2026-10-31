@@ -45,7 +45,32 @@ TRANSLIT = {
     "tauhid": ["tawhid", "tauheed"],
     "daulah": ["dawlah", "daula"],
     "jihad": ["jihaad"],
+    "kafir harbi": ["kafir harby"],
+    "al wala wal bara": ["al-wala wal-bara", "al wala' wal bara'", "al-wala' wal-bara'", "wala wal bara"],
+    "istisyhad": ["istisyhadi", "istisyhadiyah", "istishhad"],
+    "baiat": ["bai'at", "baiah", "bai'ah"],
+    "jamaah islamiyah": ["jemaah islamiyah", "jamaah islamiyyah"],
+    "jamaah ansharut daulah": ["jamaah anshorut daulah", "jemaah ansharut daulah"],
+    "ansharut daulah": ["anshorut daulah", "ansharud daulah", "anshar daulah"],
+    "isis": ["isil", "daesh", "daish"],
+    "mujahidin indonesia timur": ["mujahiddin indonesia timur"],
+    "negara islam indonesia": ["nii"],
 }
+
+# v1.1: penanda ideologis/jaringan yang lazim dalam wacana takfiri (kriteria pengambilan,
+# bukan indikator sikap). Ditambahkan sebagai versi baru agar v1.0 tetap utuh.
+V11_TERMS = {
+    "kafir harbi": "ideologis", "al wala wal bara": "ideologis", "istisyhad": "ideologis", "baiat": "ideologis",
+    "jamaah islamiyah": "jaringan_ekstrem", "jamaah ansharut daulah": "jaringan_ekstrem",
+    "ansharut daulah": "jaringan_ekstrem", "isis": "jaringan_ekstrem", "mujahidin indonesia timur": "jaringan_ekstrem",
+    "negara islam indonesia": "jaringan_ekstrem", "bom bunuh diri": "jaringan_ekstrem",
+    "napiter": "terorisme",
+}
+
+# Query bawaan crawl (filter lokal Boolean DRNO); varian ejaan ikut dicocokkan (thaghut -> thogut, dst.)
+DEFAULT_QUERY = ('(radikalisasi OR terorisme OR teroris OR ekstremisme OR deradikalisasi OR "kontra-narasi" OR napiter '
+                 'OR thaghut OR takfir OR hakimiyah OR khilafah OR "kafir harbi" OR "al wala wal bara" OR istisyhad '
+                 'OR "jamaah islamiyah" OR "ansharut daulah" OR isis OR "bom bunuh diri") AND NOT lowongan')
 
 
 def normalize(text: str) -> str:
@@ -98,6 +123,7 @@ class KeywordDictionary:
                     entry["groups"].append(g)
                 entry["baseline"] = entry["baseline"] or g in BASELINE_GROUPS
         d.versions.append(DictionaryVersion("v1.0-baseline", created_by, "Kamus awal dari master prompt", terms=terms))
+        d.new_version("v1.1-penanda-ideologis", created_by, "Penanda ideologis & nama jaringan takfiri", add=V11_TERMS)
         return d
 
     @property

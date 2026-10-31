@@ -7,7 +7,8 @@
     days: ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'], shortDays: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
     months: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
     shortMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'] });
-  const PALETTE = ['#2563eb', '#d97706', '#059669', '#dc2626', '#7c3aed', '#0891b2', '#db2777', '#65a30d'];
+  // Palet kategori selaras logo (biru, teal, hijau merek); indeks 3 tetap merah untuk makna negatif/kritis
+  const PALETTE = ['#1e63b8', '#d97706', '#2fa36b', '#dc2626', '#7c3aed', '#13998c', '#db2777', '#14306b'];
   const state = {};          // id -> {status, data, error}
   const listeners = [];
   let scheduled = false;
