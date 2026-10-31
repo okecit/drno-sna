@@ -285,7 +285,11 @@
     <div class="drno-card">
       <div class="vos-bar">
         <h3 id="kookurensi">Peta istilah ko-okurensi (gaya VOSviewer)</h3>
-        <div class="sx-seg" id="narr-mode"><button data-v="network" aria-pressed="true">Network</button><button data-v="density" aria-pressed="false">Density</button></div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+          <span class="drno-note">Normalization</span>
+          <div class="sx-seg" id="narr-norm"><button data-v="association" aria-pressed="true" title="Association strength: 2m·c_ij / (c_i·c_j)">Association</button><button data-v="none" aria-pressed="false" title="Bobot mentah (jumlah ko-okurensi)">None</button></div>
+          <div class="sx-seg" id="narr-mode"><button data-v="network" aria-pressed="true">Network</button><button data-v="density" aria-pressed="false">Density</button></div>
+        </div>
       </div>
       <p class="drno-note">Node = istilah; ukuran = frekuensi; warna = klaster (Louvain); garis = muncul bersama dalam satu unggahan (min. 2 kali). Lingkar merah = kata kunci pemicu; abu-abu = istilah keagamaan pembanding. Mode Density: kuning = area istilah paling padat. Gulir untuk memperbesar, seret untuk menggeser. Jaringan ini tidak menyatakan hubungan antarorang.</p>
       <div class="drno-legend" id="lg-narr"></div>
@@ -306,6 +310,8 @@
         <div class="sx-h">Settings</div>
         <div class="sx-h">Tampilan</div>
         <div class="sx-seg" data-key="view"><button data-v="vos">VOSviewer</button><button data-v="density">Density</button><button data-v="graph">Graf</button></div>
+        <div class="sx-h" title="Normalisasi bobot hubungan untuk tata letak VOSviewer/Density">Normalization</div>
+        <div class="sx-seg" data-key="norm"><button data-v="association" title="Association strength: 2m·c_ij / (c_i·c_j)">Association</button><button data-v="none" title="Bobot mentah (jumlah interaksi)">None</button></div>
         <div class="sx-h">Max nodes</div>
         <div class="sx-range"><input type="range" id="sx-max" min="50" max="500" step="10" value="200"><span id="sx-max-v">200</span></div>
         <div class="sx-h">Edge opacity</div>
@@ -887,8 +893,16 @@
     const cls = [...new Set(nodes.map((n) => n.c))];
     const R0 = Math.min(W, H) * 0.22;
     const ctr = new Map(cls.map((c, i) => [c, cls.length < 2 ? [W / 2, H / 2] : [W / 2 + R0 * Math.cos(2 * Math.PI * i / cls.length), H / 2 + R0 * Math.sin(2 * Math.PI * i / cls.length)]]));
+    // Normalisasi ala VOSviewer. association: s_ij = 2m·c_ij / (c_i·c_j) (association strength);
+    // none: bobot mentah. Hasil (l.a) mengatur jarak, tarikan, dan ketebalan garis.
+    const sid = (x) => (typeof x === 'object' ? x.id : x), tot = new Map();
+    let m2 = 0;
+    links.forEach((l) => { const w = l.w || 1; [sid(l.source), sid(l.target)].forEach((k) => tot.set(k, (tot.get(k) || 0) + w)); m2 += 2 * w; });
+    links.forEach((l) => { const w = l.w || 1; l.a = opts.norm === 'none' ? w : (m2 * w) / ((tot.get(sid(l.source)) || 1) * (tot.get(sid(l.target)) || 1)); });
+    const amax = d3.max(links, (l) => l.a) || 1, rel = (l) => Math.sqrt(l.a / amax);
     const sim = d3.forceSimulation(nodes)
-      .force('link', d3.forceLink(links).id((d) => d.id).distance(opts.dist || 40).strength((l) => (l.source.c === l.target.c ? 0.45 : 0.06)))
+      .force('link', d3.forceLink(links).id((d) => d.id).distance((l) => (opts.dist || 40) * (1.5 - 0.9 * rel(l)))
+        .strength((l) => (l.source.c === l.target.c ? 0.45 : 0.06) * (0.3 + 0.7 * rel(l))))
       .force('charge', d3.forceManyBody().strength(opts.charge || -60))
       .force('cx', d3.forceX((d) => ctr.get(d.c)[0]).strength(0.08)).force('cy', d3.forceY((d) => ctr.get(d.c)[1]).strength(0.08))
       .force('col', d3.forceCollide((d) => rOf(d) + 2)).stop();
@@ -924,9 +938,12 @@
     return `M${sx},${sy}Q${mx - (ty - sy) * 0.15},${my + (tx - sx) * 0.15} ${tx},${ty}`;
   }
 
-  let narrMode = 'network';
+  let narrMode = 'network', narrNorm = 'association';
   document.querySelectorAll('#narr-mode button').forEach((b) => b.addEventListener('click', () => {
     narrMode = b.dataset.v; document.querySelectorAll('#narr-mode button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); drawNarr();
+  }));
+  document.querySelectorAll('#narr-norm button').forEach((b) => b.addEventListener('click', () => {
+    narrNorm = b.dataset.v; document.querySelectorAll('#narr-norm button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); drawNarr();
   }));
   function drawNarr() {
     const el = document.getElementById('ch-narr');
@@ -939,7 +956,7 @@
     const z = svg.append('g');
     svg.call(d3.zoom().scaleExtent([0.4, 8]).on('zoom', (ev) => z.attr('transform', ev.transform)));
     const r = d3.scaleSqrt([0, d3.max(nodes, (n) => n.f) || 1], [4, 24]), rOf = (d) => r(d.f);
-    vosLayout(nodes, links, W, H, rOf, { dist: 70, charge: -160 });
+    vosLayout(nodes, links, W, H, rOf, { dist: 70, charge: -160, norm: narrNorm });
     const T = tip(el), k = () => el.getBoundingClientRect().width / W;
     const show = (ev, d) => { const [mx, my] = d3.pointer(ev, el); T.show([line(d.id, 'h'), line(`Frekuensi: ${fmt(d.f)} unggahan · klaster ${d.c}`),
       line(d.trig ? 'Kata kunci pemicu' : d.base ? 'Istilah pembanding (keagamaan umum)' : `Kelompok: ${d.grp || '—'}`)], mx, my); };
@@ -951,9 +968,9 @@
       legend('lg-narr', [[VOS_DENSITY(0.15), 'Jarang'], [VOS_DENSITY(0.55), 'Sedang'], [VOS_DENSITY(1), 'Padat (istilah sering & saling terkait)']]);
       return;
     }
-    const lw = d3.scaleLinear([1, d3.max(links, (l) => l.w) || 1], [0.8, 6]);
+    const lw = d3.scaleSqrt([0, d3.max(links, (l) => l.a) || 1], [0.6, 6]);
     z.append('g').attr('fill', 'none').selectAll('path').data(links).join('path').attr('d', vosCurve)
-      .attr('stroke', (l) => vosColor(l.source.c)).attr('stroke-opacity', 0.32).attr('stroke-width', (l) => lw(l.w));
+      .attr('stroke', (l) => vosColor(l.source.c)).attr('stroke-opacity', 0.32).attr('stroke-width', (l) => lw(l.a));
     z.append('g').selectAll('circle').data(nodes).join('circle').attr('cx', (d) => d.x).attr('cy', (d) => d.y).attr('r', rOf)
       .attr('fill', (d) => (d.base ? 'var(--cds-chart-muted)' : vosColor(d.c))).attr('fill-opacity', 0.9)
       .attr('stroke', (d) => (d.trig ? 'var(--cds-chart-status-critical)' : 'var(--color-bg)')).attr('stroke-width', (d) => (d.trig ? 3 : 1.2))
@@ -1031,7 +1048,7 @@
   const nodeName = (row) => (row.display_name ? row.display_name : row.node_id);
   const ET_ID = { reply: 'Reply', mention: 'Mention', repost: 'Repost/Quote', comment: 'Comment', comment_reply: 'Comment reply' };
   const GLYPH = { x: 'X', youtube: 'YT', facebook: 'FB', instagram: 'IG', news: 'N' };
-  const SX = { view: 'vos', maxN: 200, op: 55, cent: 'degree', ncol: 'sentiment', ecol: 'emotion', estyle: 'curve', range: 'all', ntypes: null, etypes: null, plats: null };
+  const SX = { view: 'vos', norm: 'association', maxN: 200, op: 55, cent: 'degree', ncol: 'sentiment', ecol: 'emotion', estyle: 'curve', range: 'all', ntypes: null, etypes: null, plats: null };
   const vosView = () => SX.view !== 'graph';
   let sxReady = false, sxDirty = false, sxSel = null, sxHi = new Set(), sxView = null;
 
@@ -1056,7 +1073,7 @@
         b.setAttribute('aria-pressed', String(String(SX[key]) === b.dataset.v));
         b.addEventListener('click', () => {
           SX[key] = b.dataset.v; g.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-          if (key === 'range' || key === 'cent') sxMarkDirty(); else if (key === 'view') sxDraw(); else sxRestyle();
+          if (key === 'range' || key === 'cent') sxMarkDirty(); else if (key === 'view' || key === 'norm') sxDraw(); else sxRestyle();
         });
       });
     });
@@ -1121,7 +1138,8 @@
     if (SX.view === 'density') { legend('sx-legend', [[VOS_DENSITY(0.15), 'Jarang'], [VOS_DENSITY(0.55), 'Sedang'], [VOS_DENSITY(1), 'Padat (pusat interaksi)']]); return; }
     if (SX.view === 'vos') {
       const cls = sxView ? [...new Set(sxView.R.nodes.map((n) => n.c))].sort((a, b) => a - b).slice(0, 12) : [];
-      legend('sx-legend', [...cls.map((c) => [vosColor(c), `Klaster ${c}`]), ['var(--brand-navy)', 'Cincin = kanal/media publik (bernama)'], ['var(--color-fg-muted)', 'Ukuran = sentralitas terpilih']]); return;
+      legend('sx-legend', [...cls.map((c) => [vosColor(c), `Klaster ${c}`]), ['var(--brand-navy)', 'Cincin = kanal/media publik (bernama)'], ['var(--color-fg-muted)', 'Ukuran = sentralitas terpilih'],
+        ['var(--color-fg-muted)', `Normalisasi: ${SX.norm === 'none' ? 'none (bobot mentah)' : 'association strength'}`]]); return;
     }
     if (SX.ncol === 'sentiment') items = ['positif', 'netral', 'negatif'].map((s) => [sentColor(s), `Node ${SENT_ID[s].toLowerCase()}`]);
     if (SX.ncol === 'type') items = [[dash.colors[1], 'Akun (pseudonim)'], [dash.colors[0], 'Kanal publik'], [dash.colors[4], 'Media'], [dash.colors[5], 'Page']];
@@ -1163,7 +1181,7 @@
     if (!R.nodes.length) { sxView = null; sxInsight(R); return; }
     const r = d3.scaleSqrt([0, d3.max(R.nodes, (d) => d.sc) || 1], vosView() ? [3, 24] : [2, 18]);
     if (vosView()) {
-      vosLayout(R.nodes, R.links, W, H, (d) => r(d.sc), { dist: 24, charge: -30 });
+      vosLayout(R.nodes, R.links, W, H, (d) => r(d.sc), { dist: 24, charge: -30, norm: SX.norm });
     } else {
       const sim = d3.forceSimulation(R.nodes)
         .force('link', d3.forceLink(R.links).id((d) => d.id).distance((l) => 18 + 4 * Math.sqrt(Math.min(l.source.deg || 1, l.target.deg || 1))).strength(0.6))
@@ -1176,8 +1194,10 @@
     const nodeById = new Map(R.nodes.map((n) => [n.id, n.row]));
     const shortId = (d) => { const nm = nodeName(d.row); return `${vosView() ? '' : (GLYPH[d.row.platform] || '') + ' '}${nm.length > 26 ? nm.slice(0, 26) + '…' : nm}`; };
     if (SX.view === 'density') vosDensity(z, R.nodes, W, H, (d) => Math.max(1, d.sc));
-    const lw = d3.scaleLinear([1, d3.max(R.links, (l) => l.w) || 1], vosView() ? [0.5, 4] : [0.6, 3]);
-    const ls = z.append('g').attr('fill', 'none').selectAll('path').data(SX.view === 'density' ? [] : R.links).join('path').attr('stroke-width', (l) => lw(l.w));
+    // Di tampilan VOSviewer, ketebalan garis mengikuti bobot ternormalisasi (l.a); di Graf, jumlah interaksi mentah
+    const ew = (l) => (vosView() ? l.a : l.w);
+    const lw = vosView() ? d3.scaleSqrt([0, d3.max(R.links, ew) || 1], [0.4, 4]) : d3.scaleLinear([1, d3.max(R.links, (l) => l.w) || 1], [0.6, 3]);
+    const ls = z.append('g').attr('fill', 'none').selectAll('path').data(SX.view === 'density' ? [] : R.links).join('path').attr('stroke-width', (l) => lw(ew(l)));
     const cs = z.append('g').selectAll('circle').data(R.nodes).join('circle').attr('cx', (d) => d.x).attr('cy', (d) => d.y)
       .attr('r', (d) => (SX.view === 'density' ? Math.max(4, r(d.sc) * 0.5) : r(d.sc))).attr('stroke-width', 2).style('cursor', 'pointer');
     if (SX.view === 'density') cs.attr('fill-opacity', 0);
