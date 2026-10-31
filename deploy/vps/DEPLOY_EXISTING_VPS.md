@@ -42,9 +42,12 @@ Pada setiap release:
 
 1. Ekstrak source ke direktori timestamp baru.
 2. Buat symlink `.env` ke `shared/.env`.
-3. Buat symlink `config/sources.json` ke `shared/sources.json` bila crawling web diaktifkan.
+3. Salin (bukan symlink) `shared/sources.json` ke `config/sources.json` bila crawling web diaktifkan.
+   Folder `config` di-bind ke `/app/config` di worker; symlink ke `shared/` tidak terbaca dari dalam container.
 4. Buat symlink `backups` ke `/home/drno/backups`.
 5. Validasi Compose sebelum mengganti symlink `current`.
+6. Setelah `current` diganti, jalankan Compose dari `current` (`cd current && ./deploy/vps/drno.sh up`)
+   agar bind mount worker/backup mengikuti rilis aktif, bukan folder rilis lama.
 
 ## Urutan go-live
 
