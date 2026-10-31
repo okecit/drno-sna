@@ -19,7 +19,8 @@ SRC = ROOT / "deploy" / "static-site"
 DATASETS = ["overview", "weekly_platform", "context_counts", "stance_weekly", "keyword_weekly", "nodes", "edges_weekly",
             "temporal", "community_context", "narrative_nodes", "narrative_edges", "position_change", "platform_context",
             "platform_sentiment", "platform_stance", "platform_summary", "broker_nodes", "tie_summary", "homophily",
-            "mixing_stance", "identity_markers", "sna_nodes", "sna_edges", "sna_posts", "trigger_terms", "hidden_terms"]
+            "mixing_stance", "identity_markers", "sna_nodes", "sna_edges", "sna_posts", "trigger_terms", "hidden_terms",
+            "entities", "mentions_daily", "mentions_public", "geo_provinces"]
 # Berkas yang TIDAK pernah diunggah ke web (teks lengkap / antrean internal)
 NEVER_PUBLISH = {"posts_REAL.csv", "posts_SYNTHETIC.csv", "manual_review_queue.csv"}
 

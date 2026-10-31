@@ -4,10 +4,86 @@
 .drno-title { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; }
 .drno-take { color: var(--color-fg-muted); font-size: var(--cds-font-size-body); margin: 0; }
 .drno-banner { border: 1px solid var(--color-warn); color: var(--color-warn); border-radius: var(--cds-radius); padding: var(--cds-pad-sm) var(--cds-pad-md); font-size: var(--cds-font-size-caption); font-weight: var(--cds-font-weight-medium); }
-.drno-tabs { display: flex; gap: var(--cds-gap-xs); flex-wrap: wrap; border-bottom: 1px solid var(--color-border-line); }
-.drno-tab { background: none; border: none; border-bottom: 2px solid transparent; padding: var(--cds-pad-sm) var(--cds-pad-md); font: inherit; color: var(--color-fg-muted); cursor: pointer; }
-.drno-tab[aria-selected="true"] { color: var(--color-fg); font-weight: var(--cds-font-weight-medium); border-image: var(--brand-grad) 1; border-bottom-width: 3px; }
-.drno-tab:hover { color: var(--brand-accent); }
+/* ---------- Shell: sidebar + konten ---------- */
+.drno-shell { display: grid; grid-template-columns: 236px minmax(0, 1fr); gap: 18px; align-items: start; }
+.drno-main { display: flex; flex-direction: column; gap: var(--cds-gap-md); min-width: 0; }
+.drno-side { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow: auto; background: var(--color-panel); border: 1px solid var(--color-border-line);
+  border-radius: 12px; padding: 10px 8px 12px; display: flex; flex-direction: column; gap: 2px; box-sizing: border-box; }
+.side-h { font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--color-fg-muted); padding: 12px 10px 4px; }
+.side-h:first-child { padding-top: 4px; }
+.drno-tab { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: none; border: none; border-radius: 8px; padding: 8px 10px;
+  font: inherit; font-size: 14px; color: var(--color-fg); cursor: pointer; }
+.drno-tab svg { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; opacity: .8; }
+.drno-tab:hover { background: var(--color-bg); color: var(--brand-accent); }
+.drno-tab[aria-selected="true"] { background: color-mix(in srgb, var(--brand-blue) 12%, transparent); color: var(--brand-accent); font-weight: var(--cds-font-weight-medium); box-shadow: inset 3px 0 0 var(--brand-teal); }
+.drno-tab[aria-selected="true"] svg { opacity: 1; }
+.side-more summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 10px; font-size: 14px; color: var(--color-fg-muted); border-radius: 8px; }
+.side-more summary::-webkit-details-marker { display: none; }
+.side-more summary::before { content: "›"; display: inline-block; width: 18px; text-align: center; transition: transform .15s; }
+.side-more[open] summary::before { transform: rotate(90deg); }
+.side-more .drno-tab { padding-left: 24px; }
+.side-insight { margin-top: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 10px; padding: 12px 10px; cursor: pointer;
+  font: inherit; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; font-size: 13px; color: #fff; background: var(--brand-grad); box-shadow: 0 4px 14px rgba(20,48,107,.25); }
+.side-insight:hover { filter: brightness(1.08); }
+@media (max-width: 900px) {
+  .drno-shell { grid-template-columns: 1fr; }
+  .drno-side { position: static; max-height: none; flex-direction: row; flex-wrap: wrap; }
+  .drno-side .side-h { width: 100%; padding: 6px 6px 2px; }
+  .drno-side .drno-tab { width: auto; }
+  .side-more { width: 100%; } .side-insight { width: 100%; margin-top: 6px; }
+}
+/* ---------- Modul baru ---------- */
+.drno-filters input.sx-search { min-width: 14rem; }
+.drno td a { color: var(--brand-accent); }
+.ent-name { font-weight: var(--cds-font-weight-medium); }
+.ent-tag { display: inline-block; font-size: 11px; border-radius: 999px; padding: 0 7px; border: 1px solid var(--color-border-line); color: var(--color-fg-muted); white-space: nowrap; }
+.ent-tag.pub { border-color: var(--brand-teal); color: var(--brand-teal); }
+.geo-wrap { display: grid; grid-template-columns: minmax(0, 3fr) minmax(14rem, 1fr); gap: var(--cds-gap-md); }
+@media (max-width: 900px) { .geo-wrap { grid-template-columns: 1fr; } }
+.tpl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: var(--cds-gap-md); }
+.tpl-card { border: 1px solid var(--color-border-line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 8px; background: var(--color-bg); position: relative; overflow: hidden; }
+.tpl-card::before { content: ""; position: absolute; left: 0; top: 0; right: 0; height: 3px; background: var(--brand-grad); }
+.tpl-card h4 { margin: 0; font-size: 15px; }
+.tpl-card .drno-note { flex: 1; }
+.btn-brand { font: inherit; font-weight: 600; font-size: 13px; padding: 7px 12px; border-radius: 8px; border: 0; background: var(--brand-grad); color: #fff; cursor: pointer; align-self: flex-start; }
+.btn-ghost { font: inherit; font-size: 12px; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--color-border-line); background: var(--color-bg); color: var(--color-fg); cursor: pointer; }
+.rpt-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: var(--cds-gap-md); }
+.rpt-form input[type=text], .rpt-form select { font: inherit; font-size: 14px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--color-border-line); background: var(--color-bg); color: var(--color-fg); width: 100%; box-sizing: border-box; }
+.rpt-form label { display: flex; flex-direction: column; gap: 4px; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.rpt-overlay { position: fixed; inset: 0; z-index: 50; background: rgba(15,23,42,.55); display: flex; justify-content: center; padding: 24px; overflow: auto; }
+.rpt-overlay[hidden] { display: none; }
+.rpt-sheet { background: #fff; color: #1f2937; width: min(900px, 100%); border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.3); align-self: flex-start; }
+.rpt-bar { display: flex; gap: 8px; justify-content: flex-end; padding: 10px 14px; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; background: #fff; border-radius: 12px 12px 0 0; }
+.rpt-bar .btn-ghost { background: #fff; color: #1f2937; border-color: #d1d5db; }
+.rpt-doc { padding: 28px 36px 36px; font-size: 14px; line-height: 1.55; }
+.rpt-doc .rpt-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; border-bottom: 3px solid; border-image: var(--brand-grad) 1; padding-bottom: 12px; margin-bottom: 18px; }
+.rpt-doc .rpt-head img { height: 44px; }
+.rpt-doc h1 { font-size: 22px; margin: 0 0 4px; color: #14306b; }
+.rpt-doc h2 { font-size: 16px; margin: 22px 0 8px; color: #14306b; border-left: 4px solid #13998c; padding-left: 8px; }
+.rpt-doc .meta { font-size: 12px; color: #6b7280; text-align: right; }
+.rpt-doc table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin: 6px 0; }
+.rpt-doc th { text-align: left; background: #f1f5f9; color: #334155; padding: 5px 7px; }
+.rpt-doc td { padding: 5px 7px; border-bottom: 1px solid #e5e7eb; }
+.rpt-doc td.n, .rpt-doc th.n { text-align: right; font-variant-numeric: tabular-nums; }
+.rpt-doc .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.rpt-doc .kpis div { border: 1px solid #e5e7eb; border-top: 3px solid #13998c; border-radius: 8px; padding: 8px 10px; }
+.rpt-doc .kpis b { display: block; font-size: 20px; color: #1e63b8; }
+.rpt-doc .kpis span { font-size: 11px; color: #6b7280; }
+.rpt-doc .caveat { margin-top: 22px; font-size: 11.5px; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 10px; }
+.ins-dlg { border: 0; border-radius: 14px; padding: 0; width: min(640px, calc(100vw - 32px)); box-shadow: 0 20px 60px rgba(0,0,0,.3); background: var(--color-panel); color: var(--color-fg); }
+.ins-dlg::backdrop { background: rgba(15,23,42,.5); }
+.ins-head { background: var(--brand-grad); color: #fff; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
+.ins-head b { letter-spacing: .05em; text-transform: uppercase; font-size: 14px; }
+.ins-head button { background: rgba(255,255,255,.15); color: #fff; border: 0; border-radius: 8px; padding: 4px 10px; cursor: pointer; font: inherit; }
+.ins-body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 10px; }
+.ins-item { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; font-size: 14px; }
+.ins-item i { font-style: normal; width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: color-mix(in srgb, var(--brand-teal) 15%, transparent); color: var(--brand-teal); font-weight: 700; }
+@media print {
+  body * { visibility: hidden !important; }
+  #rpt-overlay, #rpt-overlay * { visibility: visible !important; }
+  #rpt-overlay { position: absolute; inset: 0; background: #fff; padding: 0; }
+  .rpt-sheet { box-shadow: none; width: 100%; } .rpt-bar { display: none; }
+}
 .drno-kpi { box-shadow: inset 0 3px 0 var(--brand-teal); }
 .drno-kpi .v { color: var(--brand-accent); }
 .drno-card h3 { color: var(--color-fg); }
@@ -89,15 +165,30 @@
   <div class="drno-banner" id="banner">Memuat status sumber data…</div>
   <p class="drno-take" id="takeaway">Dashboard riset atas <span data-source="overview" data-field="total_posts" data-row="0" class="dash-skeleton">—</span> unggahan dari <span data-source="overview" data-field="total_accounts" data-row="0" class="dash-skeleton">—</span> akun berpseudonim; <span data-source="overview" data-field="manual_review_queue" data-row="0" class="dash-skeleton">—</span> unggahan menunggu validasi manual peneliti.</p>
 
-  <div class="drno-tabs" role="tablist">
-    <button class="drno-tab" role="tab" data-tab="overview" aria-selected="true">Overview</button>
-    <button class="drno-tab" role="tab" data-tab="platform" aria-selected="false">Per platform</button>
-    <button class="drno-tab" role="tab" data-tab="narasi" aria-selected="false">Narrative intelligence</button>
-    <button class="drno-tab" role="tab" data-tab="sna" aria-selected="false">SNA explorer</button>
-    <button class="drno-tab" role="tab" data-tab="temporal" aria-selected="false">Temporal</button>
-    <button class="drno-tab" role="tab" data-tab="teori" aria-selected="false">Lensa teori</button>
-    <button class="drno-tab" role="tab" data-tab="metode" aria-selected="false">Metode, etika &amp; ekspor</button>
-  </div>
+  <div class="drno-shell">
+  <nav class="drno-side" role="tablist" aria-label="Menu DRNO">
+    <div class="side-h">Dashboard</div>
+    <button class="drno-tab" role="tab" data-tab="overview" aria-selected="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Overview</button>
+    <button class="drno-tab" role="tab" data-tab="platform" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>Per platform</button>
+    <button class="drno-tab" role="tab" data-tab="narasi" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h10M4 15h16M4 20h8"/></svg>Narrative intelligence</button>
+    <div class="side-h">Analisis</div>
+    <button class="drno-tab" role="tab" data-tab="sna" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Network</button>
+    <button class="drno-tab" role="tab" data-tab="entity" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="m8.2 10.8 7.6-3.6M8.2 13.2l7.6 3.6"/></svg>Entity Explorer</button>
+    <button class="drno-tab" role="tab" data-tab="geo" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg>Geomap</button>
+    <button class="drno-tab" role="tab" data-tab="mention" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>Mention Explorer</button>
+    <div class="side-h">Reporting</div>
+    <button class="drno-tab" role="tab" data-tab="report" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><circle cx="16.5" cy="16.5" r="3.5"/></svg>Custom Report</button>
+    <button class="drno-tab" role="tab" data-tab="templates" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg>Report Templates</button>
+    <button class="drno-tab" role="tab" data-tab="generated" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M5 4v16M9 4v16M13 4l6 16"/></svg>Generated Reports</button>
+    <details class="side-more">
+      <summary>More Modules</summary>
+      <button class="drno-tab" role="tab" data-tab="temporal" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Temporal</button>
+      <button class="drno-tab" role="tab" data-tab="teori" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/></svg>Lensa teori</button>
+      <button class="drno-tab" role="tab" data-tab="metode" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/></svg>Metode &amp; etika</button>
+    </details>
+    <button class="side-insight" id="btn-insight" type="button"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/></svg>Quick Insight</button>
+  </nav>
+  <div class="drno-main">
 
   <!-- OVERVIEW -->
   <section class="drno-page on" id="overview">
@@ -357,11 +448,107 @@
         <ul>
           <li>CSV setiap sumber data dashboard: unduh dari panel Sources.</li>
           <li>GraphML dan GEXF (jaringan interaksi dan ko-okurensi), CSV unggahan, ringkasan JSON: dihasilkan pipeline di repositori DRNO (folder exports, berakhiran _SYNTHETIC).</li>
-          <li>Ringkasan PDF: tahap berikut.</li>
+          <li>Laporan PDF: menu Reporting → Custom Report / Report Templates → Cetak / simpan PDF.</li>
         </ul>
       </div>
     </div>
   </section>
+
+  <!-- ENTITY EXPLORER -->
+  <section class="drno-page" id="entity">
+    <div class="drno-card">
+      <h3 id="entitas">Entity Explorer</h3>
+      <p class="drno-note">Seluruh aktor dalam korpus. Media dan kanal publik (≥ ambang subscriber) tampil dengan nama; akun individu tampil sebagai pseudonim. Klik baris untuk membuka posisinya di Network. “Unggahan pemicu” = memuat penanda ideologis/jaringan, bukan bukti sikap.</p>
+      <div class="drno-filters">
+        <label>Cari<input class="sx-search" id="ent-q" placeholder="Nama, pseudonim, atau kata kunci…"></label>
+        <label>Jenis<select id="ent-type"><option value="">Semua</option><option value="public">Entitas publik (bernama)</option><option value="account">Akun pseudonim</option></select></label>
+        <label>Platform<select id="ent-plat"><option value="">Semua</option></select></label>
+        <label>Urutkan<select id="ent-sort"><option value="trigger_posts">Unggahan pemicu</option><option value="posts">Jumlah unggahan</option><option value="engagement">Engagement</option><option value="interactions_in">Interaksi masuk</option><option value="pagerank">PageRank</option></select></label>
+        <span class="drno-note" id="ent-count"></span>
+      </div>
+      <div class="drno-table-wrap" style="max-height: 38rem" id="ent-wrap" data-source="entities"></div>
+    </div>
+  </section>
+
+  <!-- GEOMAP -->
+  <section class="drno-page" id="geo">
+    <div class="drno-card">
+      <div class="vos-bar">
+        <h3 id="geomap">Geomap: sebaran penyebutan wilayah</h3>
+        <div class="sx-seg" id="geo-mode"><button data-v="posts" aria-pressed="true">Semua unggahan</button><button data-v="trigger_posts" aria-pressed="false">Unggahan pemicu</button></div>
+      </div>
+      <p class="drno-note">Peta ubin 38 provinsi (posisi mendekati geografi). Nilai = unggahan yang <b>menyebut</b> nama provinsi atau kota utamanya, bukan lokasi pengunggah. Nama kota yang juga kata umum (Serang, Malang, Medan, Solo, Palu, …) hanya dihitung bila ditulis berhuruf kapital.</p>
+      <div class="geo-wrap">
+        <div class="drno-chart" id="ch-geo" data-source="geo_provinces" style="min-height: 420px"></div>
+        <div><div class="sx-h">Provinsi teratas</div><div id="geo-top" class="sx-top" style="max-height: 26rem"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MENTION EXPLORER -->
+  <section class="drno-page" id="mention">
+    <div class="drno-card">
+      <h3 id="penyebutan">Mention Explorer</h3>
+      <p class="drno-note">Penyebutan kata kunci kamus per hari. Grafik menghitung semua unggahan (termasuk akun pseudonim, agregat); daftar di bawah hanya menampilkan cuplikan dari media dan kanal publik.</p>
+      <div class="drno-filters">
+        <label>Kata kunci<select id="men-kw"><option value="">8 teratas</option></select></label>
+        <label>Platform<select id="men-plat"><option value="">Semua</option></select></label>
+        <label>Kelompok<select id="men-grp"><option value="">Semua</option><option value="pemicu">Hanya pemicu (ideologis/jaringan)</option></select></label>
+      </div>
+      <div class="drno-legend" id="lg-men"></div>
+      <div class="drno-chart" id="ch-men" data-source="mentions_daily"></div>
+    </div>
+    <div class="drno-card">
+      <h3>Penyebutan dari sumber publik</h3>
+      <div class="drno-table-wrap" style="max-height: 34rem" id="men-list" data-source="mentions_public"></div>
+    </div>
+  </section>
+
+  <!-- CUSTOM REPORT -->
+  <section class="drno-page" id="report">
+    <div class="drno-card">
+      <h3 id="laporan">Custom Report</h3>
+      <p class="drno-note">Susun laporan dari bagian yang Anda pilih. Laporan dibuka sebagai dokumen cetak; gunakan “Cetak / simpan PDF”. Laporan tersimpan di Generated Reports pada browser ini.</p>
+      <div class="rpt-form">
+        <label>Judul laporan<input type="text" id="rpt-title" value="Laporan Pemantauan DRNO"></label>
+        <label>Periode<select id="rpt-period"><option value="all">Seluruh data</option><option value="7">7 hari terakhir</option><option value="30">30 hari terakhir</option><option value="90">90 hari terakhir</option></select></label>
+      </div>
+      <div class="sx-h">Bagian laporan</div>
+      <div class="sx-checks" id="rpt-sections"></div>
+      <button class="btn-brand" id="rpt-make" type="button">Buat laporan</button>
+    </div>
+  </section>
+
+  <!-- REPORT TEMPLATES -->
+  <section class="drno-page" id="templates">
+    <div class="drno-card">
+      <h3 id="templat">Report Templates</h3>
+      <p class="drno-note">Templat siap pakai. Narasi disusun otomatis dari data DRNO di server ini (berbasis aturan, tanpa layanan AI eksternal), sehingga teks unggahan tidak dikirim ke pihak ketiga.</p>
+      <div class="tpl-grid" id="tpl-grid"></div>
+    </div>
+  </section>
+
+  <!-- GENERATED REPORTS -->
+  <section class="drno-page" id="generated">
+    <div class="drno-card">
+      <h3 id="dihasilkan">Generated Reports</h3>
+      <p class="drno-note">Laporan yang pernah dibuat di browser ini (disimpan lokal, tidak dibagikan ke pengguna lain). Laporan memotret data saat dibuat.</p>
+      <div id="gen-list"></div>
+    </div>
+  </section>
+  </div><!-- /drno-main -->
+  </div><!-- /drno-shell -->
+
+  <div class="rpt-overlay" id="rpt-overlay" hidden>
+    <div class="rpt-sheet">
+      <div class="rpt-bar"><button class="btn-ghost" id="rpt-print" type="button">Cetak / simpan PDF</button><button class="btn-ghost" id="rpt-close" type="button">Tutup</button></div>
+      <div class="rpt-doc" id="rpt-doc"></div>
+    </div>
+  </div>
+  <dialog class="ins-dlg" id="ins-dlg">
+    <div class="ins-head"><b>✦ Quick Insight</b><button type="button" id="ins-close">Tutup</button></div>
+    <div class="ins-body" id="ins-body"></div>
+  </dialog>
 </div>
 
 <script>
@@ -1196,6 +1383,315 @@
   }
   function drawTheory() { drawSH(); drawWeak(); drawBrokerTable(); drawEI(); drawMix(); drawIdentity(); }
 
+  // ---------- util modul baru ----------
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const D = (id) => (st(id).status === 'ok' ? st(id).data : []);
+  const TRIG_SET = new Set(['ideologis', 'jaringan_ekstrem']);
+  const isTrigGroup = (g) => String(g || '').split(/[\/;]/).some((x) => TRIG_SET.has(x));
+  function fillSelect(sel, values, labels = {}) {
+    const keep = sel.value; const first = sel.options[0];
+    sel.replaceChildren(first, ...values.map((v) => { const o = document.createElement('option'); o.value = v; o.textContent = labels[v] || v; return o; }));
+    if ([...sel.options].some((o) => o.value === keep)) sel.value = keep;
+  }
+  function makeTable(cols, rows, onRow) {
+    const tb = document.createElement('table'); const tr = document.createElement('tr');
+    cols.forEach(([lab, , n]) => { const th = document.createElement('th'); th.textContent = lab; if (n) th.className = 'n'; tr.appendChild(th); });
+    const thead = document.createElement('thead'); thead.appendChild(tr); tb.appendChild(thead);
+    const body = document.createElement('tbody');
+    rows.forEach((r) => {
+      const row = document.createElement('tr');
+      cols.forEach(([, f, n]) => { const td = document.createElement('td'); const v = f(r); if (v instanceof Node) td.appendChild(v); else td.textContent = v; if (n) td.className = 'n'; row.appendChild(td); });
+      if (onRow) { row.style.cursor = 'pointer'; row.addEventListener('click', () => onRow(r)); }
+      body.appendChild(row);
+    });
+    tb.appendChild(body); return tb;
+  }
+
+  // ---------- Entity Explorer ----------
+  let entReady = false;
+  function drawEntities() {
+    const wrap = document.getElementById('ent-wrap');
+    if (!prep(wrap, ['entities'])) return;
+    const all = D('entities');
+    if (!entReady) {
+      fillSelect(document.getElementById('ent-plat'), [...new Set(all.map((r) => r.platform))].sort(), PLAT_ID);
+      ['ent-q', 'ent-type', 'ent-plat', 'ent-sort'].forEach((id) => document.getElementById(id).addEventListener(id === 'ent-q' ? 'input' : 'change', drawEntities));
+      entReady = true;
+    }
+    const q = document.getElementById('ent-q').value.trim().toLowerCase(), ty = document.getElementById('ent-type').value;
+    const pl = document.getElementById('ent-plat').value, so = document.getElementById('ent-sort').value;
+    const rows = all.filter((r) => (!ty || (ty === 'public' ? r.type !== 'account' : r.type === 'account')) && (!pl || r.platform === pl)
+      && (!q || `${r.display_name} ${r.entity_id} ${r.top_keywords}`.toLowerCase().includes(q)))
+      .sort((a, b) => num(b[so]) - num(a[so]) || num(b.posts) - num(a.posts));
+    document.getElementById('ent-count').textContent = `${fmt(rows.length)} dari ${fmt(all.length)} entitas · ${fmt(all.filter((r) => r.type !== 'account').length)} bernama`;
+    const nameCell = (r) => { const s = document.createElement('span'); s.className = 'ent-name'; s.textContent = r.display_name || r.entity_id; return s; };
+    const tag = (r) => { const s = document.createElement('span'); s.className = 'ent-tag' + (r.type !== 'account' ? ' pub' : ''); s.textContent = TYPE_ID[r.type] || r.type; return s; };
+    wrap.appendChild(makeTable([['Entitas', nameCell], ['Jenis', tag], ['Platform', (r) => PLAT_ID[r.platform] || r.platform], ['Unggahan', (r) => fmt(num(r.posts)), true],
+      ['Pemicu', (r) => fmt(num(r.trigger_posts)), true], ['Engagement', (r) => fmt(num(r.engagement)), true], ['Interaksi masuk', (r) => fmt(num(r.interactions_in)), true],
+      ['Komunitas', (r) => r.community], ['Aktif', (r) => `${r.first_seen} – ${r.last_seen}`], ['Kata kunci utama', (r) => String(r.top_keywords).replaceAll(';', ', ')]],
+    rows.slice(0, 400), (r) => { if (!r.community && r.community !== 0) return; sxSel = r.entity_id; root.querySelector('.drno-tab[data-tab="sna"]').click(); }));
+  }
+
+  // ---------- Geomap (peta ubin provinsi) ----------
+  const GEO_TILES = { AC: [0, 0], SU: [1, 0], RI: [2, 0], KR: [3, 0], KB: [5, 0], KU: [7, 0], SA: [10, 0], MU: [12, 0],
+    SB: [1, 1], JA: [2, 1], BB: [3, 1], KT: [5, 1], KS: [6, 1], KI: [7, 1], SR: [8, 1], ST: [9, 1], GO: [10, 1], MA: [12, 1], PD: [13, 1], PB: [14, 1],
+    BE: [1, 2], SS: [2, 2], LA: [3, 2], SN: [8, 2], SG: [9, 2], PT: [14, 2], PA: [15, 2],
+    BT: [3, 3], JK: [4, 3], JB: [5, 3], JT: [6, 3], JI: [7, 3], BA: [8, 3], NB: [9, 3], NT: [10, 3], PE: [15, 3], YO: [6, 4], PS: [15, 4] };
+  let geoMode = 'posts';
+  document.querySelectorAll('#geo-mode button').forEach((b) => b.addEventListener('click', () => {
+    geoMode = b.dataset.v; document.querySelectorAll('#geo-mode button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); drawGeo();
+  }));
+  function drawGeo() {
+    const el = document.getElementById('ch-geo');
+    if (!prep(el, ['geo_provinces'])) return;
+    const rows = D('geo_provinces').map((r) => ({ ...r, v: num(r[geoMode]) }));
+    const max = d3.max(rows, (r) => r.v) || 1;
+    const col = d3.scaleSequential(d3.interpolateRgbBasis(['#e8f1fb', '#7fb3e6', '#1e63b8', '#14306b'])).domain([0, max]);
+    const W = el.clientWidth || 760, cols = 16, gap = 4, s = Math.min(64, (W - gap * cols) / cols), H = 5 * (s + gap) + 30;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${cols * (s + gap)} ${H}`);
+    const T = tip(el), k = () => el.getBoundingClientRect().width / (cols * (s + gap));
+    rows.forEach((r) => {
+      const p = GEO_TILES[r.code]; if (!p) return;
+      const g = svg.append('g').attr('transform', `translate(${p[0] * (s + gap)},${p[1] * (s + gap)})`);
+      g.append('rect').attr('width', s).attr('height', s).attr('rx', 8).attr('fill', r.v ? col(r.v) : 'var(--color-panel)').attr('stroke', 'var(--color-border-line)');
+      const dark = r.v > max * 0.45;
+      g.append('text').attr('x', s / 2).attr('y', s / 2 - 3).attr('text-anchor', 'middle').text(r.code).style('font-size', '13px').style('font-weight', 700).attr('fill', dark ? '#fff' : 'var(--color-fg)');
+      g.append('text').attr('x', s / 2).attr('y', s / 2 + 13).attr('text-anchor', 'middle').text(r.v ? fmt(r.v) : '·').style('font-size', '11px').attr('fill', dark ? '#e5edf8' : 'var(--color-fg-muted)');
+      g.on('mousemove', (ev) => { const [mx, my] = d3.pointer(ev, svg.node()); T.show([line(r.province, 'h'), line(`Semua unggahan: ${fmt(num(r.posts))}`), line(`Unggahan pemicu: ${fmt(num(r.trigger_posts))}`),
+        line(r.top_keywords ? `Kata kunci: ${String(r.top_keywords).replaceAll(';', ', ')}` : 'Belum ada kata kunci')], mx * k(), my * k()); }).on('mouseleave', () => T.hide());
+    });
+    const lg = svg.append('g').attr('transform', `translate(0,${5 * (s + gap) + 6})`);
+    [0, 0.25, 0.5, 0.75, 1].forEach((t, i) => { lg.append('rect').attr('x', i * 34).attr('width', 32).attr('height', 10).attr('rx', 2).attr('fill', col(t * max)); });
+    lg.append('text').attr('x', 5 * 34 + 6).attr('y', 9).text(`0 – ${fmt(max)} ${geoMode === 'posts' ? 'unggahan' : 'unggahan pemicu'}`).style('font-size', '11px').attr('fill', 'var(--color-fg-muted)');
+    const top = document.getElementById('geo-top'); top.innerHTML = '';
+    rows.filter((r) => r.v).sort((a, b) => b.v - a.v).slice(0, 15).forEach((r) => {
+      const l = document.createElement('label'); l.style.gridTemplateColumns = '1fr auto';
+      const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = r.province;
+      const ct = document.createElement('span'); ct.className = 'ct'; ct.textContent = fmt(r.v); l.append(nm, ct); top.appendChild(l);
+    });
+    if (!top.children.length) top.appendChild(line('Belum ada penyebutan wilayah.', 'drno-note'));
+  }
+
+  // ---------- Mention Explorer ----------
+  let menReady = false;
+  function drawMentions() {
+    const el = document.getElementById('ch-men'), list = document.getElementById('men-list');
+    const okA = prep(el, ['mentions_daily']), okB = prep(list, ['mentions_public']);
+    if (!okA) return;
+    const all = D('mentions_daily');
+    if (!menReady) {
+      const tot = d3.rollup(all, (v) => d3.sum(v, (r) => num(r.posts)), (r) => r.keyword);
+      fillSelect(document.getElementById('men-kw'), [...tot.keys()].sort((a, b) => tot.get(b) - tot.get(a)));
+      fillSelect(document.getElementById('men-plat'), [...new Set(all.map((r) => r.platform))].sort(), PLAT_ID);
+      ['men-kw', 'men-plat', 'men-grp'].forEach((id) => document.getElementById(id).addEventListener('change', drawMentions));
+      menReady = true;
+    }
+    const kw = document.getElementById('men-kw').value, pl = document.getElementById('men-plat').value, gp = document.getElementById('men-grp').value;
+    const rows = all.filter((r) => (!pl || r.platform === pl) && (!gp || isTrigGroup(r.group)));
+    const byKw = d3.rollup(rows, (v) => d3.sum(v, (r) => num(r.posts)), (r) => r.keyword);
+    const kws = kw ? [kw] : [...byKw.keys()].sort((a, b) => byKw.get(b) - byKw.get(a)).slice(0, 8);
+    // Agregasi mingguan agar terbaca (harian terlalu jarang untuk kebanyakan istilah)
+    const wk = (d) => { const t = new Date(d + 'T00:00:00Z'); t.setUTCDate(t.getUTCDate() - ((t.getUTCDay() + 6) % 7)); return t.toISOString().slice(0, 10); };
+    const weeks = [...new Set(rows.map((r) => wk(r.day)))].sort();
+    if (!weeks.length || !kws.length) { el.appendChild(line('Tidak ada penyebutan untuk filter ini.', 'drno-note')); legend('lg-men', []); }
+    else {
+      const series = kws.map((k, i) => ({ name: k, color: dash.colors[i % 8], values: weeks.map((w) => d3.sum(rows.filter((r) => r.keyword === k && wk(r.day) === w), (r) => num(r.posts))) }));
+      lineChart(el, weeks, series, { label: (w) => `Minggu mulai ${w}` });
+      legend('lg-men', series.map((s) => [s.color, `${s.name} (${fmt(d3.sum(s.values))})`]));
+    }
+    if (!okB) return;
+    const pub = D('mentions_public').filter((r) => (!pl || r.platform === pl) && (!kw || String(r.keywords).split(';').includes(kw)) && (!gp || isTrigGroup(r.groups)));
+    if (!pub.length) { list.appendChild(line('Belum ada penyebutan dari sumber publik untuk filter ini.', 'drno-note')); return; }
+    const link = (r) => { if (!r.url) return ''; const a = document.createElement('a'); a.href = r.url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = 'buka'; return a; };
+    list.appendChild(makeTable([['Tanggal', (r) => r.day], ['Sumber', (r) => r.source], ['Platform', (r) => PLAT_ID[r.platform] || r.platform],
+      ['Kata kunci', (r) => String(r.keywords).replaceAll(';', ', ')], ['Cuplikan', (r) => r.excerpt], ['Engagement', (r) => fmt(num(r.engagement)), true], ['', link]], pub.slice(0, 300)));
+  }
+
+  // ---------- Laporan ----------
+  // Narasi disusun berbasis aturan dari dataset dashboard (tanpa layanan AI eksternal).
+  const SECTIONS = {
+    ringkasan: 'Ringkasan & indikator utama', tren: 'Tren volume mingguan', pemicu: 'Kata kunci pemicu', tersembunyi: 'Usulan istilah tersembunyi',
+    entitas: 'Aktor publik teratas', jaringan: 'Struktur jaringan', wilayah: 'Sebaran wilayah', penyebutan: 'Penyebutan terbaru dari sumber publik', metode: 'Catatan metode & etika',
+  };
+  const TEMPLATES = [
+    { id: 'eksekutif', title: 'Ringkasan Eksekutif Mingguan', period: '7', sections: ['ringkasan', 'tren', 'pemicu', 'entitas', 'metode'],
+      desc: 'Satu halaman untuk pimpinan: volume, perubahan dari minggu sebelumnya, kata kunci pemicu, dan aktor publik yang menonjol.' },
+    { id: 'narasi', title: 'Profil Narasi Pemicu', period: 'all', sections: ['ringkasan', 'pemicu', 'tersembunyi', 'penyebutan', 'metode'],
+      desc: 'Istilah ideologis/jaringan (thaghut, kafir harbi, JI, dst.), platform tempatnya muncul, dan usulan istilah tersembunyi untuk ditinjau.' },
+    { id: 'jaringan', title: 'Laporan Jaringan & Aktor Publik', period: 'all', sections: ['ringkasan', 'jaringan', 'entitas', 'metode'],
+      desc: 'Struktur jaringan interaksi (komunitas, modularitas) dan media/kanal publik dengan posisi paling sentral.' },
+    { id: 'wilayah', title: 'Peta Sebaran Wilayah', period: '30', sections: ['ringkasan', 'wilayah', 'pemicu', 'metode'],
+      desc: 'Provinsi yang paling sering disebut, terutama dalam unggahan berpenanda pemicu, untuk 30 hari terakhir.' },
+  ];
+  function periodFrom(period) {
+    if (period === 'all') return null;
+    const days = D('mentions_daily').map((r) => r.day).concat(D('weekly_platform').map((r) => r.week_start)).sort();
+    const last = days[days.length - 1]; if (!last) return null;
+    const d = new Date(last + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() - (+period) + 1); return d.toISOString().slice(0, 10);
+  }
+  function triggerRows(from) {
+    if (!from) return D('trigger_terms').map((r) => ({ t: r.term, g: r.group, n: num(r.posts), yt: num(r.youtube), nw: num(r.news) }));
+    const m = new Map();
+    D('mentions_daily').filter((r) => r.day >= from && isTrigGroup(r.group)).forEach((r) => {
+      const o = m.get(r.keyword) || { t: r.keyword, g: r.group, n: 0, yt: 0, nw: 0 }; const c = num(r.posts);
+      o.n += c; if (r.platform === 'youtube') o.yt += c; if (r.platform === 'news') o.nw += c; m.set(r.keyword, o);
+    });
+    return [...m.values()].sort((a, b) => b.n - a.n);
+  }
+  const tbl = (head, rows) => `<table><thead><tr>${head.map(([h, n]) => `<th${n ? ' class="n"' : ''}>${esc(h)}</th>`).join('')}</tr></thead><tbody>${
+    rows.map((r) => `<tr>${r.map((c, i) => `<td${head[i][1] ? ' class="n"' : ''}>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  function buildSection(id, from) {
+    const ov = D('overview')[0] || {};
+    const weekly = d3.rollups(D('weekly_platform').filter((r) => !from || r.week_start >= from), (v) => d3.sum(v, (r) => num(r.posts)), (r) => r.week_start).sort((a, b) => d3.ascending(a[0], b[0]));
+    if (id === 'ringkasan') {
+      const trig = triggerRows(from), tp = d3.sum(trig, (r) => r.n), totalP = from ? d3.sum(weekly, (w) => w[1]) : num(ov.total_posts);
+      const top = trig[0];
+      return `<div class="kpis"><div><b>${fmt(totalP)}</b><span>Unggahan${from ? ' (periode)' : ''}</span></div><div><b>${fmt(num(ov.total_accounts))}</b><span>Akun (seluruh data)</span></div>
+        <div><b>${fmt(num(ov.total_interactions))}</b><span>Interaksi teramati</span></div><div><b>${fmt(tp)}</b><span>Penyebutan kata kunci pemicu</span></div></div>
+        <p>DRNO mencatat <b>${fmt(totalP)}</b> unggahan${from ? ` sejak ${esc(from)}` : ''} dari YouTube dan portal berita. ${top ? `Kata kunci pemicu yang paling sering muncul adalah <b>${esc(top.t)}</b> (${fmt(top.n)} penyebutan${top.yt >= top.nw ? ', terutama di YouTube' : ', terutama di portal berita'}).` : 'Belum ada kata kunci pemicu pada periode ini.'}
+        ${pct(num(ov.uncertain_share))} klasifikasi mesin berstatus tidak pasti; ${fmt(num(ov.manual_review_queue))} unggahan menunggu validasi manual.</p>`;
+    }
+    if (id === 'tren') {
+      if (!weekly.length) return '<p>Belum ada data mingguan pada periode ini.</p>';
+      const peak = weekly.reduce((a, b) => (b[1] > a[1] ? b : a)); const last = weekly[weekly.length - 1], prev = weekly[weekly.length - 2];
+      const ch = prev && prev[1] ? (last[1] - prev[1]) / prev[1] : null;
+      return `<p>Puncak volume terjadi pada minggu mulai <b>${esc(peak[0])}</b> (${fmt(peak[1])} unggahan). Minggu terakhir (${esc(last[0])}) mencatat ${fmt(last[1])} unggahan${ch === null ? '' : `, ${ch >= 0 ? 'naik' : 'turun'} ${pct(Math.abs(ch))} dari minggu sebelumnya`}.</p>`
+        + tbl([['Minggu mulai'], ['Unggahan', 1]], weekly.slice(-12).map(([w, n]) => [w, fmt(n)]));
+    }
+    if (id === 'pemicu') {
+      const t = triggerRows(from);
+      if (!t.length) return '<p>Tidak ada kata kunci pemicu pada periode ini.</p>';
+      const yt = d3.sum(t, (r) => r.yt), nw = d3.sum(t, (r) => r.nw);
+      return `<p>Ditemukan ${fmt(t.length)} istilah pemicu. ${fmt(yt)} penyebutan berasal dari YouTube dan ${fmt(nw)} dari portal berita. Kemunculan istilah adalah kriteria pengambilan data, bukan bukti sikap pengunggah.</p>`
+        + tbl([['Istilah'], ['Kelompok'], ['Total', 1], ['YouTube', 1], ['Berita', 1]], t.slice(0, 15).map((r) => [r.t, GROUP_ID[String(r.g).split('/')[0]] || r.g, fmt(r.n), fmt(r.yt), fmt(r.nw)]));
+    }
+    if (id === 'tersembunyi') {
+      const h = D('hidden_terms'); const sam = h.filter((r) => r.kind === 'samaran'), aso = h.filter((r) => r.kind === 'asosiasi').slice(0, 12);
+      return `<p>${fmt(sam.length)} varian samaran dan ${fmt(h.length - sam.length)} istilah berasosiasi diusulkan untuk ditinjau peneliti sebelum masuk kamus.</p>`
+        + (sam.length ? tbl([['Samaran'], ['Dari istilah'], ['Unggahan', 1]], sam.slice(0, 10).map((r) => [r.term, r.related_to, fmt(num(r.posts_total))])) : '')
+        + (aso.length ? tbl([['Istilah berasosiasi'], ['Muncul bersama'], ['Lift', 1], ['z', 1]], aso.map((r) => [r.term, String(r.related_to).replaceAll('/', ', '), d3.format('.1f')(num(r.lift)) + '×', d3.format('.1f')(num(r.zscore))])) : '');
+    }
+    if (id === 'entitas') {
+      const e = D('entities').filter((r) => r.type !== 'account' && (!from || r.last_seen >= from)).sort((a, b) => num(b.trigger_posts) - num(a.trigger_posts) || num(b.posts) - num(a.posts)).slice(0, 12);
+      const anon = D('entities').filter((r) => r.type === 'account').length;
+      return `<p>${fmt(e.length)} aktor publik (media dan kanal ≥ ambang subscriber) tercatat aktif; ${fmt(anon)} akun lain tetap berpseudonim dan tidak dicantumkan namanya.</p>`
+        + tbl([['Aktor'], ['Jenis'], ['Unggahan', 1], ['Pemicu', 1], ['Interaksi masuk', 1]], e.map((r) => [r.display_name, TYPE_ID[r.type] || r.type, fmt(num(r.posts)), fmt(num(r.trigger_posts)), fmt(num(r.interactions_in))]));
+    }
+    if (id === 'jaringan') {
+      const named = D('sna_nodes').filter((r) => r.display_name).sort((a, b) => num(b.pagerank) - num(a.pagerank)).slice(0, 10);
+      return `<p>Jaringan interaksi memiliki kepadatan ${d3.format('.4f')(num(ov.network_density))}, modularitas ${f3(num(ov.modularity))}, dan ${fmt(num(ov.n_communities))} komunitas. Modularitas tinggi menandakan percakapan terkelompok di sekitar kanal tertentu; komunitas = pola interaksi, bukan kelompok ideologis.</p>`
+        + (named.length ? tbl([['Aktor publik'], ['Komunitas'], ['PageRank', 1], ['Interaksi masuk', 1]], named.map((r) => [r.display_name, r.community, d3.format('.4f')(num(r.pagerank)), fmt(num(r.in_degree))])) : '');
+    }
+    if (id === 'wilayah') {
+      const g = D('geo_provinces').filter((r) => num(r.posts)).sort((a, b) => num(b.trigger_posts) - num(a.trigger_posts) || num(b.posts) - num(a.posts)).slice(0, 10);
+      if (!g.length) return '<p>Belum ada penyebutan wilayah.</p>';
+      return `<p>Provinsi yang paling sering disebut dalam unggahan berpenanda pemicu: <b>${esc(g[0].province)}</b>. Angka menunjukkan penyebutan nama wilayah dalam teks, bukan lokasi pengunggah.</p>`
+        + tbl([['Provinsi'], ['Unggahan', 1], ['Pemicu', 1], ['Kata kunci utama']], g.map((r) => [r.province, fmt(num(r.posts)), fmt(num(r.trigger_posts)), String(r.top_keywords).replaceAll(';', ', ')]));
+    }
+    if (id === 'penyebutan') {
+      const p = D('mentions_public').filter((r) => !from || r.day >= from).slice(0, 10);
+      return p.length ? tbl([['Tanggal'], ['Sumber'], ['Kata kunci'], ['Cuplikan']], p.map((r) => [r.day, r.source, String(r.keywords).replaceAll(';', ', '), r.excerpt])) : '<p>Belum ada penyebutan dari sumber publik pada periode ini.</p>';
+    }
+    return `<p>Data dikumpulkan lewat API resmi YouTube dan crawling sopan (Scrapling: robots.txt dipatuhi, jeda per domain) atas portal berita. Akun individu dipseudonimkan (HMAC); nama hanya untuk media dan kanal publik. Klasifikasi konteks, stance, dan sentimen adalah hasil mesin berbasis aturan dan wajib divalidasi manual sebelum dikutip. Kemunculan kata kunci, sentralitas, dan keanggotaan komunitas bukan bukti afiliasi, sikap, atau keterlibatan pidana.</p>`;
+  }
+  function buildReport(title, period, sections) {
+    const from = periodFrom(period), now = new Date();
+    const pLabel = period === 'all' ? 'Seluruh data' : `${period} hari terakhir (sejak ${from})`;
+    const body = sections.map((s) => `<h2>${esc(SECTIONS[s])}</h2>${buildSection(s, from)}`).join('');
+    return `<div class="rpt-head"><div><img src="assets/drno-logo.webp" alt="DRNO"><h1>${esc(title)}</h1></div>
+      <div class="meta">Dibuat ${esc(now.toLocaleString('id-ID'))}<br>Periode: ${esc(pLabel)}<br>Mode data: ${isSynthetic() ? 'sintetis' : 'nyata'}</div></div>${body}
+      <div class="caveat">Dokumen riset internal DRNO. Narasi disusun otomatis berbasis aturan dari data agregat; bukan penilaian terhadap individu. Jangan disebarkan di luar tim peneliti tanpa persetujuan.</div>`;
+  }
+  const RKEY = 'drno.reports';
+  const loadReports = () => { try { return JSON.parse(localStorage.getItem(RKEY) || '[]'); } catch (e) { return []; } };
+  const saveReports = (a) => { try { localStorage.setItem(RKEY, JSON.stringify(a.slice(0, 20))); return true; } catch (e) { return false; } };
+  function openReport(html) { document.getElementById('rpt-doc').innerHTML = html; document.getElementById('rpt-overlay').hidden = false; }
+  function makeReport(title, period, sections) {
+    if (!allOk(['overview'])) return;
+    const html = buildReport(title, period, sections);
+    saveReports([{ id: Date.now(), title, period, created: new Date().toISOString(), html }, ...loadReports()]);
+    openReport(html);
+  }
+  document.getElementById('rpt-print').addEventListener('click', () => window.print());
+  document.getElementById('rpt-close').addEventListener('click', () => { document.getElementById('rpt-overlay').hidden = true; });
+  let rptReady = false;
+  function drawReportForm() {
+    if (rptReady) return;
+    const box = document.getElementById('rpt-sections');
+    Object.entries(SECTIONS).forEach(([k, lab]) => {
+      const l = document.createElement('label'); const c = document.createElement('input'); c.type = 'checkbox'; c.value = k; c.checked = k !== 'penyebutan';
+      l.append(c, document.createTextNode(lab)); box.appendChild(l);
+    });
+    document.getElementById('rpt-make').addEventListener('click', () => {
+      const secs = [...box.querySelectorAll('input:checked')].map((c) => c.value); if (!secs.includes('metode')) secs.push('metode');
+      makeReport(document.getElementById('rpt-title').value.trim() || 'Laporan DRNO', document.getElementById('rpt-period').value, secs);
+    });
+    rptReady = true;
+  }
+  let tplReady = false;
+  function drawTemplates() {
+    if (tplReady) return;
+    const grid = document.getElementById('tpl-grid');
+    TEMPLATES.forEach((t) => {
+      const c = document.createElement('div'); c.className = 'tpl-card';
+      const h = document.createElement('h4'); h.textContent = t.title;
+      const p = line(t.desc, 'drno-note');
+      const m = line(`Periode: ${t.period === 'all' ? 'seluruh data' : t.period + ' hari'} · ${t.sections.length} bagian`, 'drno-note');
+      const b = document.createElement('button'); b.className = 'btn-brand'; b.type = 'button'; b.textContent = 'Gunakan templat';
+      b.addEventListener('click', () => makeReport(t.title, t.period, t.sections));
+      c.append(h, p, m, b); grid.appendChild(c);
+    });
+    tplReady = true;
+  }
+  function drawGenerated() {
+    const box = document.getElementById('gen-list'); box.innerHTML = '';
+    const reps = loadReports();
+    if (!reps.length) { box.appendChild(line('Belum ada laporan. Buat dari Custom Report atau Report Templates.', 'drno-note')); return; }
+    const act = (r) => {
+      const s = document.createElement('span'); s.style.display = 'flex'; s.style.gap = '6px';
+      const o = document.createElement('button'); o.className = 'btn-ghost'; o.type = 'button'; o.textContent = 'Buka'; o.addEventListener('click', (ev) => { ev.stopPropagation(); openReport(r.html); });
+      const d = document.createElement('button'); d.className = 'btn-ghost'; d.type = 'button'; d.textContent = 'Hapus';
+      d.addEventListener('click', (ev) => { ev.stopPropagation(); saveReports(loadReports().filter((x) => x.id !== r.id)); drawGenerated(); });
+      s.append(o, d); return s;
+    };
+    box.appendChild(makeTable([['Judul', (r) => r.title], ['Periode', (r) => (r.period === 'all' ? 'Seluruh data' : `${r.period} hari`)],
+      ['Dibuat', (r) => new Date(r.created).toLocaleString('id-ID')], ['', act]], reps, (r) => openReport(r.html)));
+  }
+
+  // ---------- Quick Insight ----------
+  function insights() {
+    const out = [], ov = D('overview')[0];
+    if (!ov) return [['…', 'Data belum termuat.']];
+    const weekly = d3.rollups(D('weekly_platform'), (v) => d3.sum(v, (r) => num(r.posts)), (r) => r.week_start).sort((a, b) => d3.ascending(a[0], b[0]));
+    if (weekly.length > 1) {
+      const [l, p] = [weekly[weekly.length - 1], weekly[weekly.length - 2]]; const ch = p[1] ? (l[1] - p[1]) / p[1] : 0;
+      out.push(['↕', `Volume minggu terakhir (${l[0]}): <b>${fmt(l[1])}</b> unggahan, ${ch >= 0 ? 'naik' : 'turun'} <b>${pct(Math.abs(ch))}</b> dibanding minggu sebelumnya.`]);
+    }
+    const t = triggerRows(null);
+    if (t.length) {
+      const yt = d3.sum(t, (r) => r.yt), nw = d3.sum(t, (r) => r.nw);
+      out.push(['!', `Kata kunci pemicu teratas: <b>${esc(t[0].t)}</b> (${fmt(t[0].n)} penyebutan). ${pct(yt / ((yt + nw) || 1))} penyebutan pemicu berasal dari YouTube.`]);
+      const ideo = t.filter((r) => String(r.g).includes('ideologis')), net = t.filter((r) => String(r.g).includes('jaringan'));
+      if (ideo.length && net.length) out.push(['≈', `Penanda ideologis (${esc(ideo.slice(0, 2).map((r) => r.t).join(', '))}) muncul ${fmt(d3.sum(ideo, (r) => r.nw))}× di berita, sedangkan nama jaringan (${esc(net.slice(0, 2).map((r) => r.t).join(', '))}) ${fmt(d3.sum(net, (r) => r.nw))}× — berita memberitakan peristiwa, bahasa ideologis hidup di platform video.`]);
+    }
+    const h = D('hidden_terms').find((r) => r.kind === 'samaran') || D('hidden_terms')[0];
+    if (h) out.push(['?', `Usulan istilah tersembunyi terkuat: <b>${esc(h.term)}</b> (${h.kind === 'samaran' ? 'samaran dari ' + esc(h.related_to) : 'sering muncul bersama ' + esc(String(h.related_to).replaceAll('/', ', '))}). Perlu ditinjau sebelum masuk kamus.`]);
+    const g = D('geo_provinces').filter((r) => num(r.trigger_posts)).sort((a, b) => num(b.trigger_posts) - num(a.trigger_posts))[0];
+    if (g) out.push(['⌖', `Wilayah paling sering disebut dalam unggahan pemicu: <b>${esc(g.province)}</b> (${fmt(num(g.trigger_posts))} unggahan).`]);
+    const n = D('sna_nodes').filter((r) => r.display_name).sort((a, b) => num(b.pagerank) - num(a.pagerank))[0];
+    if (n) out.push(['◎', `Aktor publik paling sentral di jaringan: <b>${esc(n.display_name)}</b> (komunitas ${esc(n.community)}, ${fmt(num(n.in_degree))} interaksi masuk).`]);
+    out.push(['✓', `${pct(num(ov.uncertain_share))} klasifikasi masih tidak pasti; <b>${fmt(num(ov.manual_review_queue))}</b> unggahan menunggu validasi manual sebelum temuan dikutip.`]);
+    return out;
+  }
+  const insDlg = document.getElementById('ins-dlg');
+  document.getElementById('btn-insight').addEventListener('click', () => {
+    const body = document.getElementById('ins-body'); body.innerHTML = '';
+    insights().forEach(([ic, html]) => { const d = document.createElement('div'); d.className = 'ins-item'; d.innerHTML = `<i>${esc(ic)}</i><div>${html}</div>`; body.appendChild(d); });
+    body.appendChild(line('Disusun otomatis berbasis aturan dari data DRNO di server ini (tanpa layanan AI eksternal). Bukan temuan final; verifikasi sebelum dikutip.', 'drno-note'));
+    if (insDlg.showModal) insDlg.showModal(); else insDlg.setAttribute('open', '');
+  });
+  document.getElementById('ins-close').addEventListener('click', () => insDlg.close ? insDlg.close() : insDlg.removeAttribute('open'));
+
   // ---------- tabs ----------
   function drawCurrent() {
     drawKPIs(); drawBanner();
@@ -1205,6 +1701,12 @@
     if (current === 'sna') drawSX();
     if (current === 'temporal') { drawTemporal(); drawPos(); }
     if (current === 'teori') drawTheory();
+    if (current === 'entity') drawEntities();
+    if (current === 'geo') drawGeo();
+    if (current === 'mention') drawMentions();
+    if (current === 'report') drawReportForm();
+    if (current === 'templates') drawTemplates();
+    if (current === 'generated') drawGenerated();
   }
   root.querySelectorAll('.drno-tab').forEach((b) => b.addEventListener('click', () => {
     current = b.dataset.tab;
@@ -1214,7 +1716,10 @@
     drawCurrent();
   }));
   const startTab = location.hash.slice(1);
-  if (['overview', 'platform', 'narasi', 'sna', 'temporal', 'teori', 'metode'].includes(startTab)) { const b = root.querySelector(`.drno-tab[data-tab="${startTab}"]`); if (b) b.click(); }
+  if (['overview', 'platform', 'narasi', 'sna', 'entity', 'geo', 'mention', 'report', 'templates', 'generated', 'temporal', 'teori', 'metode'].includes(startTab)) {
+    const b = root.querySelector(`.drno-tab[data-tab="${startTab}"]`);
+    if (b) { const more = b.closest('details'); if (more) more.open = true; b.click(); }
+  }
   dash.onData(drawCurrent);
 })();
 </script>

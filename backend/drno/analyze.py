@@ -14,7 +14,7 @@ from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
-from . import discovery, nlp, sna
+from . import discovery, explorer, nlp, sna
 from .keywords import KeywordDictionary
 
 PLATFORM_NOTES = {
@@ -119,6 +119,16 @@ def export_dashboard(posts, inter, out, mode: str, sentiment_model=None, public_
                      "note": PLATFORM_NOTES.get(plat, "")})
     w("platform_summary.csv", rows, ["platform", "posts", "accounts", "interactions", "uncertain_share", "violence_flag_review", "note"])
 
+    # --- Modul eksplorasi: entitas, penyebutan kata kunci, sebaran wilayah ---
+    triggers = {t for t, e in kd.current.terms.items() if discovery.TRIGGER_GROUPS & set(e["groups"])}
+    w("entities.csv", explorer.entities(posts, inter, public_names, triggers, comm, metrics),
+      ["entity_id", "display_name", "type", "platform", "posts", "trigger_posts", "engagement", "interactions_in", "interactions_out",
+       "community", "pagerank", "first_seen", "last_seen", "top_keywords"])
+    m_daily, m_public = explorer.mentions(posts, public_names, {t: e["groups"] for t, e in kd.current.terms.items()})
+    w("mentions_daily.csv", m_daily, ["day", "keyword", "group", "platform", "posts"])
+    w("mentions_public.csv", m_public, ["day", "source", "type", "platform", "keywords", "groups", "excerpt", "url", "engagement"])
+    w("geo_provinces.csv", explorer.geo(posts, triggers), ["code", "province", "posts", "trigger_posts", "top_keywords"])
+
     if G.number_of_edges():
         nf = ["node_id", "platform", "author_type", "community", "degree", "in_degree", "out_degree", "betweenness", "closeness", "eigenvector", "pagerank"]
         plat_of = {}
@@ -188,17 +198,8 @@ def export_sna_explorer(posts, inter, G, metrics, comm, w, real: bool = False, p
     for i in inter:
         plat_of.setdefault(i["source"], i["platform"])
         plat_of.setdefault(i["target"], i["platform"])
-    def atype(n):
-        if n.startswith("media:"):
-            return "media"
-        if n.startswith("page:"):
-            return "page"
-        return "channel" if public_names.get(n, {}).get("type") == "channel" else "account"
-
-    def display(n):
-        if n.startswith(("media:", "page:")):
-            return n.split(":", 1)[1]
-        return public_names.get(n, {}).get("name", "") if atype(n) == "channel" else ""
+    atype = lambda n: explorer.entity_kind(n, public_names)[0]
+    display = lambda n: explorer.entity_kind(n, public_names)[1]
     rows = []
     for n in G.nodes:
         a = agg[n]
