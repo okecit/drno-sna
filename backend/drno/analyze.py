@@ -130,7 +130,8 @@ def export_dashboard(posts, inter, out, mode: str, sentiment_model=None, public_
     m_daily, m_public = explorer.mentions(posts, public_names, {t: e["groups"] for t, e in kd.current.terms.items()})
     w("mentions_daily.csv", m_daily, ["day", "keyword", "group", "platform", "posts"])
     w("mentions_public.csv", m_public, ["day", "source", "type", "platform", "keywords", "groups", "excerpt", "url", "engagement"])
-    w("geo_provinces.csv", explorer.geo(posts, triggers), ["code", "province", "posts", "trigger_posts", "top_keywords"])
+    w("geo_provinces.csv", explorer.geo(posts, triggers),
+      ["code", "province", "posts", "trigger_posts", "negative_posts", "positive_posts", "negative_share", "top_keywords"])
 
     if G.number_of_edges():
         nf = ["node_id", "platform", "author_type", "community", "degree", "in_degree", "out_degree", "betweenness", "closeness", "eigenvector", "pagerank"]

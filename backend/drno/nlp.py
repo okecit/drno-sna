@@ -95,10 +95,18 @@ class BaselineClassifier:
     def stance(self, ctx: Prediction) -> Prediction:
         return Prediction("stance", STANCE_FROM_CONTEXT[ctx.label], ctx.confidence)
 
-    POS = {"damai", "baik", "setuju", "dukung", "toleransi", "satu", "syukur", "apresiasi", "indah", "sejuk", "mantap",
-           "penting", "rahmat", "teguh", "istiqamah", "lurus", "kenal"}
+    # Kata topik crawl (teroris, terorisme, radikal, ekstremisme, ...) SENGAJA tidak dimasukkan: kata itu ada di
+    # hampir semua unggahan karena menjadi syarat pengambilan, sehingga akan membuat semua unggahan "negatif".
+    # Leksikon menangkap nada & peristiwa (bom, tewas, takut, damai, rukun ...). "satu"/"penting"/"kenal"
+    # dihapus dari POS karena netral ("satu orang tewas" sebelumnya terhitung positif).
+    POS = {"damai", "baik", "setuju", "dukung", "toleransi", "syukur", "apresiasi", "indah", "sejuk", "mantap",
+           "rahmat", "teguh", "istiqamah", "lurus", "aman", "rukun", "harmonis", "bangga", "bantu", "peduli",
+           "sukses", "berhasil", "selamat", "sayang", "hormat", "bijak", "moderat", "bersatu", "maaf", "lindung"}
     NEG = {"benci", "marah", "kecam", "takut", "buruk", "zalim", "ancam", "tolak", "kutuk", "represif", "korupsi",
-           "adil", "serang", "bunuh", "uji", "picu", "lemah", "henti"}
+           "adil", "serang", "bunuh", "uji", "picu", "lemah", "henti",
+           "bom", "ledak", "tewas", "korban", "bantai", "sadis", "keji", "hancur", "rusak", "bakar", "bahaya",
+           "panik", "duka", "sedih", "tragis", "rusuh", "musuh", "perang", "sesat", "hina", "fitnah", "provokasi",
+           "keras", "teror", "culik", "tembak", "luka", "mati", "geram", "murka", "biadab", "kejam"}
     _PREF = ("meng", "meny", "mem", "men", "me", "di", "ber", "ter", "pen", "pem", "pe", "ke")
     _SUF = ("kannya", "nya", "kan", "an", "i")
 

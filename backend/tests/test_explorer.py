@@ -32,3 +32,19 @@ def test_entities_names_only_public_and_geo_counts():
     assert rows["yo_warga"]["display_name"] == "" and rows["yo_warga"]["type"] == "account"
     g = {r["code"]: r for r in geo(posts, {"thaghut"})}
     assert g["JK"]["trigger_posts"] == 1 and g["JB"]["posts"] == 1 and len(g) == 38
+
+
+def test_sentiment_lexicon_tone_not_topic():
+    from drno.nlp import BaselineClassifier
+    s = lambda t: BaselineClassifier().sentiment(t).label
+    assert s("Satu orang tewas dalam ledakan bom di Makassar") == "negatif"  # "satu" bukan kata positif
+    assert s("Kajian tentang terorisme dan radikalisme") == "netral"        # kata topik crawl tidak menentukan nada
+    assert s("Warga Poso hidup rukun dan damai") == "positif"
+
+
+def test_geo_counts_negative_sentiment_per_province():
+    posts = [dict(_p("a", "teror di Poso", []), sentiment="negatif"), dict(_p("b", "Poso damai", []), sentiment="positif"),
+             dict(_p("c", "bom di Poso", []), sentiment="negatif"), dict(_p("d", "Bali indah", []), sentiment="netral")]
+    g = {r["code"]: r for r in geo(posts, set())}
+    assert (g["ST"]["negative_posts"], g["ST"]["positive_posts"], g["ST"]["negative_share"]) == (2, 1, 0.667)
+    assert g["BA"]["negative_posts"] == 0 and g["BA"]["negative_share"] == 0.0 and g["AC"]["negative_share"] == 0

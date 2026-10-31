@@ -141,14 +141,22 @@ def provinces_in(text: str) -> set[str]:
 
 
 def geo(posts, triggers: set) -> list[dict]:
-    n, trig, kw = Counter(), Counter(), defaultdict(Counter)
+    """Penyebutan per provinsi + sentimen (hasil leksikon baseline) unggahan yang menyebutnya."""
+    n, trig, neg, pos, kw = Counter(), Counter(), Counter(), Counter(), defaultdict(Counter)
     for p in posts:
         codes = provinces_in(p["text"])
         kws = set(p.get("keyword_matched") or [])
+        s = p.get("sentiment")
         for c in codes:
             n[c] += 1
             kw[c].update(kws)
             if kws & triggers:
                 trig[c] += 1
+            if s == "negatif":
+                neg[c] += 1
+            elif s == "positif":
+                pos[c] += 1
     return [{"code": code, "province": name, "posts": n.get(code, 0), "trigger_posts": trig.get(code, 0),
+             "negative_posts": neg.get(code, 0), "positive_posts": pos.get(code, 0),
+             "negative_share": round(neg[code] / n[code], 3) if n.get(code) else 0,
              "top_keywords": ";".join(k for k, _ in kw[code].most_common(3))} for code, name, _ in PROVINCES]

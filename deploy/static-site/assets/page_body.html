@@ -488,9 +488,9 @@
     <div class="drno-card">
       <div class="vos-bar">
         <h3 id="geomap">Geospasial: sebaran penyebutan wilayah</h3>
-        <div class="sx-seg" id="geo-mode"><button data-v="posts" aria-pressed="true">Semua unggahan</button><button data-v="trigger_posts" aria-pressed="false">Unggahan pemicu</button></div>
+        <div class="sx-seg" id="geo-mode" style="grid-template-columns: repeat(3, minmax(6.5rem, auto))"><button data-v="negative_posts" aria-pressed="true">Sentimen negatif</button><button data-v="posts" aria-pressed="false">Semua unggahan</button><button data-v="trigger_posts" aria-pressed="false">Unggahan pemicu</button></div>
       </div>
-      <p class="drno-note">Peta choropleth 38 provinsi (proyeksi Mercator). Warna = unggahan yang <b>menyebut</b> nama provinsi atau kota utamanya, bukan lokasi pengunggah. Nama kota yang juga kata umum (Serang, Malang, Medan, Solo, Palu, …) hanya dihitung bila ditulis berhuruf kapital. Gulir untuk memperbesar, seret untuk menggeser, klik ganda untuk reset.</p>
+      <p class="drno-note">Peta choropleth 38 provinsi (proyeksi Mercator). <b>Merah</b> (mode Sentimen negatif): semakin merah tua, semakin banyak unggahan bernada negatif yang menyebut wilayah itu. Sentimen adalah hasil leksikon baseline (belum divalidasi) dan mengukur nada bahasa, bukan sikap: berita yang mengecam teror juga bernada negatif. <b>Biru</b>: jumlah penyebutan (semua / pemicu). Nilai = unggahan yang <b>menyebut</b> nama provinsi atau kota utamanya, bukan lokasi pengunggah. Nama kota yang juga kata umum (Serang, Malang, Medan, Solo, Palu, …) hanya dihitung bila ditulis berhuruf kapital. Gulir untuk memperbesar, seret untuk menggeser, klik ganda untuk reset.</p>
       <div class="geo-wrap">
         <div class="vos-map" id="ch-geo" data-source="geo_provinces" style="height: 480px"></div>
         <div><div class="sx-h">Provinsi teratas</div><div id="geo-top" class="sx-top" style="max-height: 28rem"></div></div>
@@ -1542,7 +1542,10 @@
   }
 
   // ---------- Geospasial (choropleth provinsi) ----------
-  let geoMode = 'posts';
+  let geoMode = 'negative_posts';
+  const GEO_LABEL = { negative_posts: 'unggahan bersentimen negatif', posts: 'semua unggahan', trigger_posts: 'unggahan pemicu' };
+  // Merah = sentimen negatif (makin tua makin banyak); biru = volume penyebutan
+  const GEO_RAMP = { negative_posts: ['#fee2e2', '#fca5a5', '#ef4444', '#b91c1c', '#7f1d1d'], posts: ['#dbeafe', '#7fb3e6', '#1e63b8', '#14306b'], trigger_posts: ['#dbeafe', '#7fb3e6', '#1e63b8', '#14306b'] };
   document.querySelectorAll('#geo-mode button').forEach((b) => b.addEventListener('click', () => {
     geoMode = b.dataset.v; document.querySelectorAll('#geo-mode button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); drawGeo();
   }));
@@ -1572,7 +1575,7 @@
     const rows = D('geo_provinces').map((r) => ({ ...r, v: num(r[geoMode]) }));
     const byCode = new Map(rows.map((r) => [r.code, r]));
     const max = d3.max(rows, (r) => r.v) || 1;
-    const col = d3.scaleSequentialSqrt(d3.interpolateRgbBasis(['#dbeafe', '#7fb3e6', '#1e63b8', '#14306b'])).domain([0, max]);
+    const col = d3.scaleSequentialSqrt(d3.interpolateRgbBasis(GEO_RAMP[geoMode])).domain([0, max]);
     const W = el.clientWidth || 760, H = el.clientHeight || 480;
     const proj = d3.geoMercator().fitExtent([[12, 12], [W - 12, H - 12]], GEO_FC), path = d3.geoPath(proj);
     const svg = d3.select(el).append('svg').attr('width', '100%').attr('height', '100%').attr('viewBox', `0 0 ${W} ${H}`);
@@ -1588,8 +1591,9 @@
       .attr('stroke', 'var(--color-bg)').attr('stroke-width', 0.7).style('cursor', 'default')
       .on('mousemove', function (ev, f) {
         d3.select(this).attr('stroke', 'var(--brand-teal)').raise();
-        const r = byCode.get(f.properties.code) || { posts: 0, trigger_posts: 0 }; const [mx, my] = d3.pointer(ev, el);
-        T.show([line(f.properties.name, 'h'), line(`Semua unggahan: ${fmt(num(r.posts))}`), line(`Unggahan pemicu: ${fmt(num(r.trigger_posts))}`),
+        const r = byCode.get(f.properties.code) || { posts: 0, trigger_posts: 0, negative_posts: 0, positive_posts: 0, negative_share: 0 }; const [mx, my] = d3.pointer(ev, el);
+        T.show([line(f.properties.name, 'h'), swLine(GEO_RAMP.negative_posts[3], `Sentimen negatif: ${fmt(num(r.negative_posts))}${num(r.posts) ? ` (${pct(num(r.negative_share))} dari unggahan)` : ''}`),
+          line(`Sentimen positif: ${fmt(num(r.positive_posts))}`), line(`Semua unggahan: ${fmt(num(r.posts))} · pemicu: ${fmt(num(r.trigger_posts))}`),
           line(r.top_keywords ? `Kata kunci: ${String(r.top_keywords).replaceAll(';', ', ')}` : 'Belum ada kata kunci')], mx, my);
       })
       .on('mouseleave', function () { d3.select(this).attr('stroke', 'var(--color-bg)'); T.hide(); });
@@ -1607,7 +1611,7 @@
       .text((f) => `${f.properties.name} · ${fmt(byCode.get(f.properties.code).v)}`).style('font-size', '11px').style('font-weight', 600)
       .attr('fill', 'var(--color-fg)').attr('paint-order', 'stroke').attr('stroke', 'var(--color-bg)').attr('stroke-width', 3);
     const stops = [...new Set([0.05, 0.25, 0.5, 1].map((t) => Math.max(1, Math.round(t * max))))];
-    legend('lg-geo', [['var(--color-panel)', 'Tidak disebut'], ...stops.map((v) => [col(v), fmt(v)]), ['var(--color-fg-muted)', geoMode === 'posts' ? '(semua unggahan)' : '(unggahan pemicu)']]);
+    legend('lg-geo', [['var(--color-panel)', geoMode === 'negative_posts' ? 'Tidak ada' : 'Tidak disebut'], ...stops.map((v) => [col(v), fmt(v)]), ['var(--color-fg-muted)', `(${GEO_LABEL[geoMode]})`]]);
     const top = document.getElementById('geo-top'); top.innerHTML = '';
     rows.filter((r) => r.v).sort((a, b) => b.v - a.v).slice(0, 15).forEach((r) => {
       const l = document.createElement('label'); l.style.gridTemplateColumns = '1fr auto';
