@@ -60,7 +60,7 @@ def main():
         shutil.rmtree(out)
     (out / "assets").mkdir(parents=True)
     (out / "data").mkdir()
-    for f in ["d3.v7.min.js", "drno-runtime.js", "drno-theme.css", "drno-logo.webp", "drno-logo.png", "drno-mark.png", "drno-icon.png"]:
+    for f in ["d3.v7.min.js", "drno-runtime.js", "drno-theme.css", "drno-logo.webp", "drno-logo.png", "drno-mark.png", "drno-icon.png", "drno-provinsi.geojson"]:
         shutil.copy(SRC / "assets" / f, out / "assets" / f)
     ver = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
     body = (SRC / "assets" / "page_body.html").read_text(encoding="utf-8")

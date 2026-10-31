@@ -180,7 +180,7 @@
     <div class="side-h">Analisis</div>
     <button class="drno-tab" role="tab" data-tab="sna" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Network</button>
     <button class="drno-tab" role="tab" data-tab="entity" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="m8.2 10.8 7.6-3.6M8.2 13.2l7.6 3.6"/></svg>Entity Explorer</button>
-    <button class="drno-tab" role="tab" data-tab="geo" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg>Geomap</button>
+    <button class="drno-tab" role="tab" data-tab="geo" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg>Geospasial</button>
     <button class="drno-tab" role="tab" data-tab="mention" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>Mention Explorer</button>
     <div class="side-h">Reporting</div>
     <button class="drno-tab" role="tab" data-tab="report" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><circle cx="16.5" cy="16.5" r="3.5"/></svg>Custom Report</button>
@@ -487,14 +487,16 @@
   <section class="drno-page" id="geo">
     <div class="drno-card">
       <div class="vos-bar">
-        <h3 id="geomap">Geomap: sebaran penyebutan wilayah</h3>
+        <h3 id="geomap">Geospasial: sebaran penyebutan wilayah</h3>
         <div class="sx-seg" id="geo-mode"><button data-v="posts" aria-pressed="true">Semua unggahan</button><button data-v="trigger_posts" aria-pressed="false">Unggahan pemicu</button></div>
       </div>
-      <p class="drno-note">Peta ubin 38 provinsi (posisi mendekati geografi). Nilai = unggahan yang <b>menyebut</b> nama provinsi atau kota utamanya, bukan lokasi pengunggah. Nama kota yang juga kata umum (Serang, Malang, Medan, Solo, Palu, …) hanya dihitung bila ditulis berhuruf kapital.</p>
+      <p class="drno-note">Peta choropleth 38 provinsi (proyeksi Mercator). Warna = unggahan yang <b>menyebut</b> nama provinsi atau kota utamanya, bukan lokasi pengunggah. Nama kota yang juga kata umum (Serang, Malang, Medan, Solo, Palu, …) hanya dihitung bila ditulis berhuruf kapital. Gulir untuk memperbesar, seret untuk menggeser, klik ganda untuk reset.</p>
       <div class="geo-wrap">
-        <div class="drno-chart" id="ch-geo" data-source="geo_provinces" style="min-height: 420px"></div>
-        <div><div class="sx-h">Provinsi teratas</div><div id="geo-top" class="sx-top" style="max-height: 26rem"></div></div>
+        <div class="vos-map" id="ch-geo" data-source="geo_provinces" style="height: 480px"></div>
+        <div><div class="sx-h">Provinsi teratas</div><div id="geo-top" class="sx-top" style="max-height: 28rem"></div></div>
       </div>
+      <div class="drno-legend" id="lg-geo"></div>
+      <p class="drno-note" style="font-size: 11px">Batas provinsi: “Indonesia GeoJSON &amp; TopoJSON Maps (38 Provinces)”, denyherianto, <a href="https://github.com/denyherianto/indonesia-geojson-topojson-maps-with-38-provinces" target="_blank" rel="noopener noreferrer">GitHub</a>, lisensi <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>; disederhanakan (koordinat 3 desimal). Batas untuk visualisasi riset, bukan peta resmi BIG.</p>
     </div>
   </section>
 
@@ -1539,37 +1541,73 @@
     rows.slice(0, 400), (r) => { if (!r.community && r.community !== 0) return; sxSel = r.entity_id; root.querySelector('.drno-tab[data-tab="sna"]').click(); }));
   }
 
-  // ---------- Geomap (peta ubin provinsi) ----------
-  const GEO_TILES = { AC: [0, 0], SU: [1, 0], RI: [2, 0], KR: [3, 0], KB: [5, 0], KU: [7, 0], SA: [10, 0], MU: [12, 0],
-    SB: [1, 1], JA: [2, 1], BB: [3, 1], KT: [5, 1], KS: [6, 1], KI: [7, 1], SR: [8, 1], ST: [9, 1], GO: [10, 1], MA: [12, 1], PD: [13, 1], PB: [14, 1],
-    BE: [1, 2], SS: [2, 2], LA: [3, 2], SN: [8, 2], SG: [9, 2], PT: [14, 2], PA: [15, 2],
-    BT: [3, 3], JK: [4, 3], JB: [5, 3], JT: [6, 3], JI: [7, 3], BA: [8, 3], NB: [9, 3], NT: [10, 3], PE: [15, 3], YO: [6, 4], PS: [15, 4] };
+  // ---------- Geospasial (choropleth provinsi) ----------
   let geoMode = 'posts';
   document.querySelectorAll('#geo-mode button').forEach((b) => b.addEventListener('click', () => {
     geoMode = b.dataset.v; document.querySelectorAll('#geo-mode button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); drawGeo();
   }));
+  // Geometri 38 provinsi (assets/drno-provinsi.geojson, CC BY 4.0) dimuat sekali dari server sendiri
+  let GEO_FC = null, geoLoad = null;
+  function loadGeo() {
+    if (!geoLoad) {
+      geoLoad = fetch('assets/drno-provinsi.geojson', { credentials: 'same-origin' }).then((r) => (r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status))))
+        .then((fc) => {
+          // d3 memakai urutan ring searah jarum jam (bola); GeoJSON RFC 7946 berlawanan -> balik ring bila luasnya "menutupi bola"
+          fc.features.forEach((f) => {
+            if (d3.geoArea(f) > 2 * Math.PI) {
+              const rev = (poly) => poly.map((ring) => ring.slice().reverse());
+              f.geometry.coordinates = f.geometry.type === 'Polygon' ? rev(f.geometry.coordinates) : f.geometry.coordinates.map(rev);
+            }
+          });
+          GEO_FC = fc; if (current === 'geo') drawGeo();
+        }).catch(() => { GEO_FC = false; if (current === 'geo') drawGeo(); });
+    }
+    return geoLoad;
+  }
   function drawGeo() {
     const el = document.getElementById('ch-geo');
     if (!prep(el, ['geo_provinces'])) return;
+    if (GEO_FC === null) { el.classList.add('dash-skeleton'); loadGeo(); return; }
+    if (GEO_FC === false) { el.appendChild(line('Peta batas provinsi gagal dimuat (assets/drno-provinsi.geojson).', 'drno-fail')); return; }
     const rows = D('geo_provinces').map((r) => ({ ...r, v: num(r[geoMode]) }));
+    const byCode = new Map(rows.map((r) => [r.code, r]));
     const max = d3.max(rows, (r) => r.v) || 1;
-    const col = d3.scaleSequential(d3.interpolateRgbBasis(['#e8f1fb', '#7fb3e6', '#1e63b8', '#14306b'])).domain([0, max]);
-    const W = el.clientWidth || 760, cols = 16, gap = 4, s = Math.min(64, (W - gap * cols) / cols), H = 5 * (s + gap) + 30;
-    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${cols * (s + gap)} ${H}`);
-    const T = tip(el), k = () => el.getBoundingClientRect().width / (cols * (s + gap));
-    rows.forEach((r) => {
-      const p = GEO_TILES[r.code]; if (!p) return;
-      const g = svg.append('g').attr('transform', `translate(${p[0] * (s + gap)},${p[1] * (s + gap)})`);
-      g.append('rect').attr('width', s).attr('height', s).attr('rx', 8).attr('fill', r.v ? col(r.v) : 'var(--color-panel)').attr('stroke', 'var(--color-border-line)');
-      const dark = r.v > max * 0.45;
-      g.append('text').attr('x', s / 2).attr('y', s / 2 - 3).attr('text-anchor', 'middle').text(r.code).style('font-size', '13px').style('font-weight', 700).attr('fill', dark ? '#fff' : 'var(--color-fg)');
-      g.append('text').attr('x', s / 2).attr('y', s / 2 + 13).attr('text-anchor', 'middle').text(r.v ? fmt(r.v) : '·').style('font-size', '11px').attr('fill', dark ? '#e5edf8' : 'var(--color-fg-muted)');
-      g.on('mousemove', (ev) => { const [mx, my] = d3.pointer(ev, svg.node()); T.show([line(r.province, 'h'), line(`Semua unggahan: ${fmt(num(r.posts))}`), line(`Unggahan pemicu: ${fmt(num(r.trigger_posts))}`),
-        line(r.top_keywords ? `Kata kunci: ${String(r.top_keywords).replaceAll(';', ', ')}` : 'Belum ada kata kunci')], mx * k(), my * k()); }).on('mouseleave', () => T.hide());
+    const col = d3.scaleSequentialSqrt(d3.interpolateRgbBasis(['#dbeafe', '#7fb3e6', '#1e63b8', '#14306b'])).domain([0, max]);
+    const W = el.clientWidth || 760, H = el.clientHeight || 480;
+    const proj = d3.geoMercator().fitExtent([[12, 12], [W - 12, H - 12]], GEO_FC), path = d3.geoPath(proj);
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('height', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+    svg.append('rect').attr('width', W).attr('height', H).attr('fill', 'color-mix(in srgb, var(--brand-blue) 6%, var(--color-bg))');
+    const z = svg.append('g');
+    const zoom = d3.zoom().scaleExtent([1, 12]).translateExtent([[0, 0], [W, H]]).on('zoom', (ev) => {
+      z.attr('transform', ev.transform); z.selectAll('path.prov').attr('stroke-width', 0.7 / ev.transform.k); z.selectAll('text').style('font-size', `${11 / Math.sqrt(ev.transform.k)}px`);
     });
-    const lg = svg.append('g').attr('transform', `translate(0,${5 * (s + gap) + 6})`);
-    [0, 0.25, 0.5, 0.75, 1].forEach((t, i) => { lg.append('rect').attr('x', i * 34).attr('width', 32).attr('height', 10).attr('rx', 2).attr('fill', col(t * max)); });
-    lg.append('text').attr('x', 5 * 34 + 6).attr('y', 9).text(`0 – ${fmt(max)} ${geoMode === 'posts' ? 'unggahan' : 'unggahan pemicu'}`).style('font-size', '11px').attr('fill', 'var(--color-fg-muted)');
+    svg.call(zoom).on('dblclick.zoom', null).on('dblclick', () => svg.transition().duration(400).call(zoom.transform, d3.zoomIdentity));
+    const T = tip(el);
+    z.selectAll('path.prov').data(GEO_FC.features).join('path').attr('class', 'prov').attr('d', path)
+      .attr('fill', (f) => { const r = byCode.get(f.properties.code); return r && r.v ? col(r.v) : 'var(--color-panel)'; })
+      .attr('stroke', 'var(--color-bg)').attr('stroke-width', 0.7).style('cursor', 'default')
+      .on('mousemove', function (ev, f) {
+        d3.select(this).attr('stroke', 'var(--brand-teal)').raise();
+        const r = byCode.get(f.properties.code) || { posts: 0, trigger_posts: 0 }; const [mx, my] = d3.pointer(ev, el);
+        T.show([line(f.properties.name, 'h'), line(`Semua unggahan: ${fmt(num(r.posts))}`), line(`Unggahan pemicu: ${fmt(num(r.trigger_posts))}`),
+          line(r.top_keywords ? `Kata kunci: ${String(r.top_keywords).replaceAll(';', ', ')}` : 'Belum ada kata kunci')], mx, my);
+      })
+      .on('mouseleave', function () { d3.select(this).attr('stroke', 'var(--color-bg)'); T.hide(); });
+    // Label nama untuk provinsi dengan nilai tertinggi (di titik tengah poligon)
+    // Label yang bertabrakan (mis. provinsi-provinsi Jawa yang berdekatan) dilewati; tetap terbaca di tooltip / saat di-zoom
+    const placed = [], clash = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+    const labelled = GEO_FC.features.filter((f) => (byCode.get(f.properties.code) || {}).v).sort((a, b) => byCode.get(b.properties.code).v - byCode.get(a.properties.code).v)
+      .filter((f) => {
+        const [cx, cy] = path.centroid(f), w = (`${f.properties.name} · ${byCode.get(f.properties.code).v}`).length * 6.2, b = { x: cx - w / 2, y: cy - 8, w, h: 16 };
+        if (placed.length >= 10 || placed.some((p) => clash(p, b))) return false;
+        placed.push(b); return true;
+      });
+    z.append('g').style('pointer-events', 'none').selectAll('text').data(labelled).join('text')
+      .attr('transform', (f) => `translate(${path.centroid(f)})`).attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
+      .text((f) => `${f.properties.name} · ${fmt(byCode.get(f.properties.code).v)}`).style('font-size', '11px').style('font-weight', 600)
+      .attr('fill', 'var(--color-fg)').attr('paint-order', 'stroke').attr('stroke', 'var(--color-bg)').attr('stroke-width', 3);
+    const stops = [...new Set([0.05, 0.25, 0.5, 1].map((t) => Math.max(1, Math.round(t * max))))];
+    legend('lg-geo', [['var(--color-panel)', 'Tidak disebut'], ...stops.map((v) => [col(v), fmt(v)]), ['var(--color-fg-muted)', geoMode === 'posts' ? '(semua unggahan)' : '(unggahan pemicu)']]);
     const top = document.getElementById('geo-top'); top.innerHTML = '';
     rows.filter((r) => r.v).sort((a, b) => b.v - a.v).slice(0, 15).forEach((r) => {
       const l = document.createElement('label'); l.style.gridTemplateColumns = '1fr auto';
