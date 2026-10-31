@@ -17,9 +17,9 @@ def entity_kind(node: str, public_names: dict) -> tuple[str, str]:
     """(jenis, nama tampilan) sebuah penulis. Nama kosong untuk akun individu."""
     if node.startswith("media:"):
         return "media", node.split(":", 1)[1]
-    if node.startswith("page:"):
-        return "page", node.split(":", 1)[1]
     pub = public_names.get(node, {})
+    if node.startswith("page:"):
+        return "page", pub.get("name") or node.split(":", 1)[1]   # nama Page bila sudah diambil dari Graph API
     if pub.get("type") == "channel" and pub.get("name"):
         return "channel", pub["name"]
     return "account", ""

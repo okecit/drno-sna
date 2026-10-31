@@ -4,6 +4,7 @@
   python -m drno.maintenance retention   # hapus unggahan yang melewati retention_until (+ interaksi & anotasi)
   python -m drno.maintenance stats       # ringkasan isi database
   python -m drno.maintenance label-channels  # isi nama publik kanal pemilik video YouTube yang sudah tersimpan
+  python -m drno.maintenance fb-pages bnptri https://www.facebook.com/kemenag.ri   # cari ID Page untuk FB_PAGE_IDS
 """
 from __future__ import annotations
 
@@ -116,6 +117,19 @@ if __name__ == "__main__":
     if cmd == "label-channels":
         print(json.dumps(label_channels(), indent=2))
         sys.exit(0)
+    if cmd == "fb-pages":
+        from .collectors.base import NotConfigured
+        from .collectors.facebook import resolve_pages
+        try:
+            rows = resolve_pages(sys.argv[2:])
+        except NotConfigured as e:
+            print(f"[DRNO] {e}. Isi token lewat skrip pengisi kunci setelah Page Public Content Access disetujui (lihat docs/FACEBOOK_PPCA.md).")
+            sys.exit(2)
+        for r in rows:
+            print(f"{r['input']:<45} {r['id'] or '-':<20} {r['name'] or r['error']}")
+        ok = [r["id"] for r in rows if r["id"]]
+        print(f"\nFB_PAGE_IDS={','.join(ok)}" if ok else "\nTidak ada Page yang ditemukan (cek token & izin Page Public Content Access).")
+        sys.exit(0 if ok else 1)
     if cmd == "wait-db":
         sys.exit(0 if wait_db() else 1)
     if cmd == "has-data":  # kode keluar 0 bila ada unggahan nyata
