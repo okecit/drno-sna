@@ -18,7 +18,7 @@ import math
 import re
 from collections import Counter
 
-from .keywords import KeywordDictionary, normalize
+from .keywords import KeywordDictionary, load_review, normalize
 
 TRIGGER_GROUPS = {"ideologis", "jaringan_ekstrem"}
 
@@ -85,9 +85,20 @@ def trigger_counts(posts, kd: KeywordDictionary) -> list[dict]:
             continue
         plat = Counter(p["platform"] for p in hit)
         days = sorted(p["timestamp"][:10] for p in hit)
+        # Ejaan yang benar-benar dipakai pengunggah (thogut / thagut / thaghut / #thogut ...)
+        forms = [v for v in e["variants"] if not v.startswith("#")]
+        used = Counter()
+        for p in hit:
+            txt = normalize(p["text"])
+            for v in sorted(forms, key=len, reverse=True):
+                if re.search(r"(?<![\w])" + re.escape(v) + r"(?!\w)", txt):
+                    used[v] += 1
+                    break
         rows.append({"term": t, "group": "/".join(e["groups"]), "posts": len(hit), "youtube": plat.get("youtube", 0),
                      "news": plat.get("news", 0), "other": len(hit) - plat.get("youtube", 0) - plat.get("news", 0),
-                     "first_seen": days[0], "last_seen": days[-1]})
+                     "first_seen": days[0], "last_seen": days[-1],
+                     "spellings": ";".join(f"{v}:{n}" for v, n in used.most_common()),
+                     "variants": ";".join(v for v in forms if " " not in v or v == t)})
     return sorted(rows, key=lambda r: -r["posts"])
 
 
@@ -154,5 +165,7 @@ def associated_terms(posts, kd: KeywordDictionary, top: int = 40, min_df: int = 
     return [r for r in out if r["zscore"] >= 2.0 and r["lift"] >= min_lift][:top]
 
 
-def hidden_terms(posts, kd: KeywordDictionary) -> list[dict]:
-    return disguised_variants(posts, kd) + associated_terms(posts, kd)
+def hidden_terms(posts, kd: KeywordDictionary, review_path: str | None = None) -> list[dict]:
+    """Usulan baru saja: istilah yang sudah diterima (ada di kamus) atau ditolak peneliti tidak diusulkan lagi."""
+    _, rejected = load_review(review_path)
+    return [r for r in disguised_variants(posts, kd) + associated_terms(posts, kd) if normalize(r["term"]) not in rejected]

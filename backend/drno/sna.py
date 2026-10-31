@@ -49,8 +49,9 @@ def build_interaction_graph(interactions, nodes_meta=None, types=None, platforms
     return G
 
 
-def build_narrative_cooccurrence(posts, field="keyword_matched", min_weight=2):
-    """Jaringan ko-okurensi istilah/narasi dari unggahan. Tidak menyangkut relasi antarakun."""
+def build_narrative_cooccurrence(posts, field="keyword_matched", min_weight=2, keep=()):
+    """Jaringan ko-okurensi istilah/narasi dari unggahan. Tidak menyangkut relasi antarakun.
+    keep: istilah yang tetap ditampilkan (mis. kata kunci pemicu) walau belum punya pasangan >= min_weight."""
     G = nx.Graph(kind="narrative_cooccurrence")
     freq = Counter()
     pairs = Counter()
@@ -61,6 +62,9 @@ def build_narrative_cooccurrence(posts, field="keyword_matched", min_weight=2):
     for (a, b), w in pairs.items():
         if w >= min_weight:
             G.add_edge(a, b, weight=w)
+    for t in keep:
+        if freq[t] and t not in G:
+            G.add_node(t)
     for n in G.nodes:
         G.nodes[n]["frequency"] = freq[n]
     return G

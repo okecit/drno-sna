@@ -833,19 +833,24 @@
     const rows = st('keyword_weekly').data, weeks = weeksFrom(rows);
     const kws = [...new Set(rows.map((r) => r.keyword))];
     const all = rows.map((r) => num(r.posts)); const maxY = d3.max(all) || 1;
+    const trig = triggerSet(), sp = new Map(D('trigger_terms').map((r) => [r.term, spellingText(r)]));
     kws.forEach((k) => {
       const box = document.createElement('div'); box.style.minWidth = '0';
       const h = document.createElement('div'); h.style.fontSize = 'var(--cds-font-size-caption)';
       const vals = weeks.map((w) => { const r = rows.find((q) => q.week === w && q.keyword === k); return r ? num(r.posts) : 0; });
       const b = document.createElement('b'); b.textContent = k; h.appendChild(b);
       h.appendChild(document.createTextNode(` · ${fmt(d3.sum(vals))} unggahan${BASELINE.has(k) ? ' · pembanding' : ''}`));
+      if (trig.has(k)) {
+        const t = document.createElement('span'); t.className = 'ent-tag'; t.style.marginLeft = '6px'; t.style.color = 'var(--cds-chart-status-critical)'; t.style.borderColor = 'currentColor'; t.textContent = 'pemicu'; h.appendChild(t);
+        if (sp.get(k)) { const s = document.createElement('div'); s.className = 'drno-note'; s.textContent = `Ejaan: ${sp.get(k)}`; h.appendChild(s); }
+      }
       box.appendChild(h);
       const c = document.createElement('div'); c.className = 'drno-chart'; c.style.minHeight = '120px'; box.appendChild(c); el.appendChild(box);
       const W = c.clientWidth || 240, H = 110;
       const svg = d3.select(c).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
       const x = d3.scalePoint(weeks, [4, W - 4]), y = d3.scaleLinear([0, maxY], [H - 18, 6]);
       svg.append('line').attr('x1', 4).attr('x2', W - 4).attr('y1', H - 18).attr('y2', H - 18).attr('stroke', 'var(--cds-chart-axis)');
-      svg.append('path').attr('fill', 'none').attr('stroke', BASELINE.has(k) ? 'var(--cds-chart-muted)' : dash.colors[0]).attr('stroke-width', 2).attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round')
+      svg.append('path').attr('fill', 'none').attr('stroke', BASELINE.has(k) ? 'var(--cds-chart-muted)' : trig.has(k) ? 'var(--cds-chart-status-critical)' : dash.colors[0]).attr('stroke-width', 2).attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round')
         .attr('d', d3.line().x((_, j) => x(weeks[j])).y((v) => y(v))(vals));
       svg.append('text').attr('x', 4).attr('y', H - 4).text(weeks[0]).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg-muted)');
       svg.append('text').attr('x', W - 4).attr('y', H - 4).attr('text-anchor', 'end').text(weeks[weeks.length - 1]).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg-muted)');
@@ -982,15 +987,26 @@
 
   // ---------- kata kunci pemicu & tersembunyi ----------
   const GROUP_ID = { ideologis: 'Penanda ideologis', jaringan_ekstrem: 'Jaringan / aksi', terorisme: 'Terorisme' };
+  // Ejaan yang benar-benar dipakai, mis. "thogut ×8, thaghut ×3"
+  const spellingText = (r) => String(r.spellings || '').split(';').filter(Boolean).map((s) => { const [v, n] = s.split(':'); return `${v} ×${n}`; }).join(', ');
+  // Varian ejaan -> istilah baku (thagut/thogut/taghut -> thaghut), agar pencarian dengan ejaan apa pun menemukan istilahnya
+  function canonicalTerms(q) {
+    const out = new Set(); if (!q) return out;
+    D('trigger_terms').forEach((r) => { if (r.term.includes(q) || String(r.variants).split(';').some((v) => v.includes(q))) out.add(r.term); });
+    return out;
+  }
+  const triggerSet = () => new Set(D('trigger_terms').map((r) => r.term));
   function drawTriggers() {
     const el = document.getElementById('ch-trig');
     if (!prep(el, ['trigger_terms'])) return;
-    const rows = st('trigger_terms').data.map((r) => ({ t: r.term, g: String(r.group).split('/')[0], n: num(r.posts), yt: num(r.youtube), nw: num(r.news), o: num(r.other), f: r.first_seen, l: r.last_seen }));
+    const rows = st('trigger_terms').data.map((r) => ({ t: r.term, g: String(r.group).split('/')[0], n: num(r.posts), yt: num(r.youtube), nw: num(r.news), o: num(r.other), f: r.first_seen, l: r.last_seen,
+      sp: spellingText(r) }));
     if (!rows.length) { el.appendChild(line('Belum ada unggahan yang memuat kata kunci pemicu pada periode ini.', 'drno-note')); legend('lg-trig', []); return; }
     const segs = [['yt', 'YouTube', dash.colors[3]], ['nw', 'Berita & web', dash.colors[0]], ['o', 'Platform lain', dash.colors[4]]];
     const W = el.clientWidth || 600, rowH = 26, H = rows.length * rowH + 6;
     const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
-    const ll = measure(svg, rows.map((d) => d.t)) + 14, vl = measure(svg, rows.map((d) => `${fmt(d.n)} · ${GROUP_ID[d.g] || d.g}`)) + 12;
+    const vtxt = (d) => `${fmt(d.n)} · ${GROUP_ID[d.g] || d.g}${d.sp ? ' · ejaan: ' + d.sp : ''}`;
+    const ll = measure(svg, rows.map((d) => d.t)) + 14, vl = Math.min(W * 0.55, measure(svg, rows.map(vtxt)) + 12);
     const x = d3.scaleLinear([0, d3.max(rows, (d) => d.n) || 1], [0, Math.max(40, W - ll - vl)]);
     const T = tip(el), kk = () => el.getBoundingClientRect().width / W;
     rows.forEach((d, i) => {
@@ -1000,11 +1016,11 @@
       segs.forEach(([k, lab, c]) => {
         if (!d[k]) return;
         svg.append('rect').attr('x', ll + x(acc)).attr('y', yy + 3).attr('height', 15).attr('width', Math.max(1.5, x(d[k]) - 1)).attr('fill', c)
-          .on('mousemove', (ev) => { const [mx, my] = d3.pointer(ev, svg.node()); T.show([line(d.t, 'h'), swLine(c, `${lab}: ${fmt(d[k])} unggahan`), line(`Pertama ${d.f} · terakhir ${d.l}`)], mx * kk(), my * kk()); })
+          .on('mousemove', (ev) => { const [mx, my] = d3.pointer(ev, svg.node()); T.show([line(d.t, 'h'), swLine(c, `${lab}: ${fmt(d[k])} unggahan`), line(`Pertama ${d.f} · terakhir ${d.l}`), ...(d.sp ? [line(`Ejaan dipakai: ${d.sp}`)] : [])], mx * kk(), my * kk()); })
           .on('mouseleave', () => T.hide());
         acc += d[k];
       });
-      svg.append('text').attr('x', ll + x(d.n) + 6).attr('y', yy + 14).text(`${fmt(d.n)} · ${GROUP_ID[d.g] || d.g}`).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg-muted)');
+      svg.append('text').attr('x', ll + x(d.n) + 6).attr('y', yy + 14).text(vtxt(d)).style('font-size', 'var(--cds-font-size-caption)').attr('fill', 'var(--color-fg-muted)');
     });
     legend('lg-trig', segs.filter(([k]) => rows.some((d) => d[k])).map(([, lab, c]) => [c, lab]));
     el.style.minHeight = H + 'px';
@@ -1017,21 +1033,83 @@
     const tr = document.createElement('tr'); cols.forEach(([lab, , n]) => { const th = document.createElement('th'); th.textContent = lab; if (n) th.className = 'n'; tr.appendChild(th); });
     const thead = document.createElement('thead'); thead.appendChild(tr); tb.appendChild(thead);
     const body = document.createElement('tbody');
-    rows.forEach((r) => { const row = document.createElement('tr'); cols.forEach(([, f, n]) => { const td = document.createElement('td'); td.textContent = f(r); if (n) td.className = 'n'; row.appendChild(td); }); body.appendChild(row); });
+    rows.forEach((r) => { const row = document.createElement('tr'); cols.forEach(([, f, n]) => { const td = document.createElement('td'); const v = f(r); if (v instanceof Node) td.appendChild(v); else td.textContent = v; if (n) td.className = 'n'; row.appendChild(td); }); body.appendChild(row); });
     tb.appendChild(body); tw.appendChild(tb); wrap.appendChild(tw); return wrap;
   }
+  // ---------- Tinjauan istilah (review.php; hanya mode login PHP) ----------
+  // Keputusan admin disimpan di server dan dipakai worker pada siklus berikutnya (kamus v1.2 + query crawl).
+  let REVIEW = null, reviewLoading = false, reviewErr = '';
+  const GROUP_LABEL = { ideologis: 'Penanda ideologis', jaringan_ekstrem: 'Jaringan / aksi', radikalisasi: 'Radikalisasi', terorisme: 'Terorisme',
+    narasi_digital: 'Narasi digital', politik_keagamaan: 'Politik keagamaan', konflik: 'Konflik', pencegahan: 'Pencegahan', keagamaan: 'Keagamaan (pembanding)' };
+  async function loadReview() {
+    if (!window.DRNO_DATA_URL || reviewLoading) return;
+    reviewLoading = true;
+    try { const r = await fetch('review.php', { credentials: 'same-origin', cache: 'no-store' }); if (r.ok) REVIEW = await r.json(); } catch (e) { /* mode statis / jaringan */ }
+    reviewLoading = false; if (current === 'narasi') drawHidden();
+  }
+  async function sendReview(term, action, group) {
+    const csrf = document.querySelector('.drno-userbar input[name="csrf"]')?.value || '';
+    reviewErr = '';
+    try {
+      const r = await fetch('review.php', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ csrf, term, action, group }) });
+      const j = await r.json().catch(() => ({}));
+      if (r.ok) REVIEW = j; else reviewErr = j.error || `Gagal (${r.status})`;
+    } catch (e) { reviewErr = 'Gagal terhubung ke server.'; }
+    drawHidden();
+  }
+  const decisionOf = (term) => REVIEW && REVIEW.decisions.find((d) => d.term === String(term).toLowerCase());
+  function defaultGroup(r) {
+    if (r.kind === 'samaran') { const t = D('trigger_terms').find((x) => x.term === r.related_to); return t ? String(t.group).split('/')[0] : 'ideologis'; }
+    return 'narasi_digital';
+  }
+  function reviewCell(r) {
+    const box = document.createElement('span'); box.style.display = 'flex'; box.style.gap = '4px'; box.style.alignItems = 'center'; box.style.flexWrap = 'wrap';
+    const dec = decisionOf(r.term);
+    if (dec) {
+      const tag = document.createElement('span'); tag.className = 'ent-tag' + (dec.decision === 'accept' ? ' pub' : '');
+      tag.textContent = dec.decision === 'accept' ? `Diterima · ${GROUP_LABEL[dec.group] || dec.group}` : 'Ditolak';
+      tag.title = `oleh ${dec.reviewer} · ${new Date(dec.at).toLocaleString('id-ID')}`; box.appendChild(tag);
+      if (REVIEW.can_review) { const u = document.createElement('button'); u.className = 'btn-ghost'; u.type = 'button'; u.textContent = 'Batal'; u.addEventListener('click', (ev) => { ev.stopPropagation(); sendReview(r.term, 'undo'); }); box.appendChild(u); }
+      return box;
+    }
+    if (!REVIEW || !REVIEW.can_review) { box.appendChild(document.createTextNode(REVIEW ? 'Belum ditinjau' : '—')); return box; }
+    const sel = document.createElement('select'); sel.className = 'btn-ghost'; sel.title = 'Kelompok kamus bila diterima';
+    REVIEW.groups.forEach((g) => { const o = document.createElement('option'); o.value = g; o.textContent = GROUP_LABEL[g] || g; sel.appendChild(o); });
+    sel.value = defaultGroup(r);
+    const ok = document.createElement('button'); ok.className = 'btn-brand'; ok.type = 'button'; ok.textContent = 'Terima'; ok.style.padding = '3px 10px';
+    ok.addEventListener('click', () => sendReview(r.term, 'accept', sel.value));
+    const no = document.createElement('button'); no.className = 'btn-ghost'; no.type = 'button'; no.textContent = 'Tolak';
+    no.addEventListener('click', () => sendReview(r.term, 'reject'));
+    box.append(sel, ok, no); return box;
+  }
+  let reviewRequested = false;
   function drawHidden() {
     const el = document.getElementById('ch-hidden');
     if (!prep(el, ['hidden_terms'])) return;
+    if (!reviewRequested) { reviewRequested = true; loadReview(); }
     const rows = st('hidden_terms').data;
     const DET = { angka_pengganti: 'angka pengganti huruf', salah_eja: 'selisih ejaan', kata: 'kata', bigram: 'frasa' };
+    if (REVIEW) {
+      const info = line(REVIEW.can_review
+        ? 'Anda admin: pilih kelompok lalu Terima, atau Tolak. Istilah diterima masuk kamus versi baru dan ikut dipakai crawl pada siklus worker berikutnya (≤ 6 jam); istilah ditolak tidak diusulkan lagi.'
+        : 'Hanya admin yang dapat meninjau. Anda melihat status tinjauan.', 'drno-note');
+      el.appendChild(info);
+    }
+    if (reviewErr) { const er = document.createElement('div'); er.className = 'drno-warn'; er.textContent = reviewErr; el.appendChild(er); }
+    const withReview = (cols) => (REVIEW ? cols.concat([['Tinjauan', reviewCell]]) : cols);
     const grid = document.createElement('div'); grid.className = 'drno-grid';
     grid.appendChild(hiddenTable('Varian samaran', rows.filter((r) => r.kind === 'samaran'),
-      [['Istilah', (r) => r.term], ['Samaran dari', (r) => r.related_to], ['Jenis', (r) => DET[r.detail] || r.detail], ['Unggahan', (r) => fmt(num(r.posts_total)), true]]));
+      withReview([['Istilah', (r) => r.term], ['Samaran dari', (r) => r.related_to], ['Jenis', (r) => DET[r.detail] || r.detail], ['Unggahan', (r) => fmt(num(r.posts_total)), true]])));
     grid.appendChild(hiddenTable('Istilah berasosiasi dengan pemicu', rows.filter((r) => r.kind === 'asosiasi'),
-      [['Istilah', (r) => r.term], ['Muncul bersama', (r) => String(r.related_to).replaceAll('/', ', ')], ['Dgn pemicu / total', (r) => `${fmt(num(r.posts_with_trigger))} / ${fmt(num(r.posts_total))}`, true],
-        ['Lift', (r) => d3.format('.1f')(num(r.lift)) + '×', true], ['z', (r) => d3.format('.1f')(num(r.zscore)), true]]));
+      withReview([['Istilah', (r) => r.term], ['Muncul bersama', (r) => String(r.related_to).replaceAll('/', ', ')], ['Dgn pemicu / total', (r) => `${fmt(num(r.posts_with_trigger))} / ${fmt(num(r.posts_total))}`, true],
+        ['Lift', (r) => d3.format('.1f')(num(r.lift)) + '×', true], ['z', (r) => d3.format('.1f')(num(r.zscore)), true]])));
     el.appendChild(grid);
+    if (REVIEW && REVIEW.decisions.length) {
+      el.appendChild(hiddenTable('Riwayat tinjauan', REVIEW.decisions.slice().sort((a, b) => String(b.at).localeCompare(String(a.at))),
+        [['Istilah', (d) => d.term], ['Keputusan', (d) => (d.decision === 'accept' ? `Diterima · ${GROUP_LABEL[d.group] || d.group}` : 'Ditolak')],
+          ['Oleh', (d) => d.reviewer], ['Waktu', (d) => new Date(d.at).toLocaleString('id-ID')],
+          ['', (d) => { if (!REVIEW.can_review) return ''; const u = document.createElement('button'); u.className = 'btn-ghost'; u.type = 'button'; u.textContent = 'Batal'; u.addEventListener('click', () => sendReview(d.term, 'undo')); return u; }]]));
+    }
     const w = document.createElement('div'); w.className = 'drno-warn';
     w.textContent = 'Usulan otomatis, bukan temuan. Asosiasi tinggi bisa berasal dari pemberitaan penangkapan atau ceramah kontra-narasi. Tinjau konteks unggahan di data internal sebelum menambahkan istilah ke kamus.';
     el.appendChild(w);
@@ -1447,8 +1525,10 @@
     }
     const q = document.getElementById('ent-q').value.trim().toLowerCase(), ty = document.getElementById('ent-type').value;
     const pl = document.getElementById('ent-plat').value, so = document.getElementById('ent-sort').value;
+    const canon = [...canonicalTerms(q)];   // "thagut" juga menemukan entitas dengan kata kunci "thaghut"
+    const hay = (r) => `${r.display_name} ${r.entity_id} ${r.top_keywords}`.toLowerCase();
     const rows = all.filter((r) => (!ty || (ty === 'public' ? r.type !== 'account' : r.type === 'account')) && (!pl || r.platform === pl)
-      && (!q || `${r.display_name} ${r.entity_id} ${r.top_keywords}`.toLowerCase().includes(q)))
+      && (!q || hay(r).includes(q) || canon.some((t) => hay(r).includes(t))))
       .sort((a, b) => num(b[so]) - num(a[so]) || num(b.posts) - num(a.posts));
     document.getElementById('ent-count').textContent = `${fmt(rows.length)} dari ${fmt(all.length)} entitas · ${fmt(all.filter((r) => r.type !== 'account').length)} bernama`;
     const nameCell = (r) => { const s = document.createElement('span'); s.className = 'ent-name'; s.textContent = r.display_name || r.entity_id; return s; };
@@ -1508,7 +1588,9 @@
     const all = D('mentions_daily');
     if (!menReady) {
       const tot = d3.rollup(all, (v) => d3.sum(v, (r) => num(r.posts)), (r) => r.keyword);
-      fillSelect(document.getElementById('men-kw'), [...tot.keys()].sort((a, b) => tot.get(b) - tot.get(a)));
+      // Label pilihan memuat ejaan yang dipakai, mis. "thaghut (thogut ×8, thaghut ×3)"
+      const lab = Object.fromEntries(D('trigger_terms').filter((r) => r.spellings).map((r) => [r.term, `${r.term} (${spellingText(r)})`]));
+      fillSelect(document.getElementById('men-kw'), [...tot.keys()].sort((a, b) => tot.get(b) - tot.get(a)), lab);
       fillSelect(document.getElementById('men-plat'), [...new Set(all.map((r) => r.platform))].sort(), PLAT_ID);
       ['men-kw', 'men-plat', 'men-grp'].forEach((id) => document.getElementById(id).addEventListener('change', drawMentions));
       menReady = true;

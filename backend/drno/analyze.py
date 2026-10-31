@@ -73,6 +73,7 @@ def export_dashboard(posts, inter, out, mode: str, sentiment_model=None, public_
     for p in posts:
         if not p.get("keyword_matched"):
             p["keyword_matched"] = kd.match(p["text"])
+    triggers = {t for t, e in kd.current.terms.items() if discovery.TRIGGER_GROUPS & set(e["groups"])}
     weeks = sorted({week_start(p["timestamp"]) for p in posts})
     wlab = {w: f"W{w.isocalendar()[1]:02d}-{w.year}" for w in weeks}
     lab = lambda ts: wlab[week_start(ts)]
@@ -98,10 +99,13 @@ def export_dashboard(posts, inter, out, mode: str, sentiment_model=None, public_
     sw = Counter((lab(p["timestamp"]), p["stance"]) for p in posts)
     w("stance_weekly.csv", [{"week": k[0], "week_start": start[k[0]], "stance": k[1], "posts": v} for k, v in sorted(sw.items())], ["week", "week_start", "stance", "posts"])
     kw = Counter(k for p in posts for k in p["keyword_matched"]); top = [k for k, _ in kw.most_common(8)]
+    # Kata kunci pemicu (thaghut, kafir harbi, JI, ...) selalu ikut ditampilkan walau tidak masuk 8 teratas
+    top += [k for k, _ in kw.most_common() if k in triggers and k not in top][:12]
     kwc = Counter((lab(p["timestamp"]), k) for p in posts for k in p["keyword_matched"] if k in top)
     w("keyword_weekly.csv", [{"week": wlab[x], "week_start": x.isoformat(), "keyword": k, "posts": kwc.get((wlab[x], k), 0)} for x in weeks for k in top], ["week", "week_start", "keyword", "posts"])
     # --- Kata kunci pemicu & usulan istilah tersembunyi (wajib ditinjau peneliti) ---
-    w("trigger_terms.csv", discovery.trigger_counts(posts, kd), ["term", "group", "posts", "youtube", "news", "other", "first_seen", "last_seen"])
+    w("trigger_terms.csv", discovery.trigger_counts(posts, kd),
+      ["term", "group", "posts", "youtube", "news", "other", "first_seen", "last_seen", "spellings", "variants"])
     w("hidden_terms.csv", discovery.hidden_terms(posts, kd),
       ["term", "kind", "detail", "related_to", "posts_with_trigger", "posts_total", "lift", "zscore", "platforms"])
 
@@ -120,7 +124,6 @@ def export_dashboard(posts, inter, out, mode: str, sentiment_model=None, public_
     w("platform_summary.csv", rows, ["platform", "posts", "accounts", "interactions", "uncertain_share", "violence_flag_review", "note"])
 
     # --- Modul eksplorasi: entitas, penyebutan kata kunci, sebaran wilayah ---
-    triggers = {t for t, e in kd.current.terms.items() if discovery.TRIGGER_GROUPS & set(e["groups"])}
     w("entities.csv", explorer.entities(posts, inter, public_names, triggers, comm, metrics),
       ["entity_id", "display_name", "type", "platform", "posts", "trigger_posts", "engagement", "interactions_in", "interactions_out",
        "community", "pagerank", "first_seen", "last_seen", "top_keywords"])
@@ -165,7 +168,7 @@ def export_dashboard(posts, inter, out, mode: str, sentiment_model=None, public_
                                             "ei_null_high", "p_value", "assortativity", "labelled_nodes", "n_perm"])
         w("mixing_stance.csv", L["mixing_stance"], ["source_attr", "target_attr", "ties"])
         w("identity_markers.csv", L["identity"], ["community", "posts", "in_group_per_1k", "out_group_per_1k"])
-    N = sna.build_narrative_cooccurrence(posts)
+    N = sna.build_narrative_cooccurrence(posts, keep=triggers)
     if N.number_of_edges():
         sna.analyze(N)
         terms = kd.current.terms

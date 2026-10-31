@@ -8,6 +8,8 @@ APP=${DRNO_APP_DIR:-/app}
 SITE=${DRNO_SITE_DIR:-/site}
 INTERVAL=${DRNO_INTERVAL_HOURS:-6}
 WWW_UID=${DRNO_WWW_UID:-33}   # www-data pada image php:apache
+# Keputusan tinjauan istilah ditulis dashboard (review.php) ke volume situs; dibaca kamus & crawl
+export DRNO_KEYWORD_REVIEW=${DRNO_KEYWORD_REVIEW:-$SITE/private/keyword_review.json}
 log() { echo "[$(date '+%F %T')] $*"; }
 
 fix_site_permissions() {
@@ -15,7 +17,7 @@ fix_site_permissions() {
   # sedangkan akun, log, dan setup key tetap hanya untuk www-data.
   chmod 755 "$SITE" || return 1
   local item
-  for item in index.php login.php logout.php data.php setup.php users.php robots.txt .htaccess; do
+  for item in index.php login.php logout.php data.php review.php setup.php users.php robots.txt .htaccess; do
     [ ! -e "$SITE/$item" ] || chmod 644 "$SITE/$item" || return 1
   done
   for item in assets inc data; do
@@ -36,7 +38,7 @@ sync_site() {
     || { log "paket situs tidak valid (manifest kosong) - dibatalkan"; return 1; }
   mkdir -p "$SITE/private" "$SITE/data" || return 1
   local item
-  for item in index.php login.php logout.php data.php setup.php users.php robots.txt .htaccess assets inc; do
+  for item in index.php login.php logout.php data.php review.php setup.php users.php robots.txt .htaccess assets inc; do
     rm -rf "$SITE/$item.new" && cp -r "$src/$item" "$SITE/$item.new" && rm -rf "$SITE/$item" && mv "$SITE/$item.new" "$SITE/$item" || return 1
   done
   cp "$src/private/app.html" "$src/private/.htaccess" "$SITE/private/" || return 1
@@ -50,8 +52,8 @@ run_cycle() {
   cd "$APP/backend" || return 1
   local FROM TO Q
   FROM=$(date -d "-7 days" +%F); TO=$(date +%F)
-  # Satu sumber kebenaran: DEFAULT_QUERY di drno/keywords.py (termasuk penanda ideologis v1.1)
-  Q=${DRNO_QUERY:-$(python -c 'from drno.keywords import DEFAULT_QUERY; print(DEFAULT_QUERY)')}
+  # Satu sumber kebenaran: default_query() di drno/keywords.py (v1.1 + istilah yang diterima lewat tinjauan dashboard)
+  Q=${DRNO_QUERY:-$(python -c 'from drno.keywords import default_query; print(default_query())')}
   # YouTube tidak memahami AND/OR/NOT: pakai sintaks aslinya (| = OR, - = NOT)
   local YQ=${DRNO_YT_QUERY:-'radikalisasi|terorisme|ekstremisme|deradikalisasi|"kontra narasi" -lowongan'}
   # Penanda ideologis berejaan khas Indonesia; diurutkan menurut relevansi karena istilahnya jarang

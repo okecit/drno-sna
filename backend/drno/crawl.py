@@ -15,7 +15,7 @@ import os
 import sys
 
 from .collectors.base import JobConfig, NotConfigured
-from .keywords import DEFAULT_QUERY, KeywordDictionary, compile_query
+from .keywords import KeywordDictionary, compile_query, default_query
 from .storage import get_store
 
 
@@ -42,7 +42,7 @@ def build(platform, a):
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="drno.crawl")
     ap.add_argument("platform", choices=["x", "youtube", "instagram", "facebook", "web", "tiktok", "telegram", "discord", "reddit"])
-    ap.add_argument("--query", default=os.environ.get("DRNO_QUERY") or DEFAULT_QUERY,
+    ap.add_argument("--query", default=os.environ.get("DRNO_QUERY") or default_query(),
                     help="Ekspresi Boolean DRNO (dipakai juga sebagai filter lokal)")
     ap.add_argument("--native-query", default=None, help="Query dalam sintaks asli platform (opsional)")
     ap.add_argument("--hashtags", default=None, help="Instagram: daftar hashtag dipisah koma (maks. 30 per 7 hari)")

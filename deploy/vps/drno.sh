@@ -47,7 +47,7 @@ case "${1:-help}" in
     chk() { c=$(curl -s -o /dev/null -w '%{http_code}' "$B$1"); [ "$c" = "$2" ] && echo "✓ $1 -> $c" || echo "✗ $1 -> $c (harap $2)"; }
     chk_any() { c=$(curl -s -o /dev/null -w '%{http_code}' "$B$1"); case " $2 " in *" $c "*) echo "✓ $1 -> $c";; *) echo "✗ $1 -> $c (harap salah satu: $2)";; esac; }
     # Sebelum admin pertama dibuat, login.php secara benar mengarah (302) ke setup.php.
-    chk_any /login.php "200 302"; chk /data/overview.csv 403; chk "/data.php?f=overview.csv" 401
+    chk_any /login.php "200 302"; chk /data/overview.csv 403; chk "/data.php?f=overview.csv" 401; chk /review.php 401; chk /private/keyword_review.json 403
     chk /private/users.php 403; chk /inc/auth.php 403; chk /.env 403
     curl -sI "$B/login.php" | grep -qi strict-transport-security && echo "✓ HSTS aktif" || echo "✗ HSTS tidak ada"
     c=$(curl -s -o /dev/null -w '%{http_code}' "http://$(envget DRNO_DOMAIN)/login.php"); case $c in 301|308) echo "✓ HTTP dialihkan ke HTTPS";; *) echo "✗ HTTP -> $c";; esac ;;

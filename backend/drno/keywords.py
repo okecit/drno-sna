@@ -12,6 +12,7 @@ pembanding (baseline) agar korpus tidak menyamakan wacana keagamaan dengan ekstr
 from __future__ import annotations
 
 import json
+import os
 import re
 import unicodedata
 from dataclasses import dataclass, field, asdict
@@ -66,11 +67,43 @@ V11_TERMS = {
     "negara islam indonesia": "jaringan_ekstrem", "bom bunuh diri": "jaringan_ekstrem",
     "napiter": "terorisme",
 }
+REVIEW_GROUPS = set(GROUPS) | {"jaringan_ekstrem"}
+
+
+def load_review(path: str | None = None) -> tuple[dict, set]:
+    """Keputusan peneliti atas usulan istilah (ditulis dashboard lewat review.php).
+    Mengembalikan ({istilah: kelompok} yang diterima, {istilah} yang ditolak). Berkas tidak ada = kosong."""
+    path = path or os.environ.get("DRNO_KEYWORD_REVIEW", "config/keyword_review.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, ValueError):
+        return {}, set()
+    accepted, rejected = {}, set()
+    for d in data.get("decisions", []) if isinstance(data, dict) else []:
+        t = normalize(str(d.get("term", "")))
+        if not t:
+            continue
+        if d.get("decision") == "accept" and d.get("group") in REVIEW_GROUPS:
+            accepted[t] = d["group"]
+        elif d.get("decision") == "reject":
+            rejected.add(t)
+    return accepted, rejected
 
 # Query bawaan crawl (filter lokal Boolean DRNO); varian ejaan ikut dicocokkan (thaghut -> thogut, dst.)
 DEFAULT_QUERY = ('(radikalisasi OR terorisme OR teroris OR ekstremisme OR deradikalisasi OR "kontra-narasi" OR napiter '
                  'OR thaghut OR takfir OR hakimiyah OR khilafah OR "kafir harbi" OR "al wala wal bara" OR istisyhad '
                  'OR "jamaah islamiyah" OR "ansharut daulah" OR isis OR "bom bunuh diri") AND NOT lowongan')
+
+
+def default_query(review_path: str | None = None) -> str:
+    """DEFAULT_QUERY + istilah yang diterima peneliti (kecuali kelompok pembanding keagamaan umum)."""
+    accepted, _ = load_review(review_path)
+    extra = [t for t, g in accepted.items() if g not in BASELINE_GROUPS]
+    if not extra:
+        return DEFAULT_QUERY
+    terms = " OR ".join(f'"{t}"' if " " in t else t for t in sorted(extra))
+    return DEFAULT_QUERY.replace(") AND NOT lowongan", f" OR {terms}) AND NOT lowongan")
 
 
 def normalize(text: str) -> str:
@@ -124,6 +157,9 @@ class KeywordDictionary:
                 entry["baseline"] = entry["baseline"] or g in BASELINE_GROUPS
         d.versions.append(DictionaryVersion("v1.0-baseline", created_by, "Kamus awal dari master prompt", terms=terms))
         d.new_version("v1.1-penanda-ideologis", created_by, "Penanda ideologis & nama jaringan takfiri", add=V11_TERMS)
+        accepted, _ = load_review()
+        if accepted:
+            d.new_version("v1.2-tinjauan-peneliti", created_by, f"{len(accepted)} istilah diterima lewat tinjauan dashboard", add=accepted)
         return d
 
     @property

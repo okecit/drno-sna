@@ -8,7 +8,7 @@ set -a; [ -f .env ] && source .env; set +a
 FROM=${DRNO_FROM:-$(date -d '-7 days' +%F 2>/dev/null || date -v-7d +%F)}
 TO=${DRNO_TO:-$(date +%F)}
 cd backend
-QUERY=${DRNO_QUERY:-$(python -c 'from drno.keywords import DEFAULT_QUERY; print(DEFAULT_QUERY)')}
+QUERY=${DRNO_QUERY:-$(python -c 'from drno.keywords import default_query; print(default_query())')}
 YQUERY=${DRNO_YT_QUERY:-'radikalisasi|terorisme|ekstremisme|deradikalisasi|"kontra narasi" -lowongan'}
 YQUERY_IDEO=${DRNO_YT_QUERY_IDEO:-'thogut|"pemerintah thaghut"|"aparat thaghut"|"kafir harbi"|"anshorut daulah"|"ansharut daulah"|"jamaah islamiyah"|"simpatisan ISIS"|"eks napiter"|"paham takfiri"|"mantan teroris" -lowongan -film -movie -horor'}
 [ -n "${YOUTUBE_API_KEY:-}" ] && python -m drno.crawl youtube --query "$QUERY" --native-query "$YQUERY" --from "$FROM" --to "$TO" --max-videos "${DRNO_YT_VIDEOS:-20}" || echo "[lewati] youtube"
