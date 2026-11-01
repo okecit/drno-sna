@@ -79,9 +79,17 @@ class _SCBase(Collector):
 class ScrapeCreatorsXCollector(_SCBase):
     platform = "x"
 
-    def __init__(self, queries=None, pages=None, min_followers=None, **kw):
+    def __init__(self, queries=None, pages=None, min_followers=None, accounts=None, **kw):
         super().__init__(**kw)
-        self.queries = queries or _split(os.environ.get("DRNO_SC_X_QUERIES", DEFAULT_X_QUERIES))
+        # Akun publik pilihan peneliti (X_SC_ACCOUNTS: handle dipisah koma). Pencarian kata kunci berbasis Google
+        # terbukti tidak relevan untuk istilah Indonesia (mis. "thogut" -> salah ketik "thought"), jadi hanya
+        # dijalankan bila DRNO_SC_X_QUERIES diisi eksplisit.
+        if accounts is None:
+            accounts = [a for a in os.environ.get("X_SC_ACCOUNTS", "").split(",") if a.strip()]
+        self.accounts = [a.strip().lstrip("@").split("/")[-1].split("?")[0] for a in accounts]
+        self.queries = queries if queries is not None else _split(os.environ.get("DRNO_SC_X_QUERIES", ""))
+        if not (self.accounts or self.queries):
+            raise NotConfigured("X_SC_ACCOUNTS (akun publik pilihan) atau DRNO_SC_X_QUERIES belum diisi")
         self.pages = int(pages or os.environ.get("DRNO_SC_X_PAGES", 1))
         self.min_followers = int(min_followers or os.environ.get("DRNO_PUBLIC_MIN_FOLLOWERS", 10000))
 
@@ -97,6 +105,22 @@ class ScrapeCreatorsXCollector(_SCBase):
 
     def fetch(self, job: JobConfig):
         d0, d1 = _ts(f"{job.date_from}T00:00:00+00:00"), _ts(f"{job.date_to}T23:59:59+00:00")
+        self.skipped = []
+        # Akun pilihan: endpoint hanya memberi ~100 tweet TERPOPULER (bukan kronologis) -> catat di metode.
+        for h in self.accounts:
+            res = self._call("/v1/twitter/user-tweets", {"handle": h})
+            if res is None:
+                return
+            tweets = _first(res, "tweets", "data", default=[]) or []
+            owner = self._user(tweets[0]) if tweets else {}
+            if not tweets or owner.get("followers", 0) < self.min_followers:
+                # hanya akun publik besar (ambang aktor publik) yang dipantau per akun; akun kecil = individu, dilewati
+                self.skipped.append({"handle": h, "reason": "tidak ditemukan" if not tweets else f"pengikut < {self.min_followers}"})
+                continue
+            for t in tweets:
+                rec = self._tweet(t, d0, d1)
+                if rec:
+                    yield rec
         for q in self.queries:
             cursor = None
             for _ in range(self.pages):
@@ -104,32 +128,37 @@ class ScrapeCreatorsXCollector(_SCBase):
                 if res is None:
                     return
                 for t in _first(res, "posts", "tweets", "results", "data", default=[]) or []:
-                    leg = t.get("legacy") or t
-                    ts = _ts(_first(leg, "created_at", default=None) or _first(t, "created_at", "createdAt"))
-                    if not ts or (d0 and ts < d0) or (d1 and ts > d1):
-                        continue
-                    u = self._user(t)
-                    ident = u["id"] or (f"handle:{u['handle'].lower()}" if u["handle"] else None)
-                    if not ident:
-                        continue
-                    if u["followers"] >= self.min_followers and u["handle"]:
-                        self.public[ident] = f"@{u['handle']}" + (f" ({u['name']})" if u["name"] else "")
-                    inter = []
-                    for m in ((leg.get("entities") or {}).get("user_mentions") or []):
-                        mid = _first(m, "id_str", "id") or (f"handle:{str(m.get('screen_name', '')).lower()}" if m.get("screen_name") else None)
-                        if mid and str(mid) != ident:
-                            inter.append((str(mid), "mention"))
-                    rid = _first(leg, "in_reply_to_user_id_str", "in_reply_to_user_id")
-                    if rid:
-                        inter.append((str(rid), "reply"))
-                    pid = str(_first(t, "rest_id", "id", default="") or _first(leg, "id_str", default=""))
-                    yield {"id": pid, "author": ident, "ts": ts, "text": _first(leg, "full_text", "text", default="") or _first(t, "full_text", "text", default=""),
-                           "url": _first(t, "url"), "likes": int(_first(leg, "favorite_count", default=0) or 0) + int(_first(leg, "retweet_count", default=0) or 0),
-                           "reply_to": f"x:{_first(leg, 'in_reply_to_status_id_str')}" if _first(leg, "in_reply_to_status_id_str") else None,
-                           "_interactions": inter}
+                    rec = self._tweet(t, d0, d1)
+                    if rec:
+                        yield rec
                 cursor = _first(res, "cursor", "next_cursor")
                 if not cursor:
                     break
+
+    def _tweet(self, t, d0, d1):
+        leg = t.get("legacy") or t
+        ts = _ts(_first(leg, "created_at", default=None) or _first(t, "created_at", "createdAt"))
+        if not ts or (d0 and ts < d0) or (d1 and ts > d1):
+            return None
+        u = self._user(t)
+        ident = u["id"] or (f"handle:{u['handle'].lower()}" if u["handle"] else None)
+        if not ident:
+            return None
+        if u["followers"] >= self.min_followers and u["handle"]:
+            self.public[ident] = f"@{u['handle']}" + (f" ({u['name']})" if u["name"] else "")
+        inter = []
+        for m in ((leg.get("entities") or {}).get("user_mentions") or []):
+            mid = _first(m, "id_str", "id") or (f"handle:{str(m.get('screen_name', '')).lower()}" if m.get("screen_name") else None)
+            if mid and str(mid) != ident:
+                inter.append((str(mid), "mention"))
+        rid = _first(leg, "in_reply_to_user_id_str", "in_reply_to_user_id")
+        if rid:
+            inter.append((str(rid), "reply"))
+        pid = str(_first(t, "rest_id", "id", default="") or _first(leg, "id_str", default=""))
+        return {"id": pid, "author": ident, "ts": ts, "text": _first(leg, "full_text", "text", default="") or _first(t, "full_text", "text", default=""),
+                "url": _first(t, "url"), "likes": int(_first(leg, "favorite_count", default=0) or 0) + int(_first(leg, "retweet_count", default=0) or 0),
+                "reply_to": f"x:{_first(leg, 'in_reply_to_status_id_str')}" if _first(leg, "in_reply_to_status_id_str") else None,
+                "_interactions": inter}
 
 
 class ScrapeCreatorsInstagramCollector(_SCBase):

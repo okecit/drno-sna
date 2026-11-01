@@ -68,13 +68,15 @@ run_cycle() {
     # Nama publik hanya untuk kanal >= DRNO_PUBLIC_CHANNEL_MIN_SUBS subscriber; sisanya tetap pseudonim
     python -m drno.maintenance label-channels >/dev/null || log "label kanal gagal"
   fi
-  if [ -n "${X_BEARER_TOKEN:-}" ]; then python -m drno.crawl x --query "$Q" --from "$FROM" --to "$TO" --max "${DRNO_X_MAX:-200}" || log "x gagal"; fi
+  # X API resmi (recent search, maks. 7 hari): kueri khusus istilah tersamar/takfiri dalam sintaks X (<=512 karakter)
+  XQ=${DRNO_X_QUERY:-'(thoghut OR thaghut OR taghut OR toghut OR thogut OR "demokrasi syirik" OR "hukum thaghut" OR "ansharut daulah" OR "anshor daulah" OR muwahhid OR "kafir harbi" OR "daulah islamiyah" OR "tauhid wal jihad" OR "pemilu syirik" OR takfiri OR "khilafah islamiyah") lang:in -is:retweet'}
+  if [ -n "${X_BEARER_TOKEN:-}" ]; then python -m drno.crawl x --query "$Q" --native-query "$XQ" --from "$(date -d '-6 days' +%F)" --to "$TO" --max "${DRNO_X_MAX:-200}" || log "x gagal"; fi
   if [ -n "${META_ACCESS_TOKEN:-}" ] && [ -n "${FB_PAGE_IDS:-}" ]; then python -m drno.crawl facebook --query "$Q" --from "$FROM" --to "$TO" || log "facebook gagal"; fi
   # Alternatif sementara (pihak ketiga, bukan API resmi Meta); kredit dibatasi DRNO_SC_MAX_CALLS per run
   if [ -n "${SCRAPECREATORS_API_KEY:-}" ] && { [ -n "${FB_SC_PAGES:-}" ] || [ -f "$DRNO_PAGE_REVIEW" ]; }; then python -m drno.crawl facebook_sc --query "$Q" --from "$FROM" --to "$TO" || log "facebook (scrapecreators) gagal"; fi
   # X & Instagram via ScrapeCreators; pilih platform lewat DRNO_SC_PLATFORMS (default facebook,x,instagram)
   if [ -n "${SCRAPECREATORS_API_KEY:-}" ]; then
-    case ",${DRNO_SC_PLATFORMS:-facebook,x,instagram}," in *,x,*) python -m drno.crawl x_sc --query "$Q" --from "$FROM" --to "$TO" || log "x (scrapecreators) gagal";; esac
+    case ",${DRNO_SC_PLATFORMS:-facebook,x,instagram}," in *,x,*) if [ -n "${X_SC_ACCOUNTS:-}${DRNO_SC_X_QUERIES:-}" ]; then python -m drno.crawl x_sc --query "$Q" --from "$(date -d "-${DRNO_SC_X_DAYS:-1095} days" +%F)" --to "$TO" || log "x (scrapecreators) gagal"; fi;; esac
     case ",${DRNO_SC_PLATFORMS:-facebook,x,instagram}," in *,instagram,*) python -m drno.crawl instagram_sc --from "$FROM" --to "$TO" || log "instagram (scrapecreators) gagal";; esac
   fi
   if [ -n "${META_ACCESS_TOKEN:-}" ] && [ -n "${IG_USER_ID:-}" ]; then python -m drno.crawl instagram --hashtags "${IG_HASHTAGS:-}" --from "$(date -d '-1 days' +%F)" --to "$TO" || log "instagram gagal"; fi

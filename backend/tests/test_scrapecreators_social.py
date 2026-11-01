@@ -80,3 +80,21 @@ def test_credit_cap_and_split():
     col.run(_job("x_sc"), lambda t: True, KD.match)
     assert len(seen) == 2
     assert _split('thogut,"kafir harbi", deradikalisasi') == ["thogut", "kafir harbi", "deradikalisasi"]
+
+
+def test_x_accounts_mode_skips_small_accounts_and_search_is_opt_in():
+    import pytest
+    from drno.collectors.base import NotConfigured
+    with pytest.raises(NotConfigured):
+        ScrapeCreatorsXCollector(api_key="k", accounts=[], queries=[])
+    def handler(req):
+        h = req.url.params["handle"]
+        n = 250000 if h == "BeritaBesar" else 40
+        return httpx.Response(200, json={"tweets": [
+            {"rest_id": f"t_{h}", "core": {"user_results": {"result": {"rest_id": f"u_{h}", "legacy": {"screen_name": h, "followers_count": n}}}},
+             "legacy": {"full_text": "kontra-narasi @lain", "created_at": "Thu Oct 30 05:00:00 +0000 2026",
+                        "entities": {"user_mentions": [{"id_str": "u9", "screen_name": "lain"}]}}}]})
+    col = ScrapeCreatorsXCollector(api_key="k", accounts=["@BeritaBesar", "https://x.com/akun_kecil"], transport=httpx.MockTransport(handler))
+    recs, inter, _ = col.run(_job("x_sc"), lambda t: True, KD.match)
+    assert [r["public_entity_name"] for r in recs] == ["@BeritaBesar"] and col.skipped[0]["handle"] == "akun_kecil"
+    assert inter[0]["type"] == "mention"
