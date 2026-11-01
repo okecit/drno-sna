@@ -35,6 +35,9 @@ def build(platform, a):
     if platform == "facebook_sc":  # Page publik via ScrapeCreators (pihak ketiga, bukan API resmi Meta)
         from .collectors.scrapecreators_fb import ScrapeCreatorsFacebookCollector
         return ScrapeCreatorsFacebookCollector()
+    if platform in ("x_sc", "instagram_sc"):  # X / Instagram via ScrapeCreators (pihak ketiga)
+        from .collectors.scrapecreators_social import ScrapeCreatorsInstagramCollector, ScrapeCreatorsXCollector
+        return ScrapeCreatorsXCollector() if platform == "x_sc" else ScrapeCreatorsInstagramCollector()
     if platform == "web":
         from .collectors.web_scrapling import ScraplingWebCollector
         return ScraplingWebCollector(sources_path=a.sources)
@@ -44,7 +47,7 @@ def build(platform, a):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="drno.crawl")
-    ap.add_argument("platform", choices=["x", "youtube", "instagram", "facebook", "facebook_sc", "web", "tiktok", "telegram", "discord", "reddit"])
+    ap.add_argument("platform", choices=["x", "youtube", "instagram", "facebook", "facebook_sc", "x_sc", "instagram_sc", "web", "tiktok", "telegram", "discord", "reddit"])
     ap.add_argument("--query", default=os.environ.get("DRNO_QUERY") or default_query(),
                     help="Ekspresi Boolean DRNO (dipakai juga sebagai filter lokal)")
     ap.add_argument("--native-query", default=None, help="Query dalam sintaks asli platform (opsional)")
@@ -66,7 +69,7 @@ def main(argv=None):
     try:
         col = build(a.platform, a)
         kd = KeywordDictionary.baseline()
-        pred = (lambda t: True) if a.platform == "instagram" else compile_query(a.query)  # IG sudah tersaring hashtag
+        pred = (lambda t: True) if a.platform in ("instagram", "instagram_sc") else compile_query(a.query)  # IG sudah tersaring hashtag
         records, inter, rep = col.run(job, pred, kd.match)
     except NotConfigured as e:
         print(f"[DRNO] Konektor {a.platform} tidak dijalankan: {e}", file=sys.stderr)

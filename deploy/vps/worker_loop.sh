@@ -69,6 +69,11 @@ run_cycle() {
   if [ -n "${META_ACCESS_TOKEN:-}" ] && [ -n "${FB_PAGE_IDS:-}" ]; then python -m drno.crawl facebook --query "$Q" --from "$FROM" --to "$TO" || log "facebook gagal"; fi
   # Alternatif sementara (pihak ketiga, bukan API resmi Meta); kredit dibatasi DRNO_SC_MAX_CALLS per run
   if [ -n "${SCRAPECREATORS_API_KEY:-}" ] && [ -n "${FB_SC_PAGES:-}" ]; then python -m drno.crawl facebook_sc --query "$Q" --from "$FROM" --to "$TO" || log "facebook (scrapecreators) gagal"; fi
+  # X & Instagram via ScrapeCreators; pilih platform lewat DRNO_SC_PLATFORMS (default facebook,x,instagram)
+  if [ -n "${SCRAPECREATORS_API_KEY:-}" ]; then
+    case ",${DRNO_SC_PLATFORMS:-facebook,x,instagram}," in *,x,*) python -m drno.crawl x_sc --query "$Q" --from "$FROM" --to "$TO" || log "x (scrapecreators) gagal";; esac
+    case ",${DRNO_SC_PLATFORMS:-facebook,x,instagram}," in *,instagram,*) python -m drno.crawl instagram_sc --from "$FROM" --to "$TO" || log "instagram (scrapecreators) gagal";; esac
+  fi
   if [ -n "${META_ACCESS_TOKEN:-}" ] && [ -n "${IG_USER_ID:-}" ]; then python -m drno.crawl instagram --hashtags "${IG_HASHTAGS:-}" --from "$(date -d '-1 days' +%F)" --to "$TO" || log "instagram gagal"; fi
   # Portal berita & situs publik (Scrapling, mode sopan): sekali per DRNO_SCRAPE_EVERY_HOURS (default 24 jam)
   if [ -f "$APP/config/sources.json" ]; then

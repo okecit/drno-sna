@@ -35,11 +35,13 @@ def _ts(v) -> str | None:
         return datetime.fromtimestamp(x, tz=timezone.utc).isoformat()
     except (TypeError, ValueError):
         s = str(v).replace("Z", "+00:00")
-        try:
-            d = datetime.fromisoformat(s)
-            return (d if d.tzinfo else d.replace(tzinfo=timezone.utc)).astimezone(timezone.utc).isoformat()
-        except ValueError:
-            return None
+        for parse in (datetime.fromisoformat, lambda t: datetime.strptime(t, "%a %b %d %H:%M:%S %z %Y")):  # ISO / format X
+            try:
+                d = parse(s)
+                return (d if d.tzinfo else d.replace(tzinfo=timezone.utc)).astimezone(timezone.utc).isoformat()
+            except ValueError:
+                continue
+        return None
 
 
 def _first(d: dict, *keys, default=None):
