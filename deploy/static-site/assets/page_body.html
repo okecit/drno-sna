@@ -32,10 +32,10 @@
   .drno-side .drno-tab { width: auto; }
   .side-more { width: 100%; } .side-insight { width: 100%; margin-top: 6px; }
 }
-/* Halaman Network: menu pindah ke panel Settings (di bawah Apply) agar graf memakai lebar penuh */
+/* Halaman Network: menu pindah ke puncak panel Settings (di atas pengaturan) agar graf memakai lebar penuh */
 .drno-shell.nav-in-sna { grid-template-columns: minmax(0, 1fr); }
-#sx-nav-slot .drno-side { position: static; max-height: none; overflow: visible; background: none; border: 0; border-top: 1px solid var(--color-border-line);
-  border-radius: 0; padding: 8px 0 0; margin-top: 6px; }
+#sx-nav-slot .drno-side { position: static; max-height: none; overflow: visible; background: none; border: 0; border-bottom: 1px solid var(--color-border-line);
+  border-radius: 0; padding: 0 0 8px; margin-bottom: 6px; }
 #sx-nav-slot .drno-tab { padding: 6px 8px; font-size: 13px; }
 #sx-nav-slot .side-insight { margin-top: 10px; padding: 10px 8px; font-size: 12px; }
 /* ---------- Modul baru ---------- */
@@ -307,6 +307,7 @@
   <section class="drno-page" id="sna">
     <div class="sx">
       <aside class="sx-panel" id="sx-left" data-source="sna_nodes sna_edges">
+        <div id="sx-nav-slot"></div>
         <div class="sx-h">Settings</div>
         <div class="sx-h">Tampilan</div>
         <div class="sx-seg" data-key="view"><button data-v="vos">VOSviewer</button><button data-v="density">Density</button><button data-v="graph">Graf</button></div>
@@ -333,7 +334,6 @@
         <div class="sx-h">Date range</div>
         <div class="sx-seg" data-key="range"><button data-v="7">7 hari</button><button data-v="15">15 hari</button><button data-v="30">1 bulan</button><button data-v="90">3 bulan</button><button data-v="all">Semua</button></div>
         <button class="sx-apply" id="sx-apply">Apply</button>
-        <div id="sx-nav-slot"></div>
         <div class="sx-h">Legenda</div>
         <div class="drno-legend" id="sx-legend"></div>
       </aside>
@@ -1923,7 +1923,7 @@
     if (current === 'templates') drawTemplates();
     if (current === 'generated') drawGenerated();
   }
-  // Di halaman Network, menu dipindah ke panel Settings (di bawah Apply) agar graf SNA lebih lebar
+  // Di halaman Network, menu dipindah ke puncak panel Settings (di atas pengaturan) agar graf SNA lebih lebar
   const nav = root.querySelector('.drno-side'), shell = root.querySelector('.drno-shell');
   function placeNav() {
     const inSna = current === 'sna', slot = document.getElementById('sx-nav-slot');
