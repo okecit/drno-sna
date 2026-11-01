@@ -125,7 +125,7 @@ def export_dashboard(posts, inter, out, mode: str, sentiment_model=None, public_
 
     # --- Modul eksplorasi: entitas, penyebutan kata kunci, sebaran wilayah ---
     w("entities.csv", explorer.entities(posts, inter, public_names, triggers, comm, metrics),
-      ["entity_id", "display_name", "type", "platform", "posts", "trigger_posts", "engagement", "interactions_in", "interactions_out",
+      ["entity_id", "display_name", "anon_label", "type", "platform", "posts", "trigger_posts", "engagement", "interactions_in", "interactions_out",
        "community", "pagerank", "first_seen", "last_seen", "top_keywords"])
     m_daily, m_public = explorer.mentions(posts, public_names, {t: e["groups"] for t, e in kd.current.terms.items()})
     w("mentions_daily.csv", m_daily, ["day", "keyword", "group", "platform", "posts"])
@@ -204,16 +204,17 @@ def export_sna_explorer(posts, inter, G, metrics, comm, w, real: bool = False, p
         plat_of.setdefault(i["target"], i["platform"])
     atype = lambda n: explorer.entity_kind(n, public_names)[0]
     display = lambda n: explorer.entity_kind(n, public_names)[1]
+    labels = explorer.anon_labels(posts, inter, public_names)  # "Pengunggah #n" / "Komentator #n" untuk akun berpseudonim
     rows = []
     for n in G.nodes:
         a = agg[n]
         m = metrics[n]
-        rows.append({"node_id": n, "display_name": display(n), "platform": plat_of.get(n), "node_type": atype(n), "community": comm[n],
+        rows.append({"node_id": n, "display_name": display(n), "anon_label": labels.get(n, ""), "platform": plat_of.get(n), "node_type": atype(n), "community": comm[n],
                      "degree": G.in_degree(n) + G.out_degree(n), "in_degree": m["in_degree"], "out_degree": m["out_degree"],
                      "betweenness": m["betweenness"], "pagerank": m["pagerank"], "engagement": a["engagement"], "posts": a["posts"],
                      "sentiment": a["sent"].most_common(1)[0][0] if a["sent"] else "tidak_ada_unggahan",
                      **{f"e_{e}": a["emo"].get(e, 0) for e in nlp.EMOTIONS + ["netral"]}})
-    w("sna_nodes.csv", rows, ["node_id", "display_name", "platform", "node_type", "community", "degree", "in_degree", "out_degree", "betweenness", "pagerank",
+    w("sna_nodes.csv", rows, ["node_id", "display_name", "anon_label", "platform", "node_type", "community", "degree", "in_degree", "out_degree", "betweenness", "pagerank",
                               "engagement", "posts", "sentiment", *[f"e_{e}" for e in nlp.EMOTIONS + ["netral"]]])
     ec = Counter()
     for i in inter:

@@ -25,6 +25,27 @@ def entity_kind(node: str, public_names: dict) -> tuple[str, str]:
     return "account", ""
 
 
+def anon_labels(posts, inter, public_names) -> dict[str, str]:
+    """Label peran yang mudah dibaca untuk akun berpseudonim, tanpa membuka identitas:
+    'Pengunggah #n' (punya unggahan utama: video/posting) atau 'Komentator #n' (hanya komentar/balasan).
+    Nomor = peringkat aktivitas (interaksi + unggahan) di dalam perannya; #1 paling aktif."""
+    activity = Counter()
+    for i in inter:
+        activity[i["source"]] += 1
+        activity[i["target"]] += 1
+    uploaders = set()
+    for p in posts:
+        activity[p["author_id_pseudonym"]] += 1
+        if not p.get("reply_to"):
+            uploaders.add(p["author_id_pseudonym"])
+    nodes = {n for n in activity if entity_kind(n, public_names)[0] == "account" and not n.endswith(("_unknown_commenter",))}
+    out = {}
+    for role, members in (("Pengunggah", nodes & uploaders), ("Komentator", nodes - uploaders)):
+        for k, n in enumerate(sorted(members, key=lambda x: (-activity[x], x)), 1):
+            out[n] = f"{role} #{k}"
+    return out
+
+
 def entities(posts, inter, public_names, triggers: set, comm=None, metrics=None, limit: int = 600) -> list[dict]:
     comm, metrics = comm or {}, metrics or {}
     agg = defaultdict(lambda: {"posts": 0, "trigger": 0, "eng": 0, "plat": Counter(), "days": [], "kw": Counter()})
@@ -39,10 +60,11 @@ def entities(posts, inter, public_names, triggers: set, comm=None, metrics=None,
         if kws & triggers:
             a["trigger"] += 1
     deg_in, deg_out = Counter(i["target"] for i in inter), Counter(i["source"] for i in inter)
+    labels = anon_labels(posts, inter, public_names)
     rows = []
     for n, a in agg.items():
         kind, name = entity_kind(n, public_names)
-        rows.append({"entity_id": n, "display_name": name, "type": kind, "platform": a["plat"].most_common(1)[0][0],
+        rows.append({"entity_id": n, "display_name": name, "anon_label": labels.get(n, ""), "type": kind, "platform": a["plat"].most_common(1)[0][0],
                      "posts": a["posts"], "trigger_posts": a["trigger"], "engagement": a["eng"],
                      "interactions_in": deg_in.get(n, 0), "interactions_out": deg_out.get(n, 0),
                      "community": comm.get(n, ""), "pagerank": round(metrics.get(n, {}).get("pagerank", 0), 6),

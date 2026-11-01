@@ -1130,7 +1130,7 @@
   const TYPE_ID = { account: 'Akun (pseudonim)', media: 'Media', page: 'Page', channel: 'Kanal publik' };
   const isPublic = (row) => ['media', 'page', 'channel'].includes(row.node_type);
   // Nama tampilan: entitas publik memakai nama publiknya; akun individu tetap pseudonim
-  const nodeName = (row) => (row.display_name ? row.display_name : row.node_id);
+  const nodeName = (row) => row.display_name || row.anon_label || row.node_id;   // publik: nama; individu: label peran (tetap anonim)
   const ET_ID = { reply: 'Reply', mention: 'Mention', repost: 'Repost/Quote', comment: 'Comment', comment_reply: 'Comment reply' };
   const GLYPH = { x: 'X', youtube: 'YT', facebook: 'FB', instagram: 'IG', news: 'N' };
   const SX = { view: 'vos', norm: 'association', maxN: 200, op: 55, cent: 'degree', ncol: 'sentiment', ecol: 'emotion', estyle: 'curve', range: 'all', ntypes: null, etypes: null, plats: null };
@@ -1191,7 +1191,14 @@
     const deg = new Map();
     agg.forEach((l) => { deg.set(l.source, (deg.get(l.source) || 0) + l.w); deg.set(l.target, (deg.get(l.target) || 0) + l.w); });
     const score = (n) => SX.cent === 'degree' ? (deg.get(n.node_id) || 0) : SX.cent === 'engagement' ? num(n.engagement) : num(n.betweenness);
-    const keep = new Set([...deg.keys()].map((id) => nodeById.get(id)).sort((a, b) => score(b) - score(a)).slice(0, SX.maxN).map((n) => n.node_id));
+    // Jatah minimum per platform: tanpa ini, platform besar (YouTube) menghabiskan semua slot "Max nodes"
+    // sehingga jaringan platform kecil (Facebook, Instagram) tidak pernah tergambar.
+    const ranked = [...deg.keys()].map((id) => nodeById.get(id)).sort((a, b) => score(b) - score(a));
+    const byPlat = d3.group(ranked, (n) => n.platform);
+    const quota = Math.max(10, Math.floor(SX.maxN / Math.max(1, byPlat.size) / 2));
+    const keep = new Set();
+    byPlat.forEach((ns) => ns.slice(0, quota).forEach((n) => keep.add(n.node_id)));
+    for (const n of ranked) { if (keep.size >= SX.maxN) break; keep.add(n.node_id); }
     const links = [...agg.values()].filter((l) => keep.has(l.source) && keep.has(l.target)).map((l) => ({ ...l,
       mainEmo: Object.entries(l.emo).sort((a, b) => b[1] - a[1])[0][0], mainSen: Object.entries(l.sen).sort((a, b) => b[1] - a[1])[0][0] }));
     const used = new Set(links.flatMap((l) => [l.source, l.target]));
@@ -1325,7 +1332,7 @@
       const h = document.createElement('div'); h.style.fontWeight = 'var(--cds-font-weight-medium)'; h.style.overflowWrap = 'anywhere'; h.textContent = `${GLYPH[n.platform] || ''} ${nodeName(n)}`; box.appendChild(h);
       const dl = document.createElement('dl'); dl.className = 'drno-detail'; const dlw = document.createElement('div'); dlw.className = 'drno-detail';
       const inner = document.createElement('dl');
-      [['Jenis', TYPE_ID[n.node_type] || n.node_type], ['Platform', PLAT_ID[n.platform] || n.platform], ['Komunitas', n.community], ['Unggahan', fmt(num(n.posts))], ['Engagement', fmt(num(n.engagement))], ['In / out', `${fmt(num(n.in_degree))} / ${fmt(num(n.out_degree))}`],
+      [['Jenis', TYPE_ID[n.node_type] || n.node_type], ...(n.display_name ? [] : [['Pseudonim', n.node_id]]), ['Platform', PLAT_ID[n.platform] || n.platform], ['Komunitas', n.community], ['Unggahan', fmt(num(n.posts))], ['Engagement', fmt(num(n.engagement))], ['In / out', `${fmt(num(n.in_degree))} / ${fmt(num(n.out_degree))}`],
         ['Betweenness', f3(num(n.betweenness))], ['PageRank', d3.format('.4f')(num(n.pagerank))], ['Sentimen dominan', SENT_ID[n.sentiment] || n.sentiment]]
         .forEach(([a, b]) => { const dt = document.createElement('dt'); dt.textContent = a; const dd = document.createElement('dd'); dd.textContent = b; inner.append(dt, dd); });
       dlw.appendChild(inner); box.appendChild(dlw);
@@ -1533,12 +1540,12 @@
     const q = document.getElementById('ent-q').value.trim().toLowerCase(), ty = document.getElementById('ent-type').value;
     const pl = document.getElementById('ent-plat').value, so = document.getElementById('ent-sort').value;
     const canon = [...canonicalTerms(q)];   // "thagut" juga menemukan entitas dengan kata kunci "thaghut"
-    const hay = (r) => `${r.display_name} ${r.entity_id} ${r.top_keywords}`.toLowerCase();
+    const hay = (r) => `${r.display_name} ${r.anon_label} ${r.entity_id} ${r.top_keywords}`.toLowerCase();
     const rows = all.filter((r) => (!ty || (ty === 'public' ? r.type !== 'account' : r.type === 'account')) && (!pl || r.platform === pl)
       && (!q || hay(r).includes(q) || canon.some((t) => hay(r).includes(t))))
       .sort((a, b) => num(b[so]) - num(a[so]) || num(b.posts) - num(a.posts));
     document.getElementById('ent-count').textContent = `${fmt(rows.length)} dari ${fmt(all.length)} entitas · ${fmt(all.filter((r) => r.type !== 'account').length)} bernama`;
-    const nameCell = (r) => { const s = document.createElement('span'); s.className = 'ent-name'; s.textContent = r.display_name || r.entity_id; return s; };
+    const nameCell = (r) => { const s = document.createElement('span'); s.className = 'ent-name'; s.textContent = r.display_name || r.anon_label || r.entity_id; if (!r.display_name) s.title = `Pseudonim: ${r.entity_id}`; return s; };
     const tag = (r) => { const s = document.createElement('span'); s.className = 'ent-tag' + (r.type !== 'account' ? ' pub' : ''); s.textContent = TYPE_ID[r.type] || r.type; return s; };
     wrap.appendChild(makeTable([['Entitas', nameCell], ['Jenis', tag], ['Platform', (r) => PLAT_ID[r.platform] || r.platform], ['Unggahan', (r) => fmt(num(r.posts)), true],
       ['Pemicu', (r) => fmt(num(r.trigger_posts)), true], ['Engagement', (r) => fmt(num(r.engagement)), true], ['Interaksi masuk', (r) => fmt(num(r.interactions_in)), true],

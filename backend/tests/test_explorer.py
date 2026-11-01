@@ -34,6 +34,15 @@ def test_entities_names_only_public_and_geo_counts():
     assert g["JK"]["trigger_posts"] == 1 and g["JB"]["posts"] == 1 and len(g) == 38
 
 
+def test_anon_labels_readable_roles_without_identity():
+    from drno.explorer import anon_labels
+    posts = [_p("yo_kecil", "video", []), dict(_p("yo_w1", "komentar", []), reply_to="youtube:v1"), dict(_p("yo_w2", "komentar", []), reply_to="youtube:v1"),
+             _p("media:ANTARA", "berita", [], platform="news")]
+    inter = [{"source": "yo_w1", "target": "yo_kecil"}, {"source": "yo_w1", "target": "yo_kecil"}, {"source": "yo_w2", "target": "yo_kecil"}]
+    lab = anon_labels(posts, inter, {})
+    assert lab == {"yo_kecil": "Pengunggah #1", "yo_w1": "Komentator #1", "yo_w2": "Komentator #2"}  # media publik tidak diberi label anonim
+
+
 def test_sentiment_lexicon_tone_not_topic():
     from drno.nlp import BaselineClassifier
     s = lambda t: BaselineClassifier().sentiment(t).label
