@@ -69,7 +69,9 @@ def main(argv=None):
     try:
         col = build(a.platform, a)
         kd = KeywordDictionary.baseline()
-        pred = (lambda t: True) if a.platform in ("instagram", "instagram_sc") else compile_query(a.query)  # IG sudah tersaring hashtag
+        # IG sudah tersaring hashtag; Page FB pilihan peneliti adalah kerangka sampelnya sendiri (semua posting + percakapan
+        # disimpan, kredit komentar tidak terbuang); keyword_matched tetap menandai posting yang memuat kata pemicu.
+        pred = (lambda t: True) if a.platform in ("instagram", "instagram_sc", "facebook_sc") else compile_query(a.query)
         records, inter, rep = col.run(job, pred, kd.match)
     except NotConfigured as e:
         print(f"[DRNO] Konektor {a.platform} tidak dijalankan: {e}", file=sys.stderr)

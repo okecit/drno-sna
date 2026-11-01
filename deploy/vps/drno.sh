@@ -33,6 +33,8 @@ case "${1:-help}" in
   scrape-now)  # jalankan crawling web sekarang & simpan
     "${DC[@]}" exec worker bash -c 'cd /app/backend && python -m drno.crawl web --from "$(date -d "-2 days" +%F)" --to "$(date +%F)" --sources /app/config/sources.json && date +%s > /site/private/.last_scrape' ;;
   run-now)    "${DC[@]}" restart worker && echo "Worker dimulai ulang: siklus pembaruan berjalan sekarang." ;;
+  fb-backfill) # sekali jalan: posting + komentar + balasan Page FB publik N hari terakhir (default 90; memakai kredit, maks DRNO_SC_BACKFILL_CALLS)
+    "${DC[@]}" exec -e DAYS="${2:-90}" worker bash -c 'cd /app/backend && export DRNO_KEYWORD_REVIEW=/site/private/keyword_review.json DRNO_PAGE_REVIEW=/site/private/page_review.json DRNO_SC_POSTS_PER_PAGE=60 DRNO_SC_COMMENT_PAGES=3 DRNO_SC_MAX_CALLS="${DRNO_SC_BACKFILL_CALLS:-300}" && python -m drno.crawl facebook_sc --from "$(date -d "-$DAYS days" +%F)" --to "$(date +%F)" --max 5000' && "$0" run-now ;;
   discover-pages) # usulkan Page Facebook publik bernada serupa (ScrapeCreators, memakai kredit); tinjau di dashboard
     "${DC[@]}" exec worker bash -c 'cd /app/backend && DRNO_PAGE_CANDIDATES=/site/private/page_candidates.json DRNO_PAGE_REVIEW=/site/private/page_review.json python -m drno.maintenance discover-pages && chown 33:33 /site/private/page_candidates.json && chmod 640 /site/private/page_candidates.json' ;;
   backup)     mkdir -p backups && "${DC[@]}" exec backup bash /backup.sh now && ls -lh backups | tail -5 ;;

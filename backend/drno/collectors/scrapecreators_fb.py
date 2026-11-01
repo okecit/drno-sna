@@ -87,9 +87,10 @@ class ScrapeCreatorsFacebookCollector(Collector):
         self.pages = list(dict.fromkeys(resolve_share_link(p.strip()) for p in pages))
         self.handles = {page_handle(p) for p in self.pages}
         self.http = make_client(transport)
-        self.max_posts = int(max_posts_per_page or os.environ.get("DRNO_SC_POSTS_PER_PAGE", 9))
-        self.comment_pages = int(comment_pages or os.environ.get("DRNO_SC_COMMENT_PAGES", 1))
+        self.max_posts = int(max_posts_per_page or os.environ.get("DRNO_SC_POSTS_PER_PAGE", 15))
+        self.comment_pages = int(comment_pages or os.environ.get("DRNO_SC_COMMENT_PAGES", 2))
         self.max_calls = int(max_calls or os.environ.get("DRNO_SC_MAX_CALLS", 60))
+        self.reply_threads = int(os.environ.get("DRNO_SC_REPLY_THREADS", 3))
         self.calls = 0
         self.names: dict[str, str] = {}
 
@@ -151,21 +152,43 @@ class ScrapeCreatorsFacebookCollector(Collector):
             res = self._call("/v1/facebook/post/comments", {**params, **({"cursor": cursor} if cursor else {})})
             if not res:
                 return
-            for c in _first(res, "comments", "data", default=[]) or []:
-                ts = _ts(_first(c, "created_at", "createdAt", "publishTime"))
-                a = c.get("author") or {}
-                # identitas komentator -> kunci HMAC saja; nama tidak disimpan di record
-                ident = _first(a, "id", "profile_id", "url") or (f"name:{a['name']}" if a.get("name") else None)
-                if not ts:
-                    continue
-                yield {"id": str(_first(c, "id", "comment_id")), "author": ident or "fb_unknown_commenter", "ts": ts,
-                       "text": _first(c, "text", "message", default="") or "", "url": url,
-                       "likes": int(_first(c, "reaction_count", "reactionCount", default=0) or 0),
-                       "reply_to": f"facebook:{pid}", "_thread": pid,
-                       "_interactions": [(f"page::{handle}", "comment")] if ident else []}
+            comments = _first(res, "comments", "data", default=[]) or []
+            for c in comments:
+                rec = self._comment(c, url, pid, f"facebook:{pid}", f"page::{handle}", "comment")
+                if rec:
+                    yield rec
+            # Balasan komentar -> garis komentator -> komentator (struktur percakapan, bukan hanya bintang ke Page).
+            # Hanya komentar yang punya balasan, terbanyak dulu, dibatasi DRNO_SC_REPLY_THREADS per halaman komentar.
+            threads = sorted((c for c in comments if int(c.get("reply_count") or 0) > 0 and c.get("feedback_id") and c.get("expansion_token")),
+                             key=lambda c: -int(c.get("reply_count") or 0))[:self.reply_threads]
+            for c in threads:
+                res_r = self._call("/v1/facebook/post/comment/replies", {"feedback_id": c["feedback_id"], "expansion_token": c["expansion_token"]})
+                if not res_r:
+                    break
+                parent = self._ident(c.get("author") or {}) or "fb_unknown_commenter"
+                for r in _first(res_r, "replies", "comments", "data", default=[]) or []:
+                    rec = self._comment(r, url, pid, f"facebook:{_first(c, 'id', 'comment_id')}", parent, "comment_reply")
+                    if rec:
+                        yield rec
             cursor = _first(res, "cursor", "next_cursor")
             if not cursor:
                 return
+
+    @staticmethod
+    def _ident(a: dict):
+        # identitas komentator -> kunci HMAC saja; nama tidak disimpan di record
+        return _first(a, "id", "profile_id", "url") or (f"name:{a['name']}" if a.get("name") else None)
+
+    def _comment(self, c, url, pid, reply_to, target, itype):
+        ts = _ts(_first(c, "created_at", "createdAt", "publishTime"))
+        if not ts:
+            return None
+        ident = self._ident(c.get("author") or {})
+        return {"id": str(_first(c, "id", "comment_id")), "author": ident or "fb_unknown_commenter", "ts": ts,
+                "text": _first(c, "text", "message", default="") or "", "url": url,
+                "likes": int(_first(c, "reaction_count", "reactionCount", default=0) or 0),
+                "reply_to": reply_to, "_thread": pid,
+                "_interactions": [(target, itype)] if ident and target != "fb_unknown_commenter" else []}
 
     def author_key(self, native_author_id) -> str:
         sid = str(native_author_id)
