@@ -67,6 +67,8 @@ run_cycle() {
   fi
   if [ -n "${X_BEARER_TOKEN:-}" ]; then python -m drno.crawl x --query "$Q" --from "$FROM" --to "$TO" --max "${DRNO_X_MAX:-200}" || log "x gagal"; fi
   if [ -n "${META_ACCESS_TOKEN:-}" ] && [ -n "${FB_PAGE_IDS:-}" ]; then python -m drno.crawl facebook --query "$Q" --from "$FROM" --to "$TO" || log "facebook gagal"; fi
+  # Alternatif sementara (pihak ketiga, bukan API resmi Meta); kredit dibatasi DRNO_SC_MAX_CALLS per run
+  if [ -n "${SCRAPECREATORS_API_KEY:-}" ] && [ -n "${FB_SC_PAGES:-}" ]; then python -m drno.crawl facebook_sc --query "$Q" --from "$FROM" --to "$TO" || log "facebook (scrapecreators) gagal"; fi
   if [ -n "${META_ACCESS_TOKEN:-}" ] && [ -n "${IG_USER_ID:-}" ]; then python -m drno.crawl instagram --hashtags "${IG_HASHTAGS:-}" --from "$(date -d '-1 days' +%F)" --to "$TO" || log "instagram gagal"; fi
   # Portal berita & situs publik (Scrapling, mode sopan): sekali per DRNO_SCRAPE_EVERY_HOURS (default 24 jam)
   if [ -f "$APP/config/sources.json" ]; then

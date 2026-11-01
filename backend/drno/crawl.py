@@ -32,6 +32,9 @@ def build(platform, a):
     if platform == "facebook":
         from .collectors.facebook import FacebookPagesCollector
         return FacebookPagesCollector()
+    if platform == "facebook_sc":  # Page publik via ScrapeCreators (pihak ketiga, bukan API resmi Meta)
+        from .collectors.scrapecreators_fb import ScrapeCreatorsFacebookCollector
+        return ScrapeCreatorsFacebookCollector()
     if platform == "web":
         from .collectors.web_scrapling import ScraplingWebCollector
         return ScraplingWebCollector(sources_path=a.sources)
@@ -41,7 +44,7 @@ def build(platform, a):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="drno.crawl")
-    ap.add_argument("platform", choices=["x", "youtube", "instagram", "facebook", "web", "tiktok", "telegram", "discord", "reddit"])
+    ap.add_argument("platform", choices=["x", "youtube", "instagram", "facebook", "facebook_sc", "web", "tiktok", "telegram", "discord", "reddit"])
     ap.add_argument("--query", default=os.environ.get("DRNO_QUERY") or default_query(),
                     help="Ekspresi Boolean DRNO (dipakai juga sebagai filter lokal)")
     ap.add_argument("--native-query", default=None, help="Query dalam sintaks asli platform (opsional)")
