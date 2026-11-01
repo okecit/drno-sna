@@ -51,6 +51,20 @@ def _first(d: dict, *keys, default=None):
     return default
 
 
+def resolve_share_link(url: str, transport=None) -> str:
+    """'facebook.com/share/XXXX' (tautan bagikan) -> alamat Page asli lewat redirect / og:url. Gagal -> URL apa adanya."""
+    if "/share/" not in url:
+        return url
+    try:
+        import httpx
+        r = httpx.get(url, headers={"User-Agent": "Mozilla/5.0 (compatible; DRNO-research)"}, follow_redirects=True, timeout=30, transport=transport)
+        m = re.search(r'og:url"?\s+content="([^"]+)"', r.text)
+        final = m.group(1) if m else str(r.url)
+        return final if "/login" not in final and "/share/" not in final else url
+    except Exception:  # noqa: BLE001
+        return url
+
+
 def page_handle(page: str) -> str:
     """'https://www.facebook.com/bnptri/' -> 'bnptri'; ID angka dibiarkan."""
     h = re.sub(r"^(https?://)?(www\.|m\.|web\.)?facebook\.com/", "", page.strip()).split("?")[0].strip("/")
@@ -64,10 +78,13 @@ class ScrapeCreatorsFacebookCollector(Collector):
     def __init__(self, api_key=None, pages=None, transport=None, max_posts_per_page=None, comment_pages=None, max_calls=None, **kw):
         super().__init__(**kw)
         self.key = api_key or os.environ.get("SCRAPECREATORS_API_KEY")
-        pages = pages or [p for p in os.environ.get("FB_SC_PAGES", "").split(",") if p.strip()]
+        if pages is None:
+            from ..page_discovery import accepted_pages  # Page sejenis yang diterima peneliti di dashboard
+            pages = [p for p in os.environ.get("FB_SC_PAGES", "").split(",") if p.strip()] + accepted_pages()
         if not (self.key and pages):
-            raise NotConfigured("SCRAPECREATORS_API_KEY dan FB_SC_PAGES belum tersedia")
-        self.pages = [p.strip() for p in pages]
+            raise NotConfigured("SCRAPECREATORS_API_KEY dan FB_SC_PAGES / Page yang diterima belum tersedia")
+        # Tautan bagikan diterjemahkan ke alamat Page asli; duplikat dibuang
+        self.pages = list(dict.fromkeys(resolve_share_link(p.strip()) for p in pages))
         self.handles = {page_handle(p) for p in self.pages}
         self.http = make_client(transport)
         self.max_posts = int(max_posts_per_page or os.environ.get("DRNO_SC_POSTS_PER_PAGE", 9))

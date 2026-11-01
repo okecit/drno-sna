@@ -10,6 +10,9 @@ INTERVAL=${DRNO_INTERVAL_HOURS:-6}
 WWW_UID=${DRNO_WWW_UID:-33}   # www-data pada image php:apache
 # Keputusan tinjauan istilah ditulis dashboard (review.php) ke volume situs; dibaca kamus & crawl
 export DRNO_KEYWORD_REVIEW=${DRNO_KEYWORD_REVIEW:-$SITE/private/keyword_review.json}
+# Kandidat Page sejenis (discover-pages) & keputusan tinjauannya (page_review.php)
+export DRNO_PAGE_CANDIDATES=${DRNO_PAGE_CANDIDATES:-$SITE/private/page_candidates.json}
+export DRNO_PAGE_REVIEW=${DRNO_PAGE_REVIEW:-$SITE/private/page_review.json}
 log() { echo "[$(date '+%F %T')] $*"; }
 
 fix_site_permissions() {
@@ -17,7 +20,7 @@ fix_site_permissions() {
   # sedangkan akun, log, dan setup key tetap hanya untuk www-data.
   chmod 755 "$SITE" || return 1
   local item
-  for item in index.php login.php logout.php data.php review.php setup.php users.php robots.txt .htaccess; do
+  for item in index.php login.php logout.php data.php review.php page_review.php setup.php users.php robots.txt .htaccess; do
     [ ! -e "$SITE/$item" ] || chmod 644 "$SITE/$item" || return 1
   done
   for item in assets inc data; do
@@ -38,7 +41,7 @@ sync_site() {
     || { log "paket situs tidak valid (manifest kosong) - dibatalkan"; return 1; }
   mkdir -p "$SITE/private" "$SITE/data" || return 1
   local item
-  for item in index.php login.php logout.php data.php review.php setup.php users.php robots.txt .htaccess assets inc; do
+  for item in index.php login.php logout.php data.php review.php page_review.php setup.php users.php robots.txt .htaccess assets inc; do
     rm -rf "$SITE/$item.new" && cp -r "$src/$item" "$SITE/$item.new" && rm -rf "$SITE/$item" && mv "$SITE/$item.new" "$SITE/$item" || return 1
   done
   cp "$src/private/app.html" "$src/private/.htaccess" "$SITE/private/" || return 1
@@ -68,7 +71,7 @@ run_cycle() {
   if [ -n "${X_BEARER_TOKEN:-}" ]; then python -m drno.crawl x --query "$Q" --from "$FROM" --to "$TO" --max "${DRNO_X_MAX:-200}" || log "x gagal"; fi
   if [ -n "${META_ACCESS_TOKEN:-}" ] && [ -n "${FB_PAGE_IDS:-}" ]; then python -m drno.crawl facebook --query "$Q" --from "$FROM" --to "$TO" || log "facebook gagal"; fi
   # Alternatif sementara (pihak ketiga, bukan API resmi Meta); kredit dibatasi DRNO_SC_MAX_CALLS per run
-  if [ -n "${SCRAPECREATORS_API_KEY:-}" ] && [ -n "${FB_SC_PAGES:-}" ]; then python -m drno.crawl facebook_sc --query "$Q" --from "$FROM" --to "$TO" || log "facebook (scrapecreators) gagal"; fi
+  if [ -n "${SCRAPECREATORS_API_KEY:-}" ] && { [ -n "${FB_SC_PAGES:-}" ] || [ -f "$DRNO_PAGE_REVIEW" ]; }; then python -m drno.crawl facebook_sc --query "$Q" --from "$FROM" --to "$TO" || log "facebook (scrapecreators) gagal"; fi
   # X & Instagram via ScrapeCreators; pilih platform lewat DRNO_SC_PLATFORMS (default facebook,x,instagram)
   if [ -n "${SCRAPECREATORS_API_KEY:-}" ]; then
     case ",${DRNO_SC_PLATFORMS:-facebook,x,instagram}," in *,x,*) python -m drno.crawl x_sc --query "$Q" --from "$FROM" --to "$TO" || log "x (scrapecreators) gagal";; esac

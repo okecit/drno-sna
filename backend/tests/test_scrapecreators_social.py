@@ -64,6 +64,16 @@ def test_instagram_verified_named_commenter_pseudonymized():
     assert seen[0].url.params["hashtag"] == "deradikalisasi" and seen[1].url.path == "/v2/instagram/post/comments"
 
 
+def test_instagram_empty_hashtag_404_does_not_stop_run():
+    def handler(req):
+        if req.url.params.get("hashtag") == "kosong":
+            return httpx.Response(404, json={"success": False, "message": "No posts found"})
+        return _ig_transport([]).handle_request(req)
+    col = ScrapeCreatorsInstagramCollector(api_key="k", hashtags=["kosong", "deradikalisasi"], transport=httpx.MockTransport(handler), comment_posts=0)
+    recs, inter, rep = col.run(_job("instagram_sc"), lambda t: True, KD.match)
+    assert rep.status == "success" and len(recs) == 1
+
+
 def test_credit_cap_and_split():
     seen = []
     col = ScrapeCreatorsXCollector(api_key="k", queries=["a", "b", "c"], transport=_x_transport(seen), max_calls=2)

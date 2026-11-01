@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Perintah operasional DRNO di VPS:  ./deploy/vps/drno.sh <perintah>
-#   check | up | down | ps | logs [svc] | setup-key | stats | scrape-test | scrape-now | run-now | backup | restore F | restore-users F | update | verify | up-api
+#   check | up | down | ps | logs [svc] | setup-key | stats | scrape-test | scrape-now | run-now | discover-pages | backup | restore F | restore-users F | update | verify | up-api
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 [ -f .env ] || { echo "Belum ada .env - jalankan ./deploy/vps/init.sh"; exit 1; }
@@ -33,6 +33,8 @@ case "${1:-help}" in
   scrape-now)  # jalankan crawling web sekarang & simpan
     "${DC[@]}" exec worker bash -c 'cd /app/backend && python -m drno.crawl web --from "$(date -d "-2 days" +%F)" --to "$(date +%F)" --sources /app/config/sources.json && date +%s > /site/private/.last_scrape' ;;
   run-now)    "${DC[@]}" restart worker && echo "Worker dimulai ulang: siklus pembaruan berjalan sekarang." ;;
+  discover-pages) # usulkan Page Facebook publik bernada serupa (ScrapeCreators, memakai kredit); tinjau di dashboard
+    "${DC[@]}" exec worker bash -c 'cd /app/backend && DRNO_PAGE_CANDIDATES=/site/private/page_candidates.json DRNO_PAGE_REVIEW=/site/private/page_review.json python -m drno.maintenance discover-pages && chown 33:33 /site/private/page_candidates.json && chmod 640 /site/private/page_candidates.json' ;;
   backup)     mkdir -p backups && "${DC[@]}" exec backup bash /backup.sh now && ls -lh backups | tail -5 ;;
   restore)
     f=${2:?berikan berkas .dump}; read -rp "Timpa database dengan $f? ketik YA: " a; [ "$a" = "YA" ] || exit 1
@@ -47,7 +49,7 @@ case "${1:-help}" in
     chk() { c=$(curl -s -o /dev/null -w '%{http_code}' "$B$1"); [ "$c" = "$2" ] && echo "✓ $1 -> $c" || echo "✗ $1 -> $c (harap $2)"; }
     chk_any() { c=$(curl -s -o /dev/null -w '%{http_code}' "$B$1"); case " $2 " in *" $c "*) echo "✓ $1 -> $c";; *) echo "✗ $1 -> $c (harap salah satu: $2)";; esac; }
     # Sebelum admin pertama dibuat, login.php secara benar mengarah (302) ke setup.php.
-    chk_any /login.php "200 302"; chk /data/overview.csv 403; chk "/data.php?f=overview.csv" 401; chk /review.php 401; chk /private/keyword_review.json 403
+    chk_any /login.php "200 302"; chk /data/overview.csv 403; chk "/data.php?f=overview.csv" 401; chk /review.php 401; chk /private/keyword_review.json 403; chk /page_review.php 401; chk /private/page_candidates.json 403
     chk /private/users.php 403; chk /inc/auth.php 403; chk /.env 403
     curl -sI "$B/login.php" | grep -qi strict-transport-security && echo "✓ HSTS aktif" || echo "✗ HSTS tidak ada"
     c=$(curl -s -o /dev/null -w '%{http_code}' "http://$(envget DRNO_DOMAIN)/login.php"); case $c in 301|308) echo "✓ HTTP dialihkan ke HTTPS";; *) echo "✗ HTTP -> $c";; esac ;;

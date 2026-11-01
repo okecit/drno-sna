@@ -481,6 +481,11 @@
       </div>
       <div class="drno-table-wrap" style="max-height: 38rem" id="ent-wrap" data-source="entities"></div>
     </div>
+    <div class="drno-card">
+      <h3 id="page-sejenis">Kandidat Page Facebook sejenis (nada takfiri / anti-thaghut)</h3>
+      <p class="drno-note">Usulan otomatis dari pencarian (ScrapeCreators, pihak ketiga). Hanya <b>Page publik</b> dengan pengikut di atas ambang yang diusulkan; profil pribadi, grup, dan akun kecil dibuang tanpa dicatat. <b>Skor nada</b> = porsi posting sampel yang memuat penanda ideologis kamus DRNO; ini kriteria pemantauan, bukan bukti sikap atau afiliasi. Page yang diterima admin ikut di-crawl pada siklus berikutnya. Jalankan penemuan baru di VPS: <code>./deploy/vps/drno.sh discover-pages</code>.</p>
+      <div id="pg-cand"></div>
+    </div>
   </section>
 
   <!-- GEOMAP -->
@@ -1541,6 +1546,58 @@
     rows.slice(0, 400), (r) => { if (!r.community && r.community !== 0) return; sxSel = r.entity_id; root.querySelector('.drno-tab[data-tab="sna"]').click(); }));
   }
 
+  // ---------- Kandidat Page sejenis (page_review.php; mode login PHP) ----------
+  let PAGES = null, pagesLoading = false, pagesErr = '';
+  async function loadPages() {
+    if (!window.DRNO_DATA_URL || pagesLoading) return;
+    pagesLoading = true;
+    try { const r = await fetch('page_review.php', { credentials: 'same-origin', cache: 'no-store' }); if (r.ok) PAGES = await r.json(); } catch (e) { /* mode statis */ }
+    pagesLoading = false; if (current === 'entity') drawPageCandidates();
+  }
+  async function sendPage(handle, action) {
+    const csrf = document.querySelector('.drno-userbar input[name="csrf"]')?.value || '';
+    pagesErr = '';
+    try {
+      const r = await fetch('page_review.php', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ csrf, handle, action }) });
+      const j = await r.json().catch(() => ({}));
+      if (r.ok) PAGES = j; else pagesErr = j.error || `Gagal (${r.status})`;
+    } catch (e) { pagesErr = 'Gagal terhubung ke server.'; }
+    drawPageCandidates();
+  }
+  let pagesRequested = false;
+  function drawPageCandidates() {
+    const box = document.getElementById('pg-cand'); if (!box) return; box.innerHTML = '';
+    if (!window.DRNO_DATA_URL) { box.appendChild(line('Tersedia di dashboard login (mode PHP).', 'drno-note')); return; }
+    if (!pagesRequested) { pagesRequested = true; loadPages(); }
+    if (!PAGES) { box.appendChild(line('Memuat kandidat…', 'drno-note')); return; }
+    if (pagesErr) { const er = document.createElement('div'); er.className = 'drno-warn'; er.textContent = pagesErr; box.appendChild(er); }
+    const dec = new Map(PAGES.decisions.map((d) => [String(d.handle).toLowerCase(), d]));
+    box.appendChild(line(`${fmt(PAGES.candidates.length)} kandidat · ambang pengikut ${fmt(num(PAGES.min_followers || 0))} · diperbarui ${PAGES.updated ? new Date(PAGES.updated).toLocaleString('id-ID') : 'belum pernah'}${PAGES.can_review ? '' : ' · hanya admin yang dapat meninjau'}`, 'drno-note'));
+    if (!PAGES.candidates.length) { box.appendChild(line('Belum ada kandidat. Jalankan penemuan di VPS (lihat catatan di atas).', 'drno-note')); }
+    const pageCell = (c) => { const a = document.createElement('a'); a.href = c.url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = c.name || c.handle; return a; };
+    const reviewCell = (c) => {
+      const s = document.createElement('span'); s.style.display = 'flex'; s.style.gap = '4px'; s.style.flexWrap = 'wrap';
+      const d = dec.get(String(c.handle).toLowerCase());
+      if (d) {
+        const t = document.createElement('span'); t.className = 'ent-tag' + (d.decision === 'accept' ? ' pub' : ''); t.textContent = d.decision === 'accept' ? 'Diterima · di-crawl' : 'Ditolak';
+        t.title = `oleh ${d.reviewer} · ${new Date(d.at).toLocaleString('id-ID')}`; s.appendChild(t);
+        if (PAGES.can_review) { const u = document.createElement('button'); u.className = 'btn-ghost'; u.type = 'button'; u.textContent = 'Batal'; u.addEventListener('click', () => sendPage(c.handle, 'undo')); s.appendChild(u); }
+        return s;
+      }
+      if (!PAGES.can_review) { s.textContent = 'Belum ditinjau'; return s; }
+      const ok = document.createElement('button'); ok.className = 'btn-brand'; ok.type = 'button'; ok.textContent = 'Terima'; ok.style.padding = '3px 10px'; ok.addEventListener('click', () => sendPage(c.handle, 'accept'));
+      const no = document.createElement('button'); no.className = 'btn-ghost'; no.type = 'button'; no.textContent = 'Tolak'; no.addEventListener('click', () => sendPage(c.handle, 'reject'));
+      s.append(ok, no); return s;
+    };
+    if (PAGES.candidates.length) {
+      const wrap = document.createElement('div'); wrap.className = 'drno-table-wrap';
+      wrap.appendChild(makeTable([['Page', pageCell], ['Kategori', (c) => c.category || ''], ['Pengikut', (c) => fmt(num(c.followers)), true],
+        ['Skor nada', (c) => `${d3.format('.0%')(num(c.tone_score))} (${c.tone_posts}/${c.posts_sampled})`, true], ['Istilah cocok', (c) => (c.matched_terms || []).join(', ')],
+        ['Ditemukan lewat', (c) => c.found_via], ['Tinjauan', reviewCell]], PAGES.candidates));
+      box.appendChild(wrap);
+    }
+  }
+
   // ---------- Geospasial (choropleth provinsi) ----------
   let geoMode = 'negative_posts';
   const GEO_LABEL = { negative_posts: 'unggahan bersentimen negatif', posts: 'semua unggahan', trigger_posts: 'unggahan pemicu' };
@@ -1852,7 +1909,7 @@
     if (current === 'sna') drawSX();
     if (current === 'temporal') { drawTemporal(); drawPos(); }
     if (current === 'teori') drawTheory();
-    if (current === 'entity') drawEntities();
+    if (current === 'entity') { drawEntities(); drawPageCandidates(); }
     if (current === 'geo') drawGeo();
     if (current === 'mention') drawMentions();
     if (current === 'report') drawReportForm();

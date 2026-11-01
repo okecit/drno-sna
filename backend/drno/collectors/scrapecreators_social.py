@@ -13,6 +13,8 @@ from __future__ import annotations
 
 import os
 
+import httpx
+
 from ..privacy import pseudonymize
 from .base import Collector, JobConfig, NotConfigured
 from .http import check, make_client
@@ -53,7 +55,12 @@ class _SCBase(Collector):
         if self.calls >= self.max_calls:
             return None  # batas kredit per run tercapai
         self.calls += 1
-        return self.with_backoff(lambda: check(self.http.get(f"{API}{path}", params=params, headers={"x-api-key": self.key})))
+        try:
+            return self.with_backoff(lambda: check(self.http.get(f"{API}{path}", params=params, headers={"x-api-key": self.key})))
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 404:
+                return {}  # ScrapeCreators menjawab 404 bila pencarian tidak punya hasil -> lanjut ke kueri berikutnya
+            raise
 
     def author_key(self, native_author_id) -> str:
         return pseudonymize(self.platform, str(native_author_id))
@@ -82,8 +89,10 @@ class ScrapeCreatorsXCollector(_SCBase):
     def _user(t):
         u = t.get("author") or (((t.get("core") or {}).get("user_results") or {}).get("result")) or t.get("user") or {}
         leg = u.get("legacy") or u
-        return {"id": str(_first(u, "rest_id", "id_str", "id", default="") or _first(leg, "id_str", default="")),
-                "handle": _first(leg, "screen_name", "username", "handle", default=""), "name": _first(leg, "name", default=""),
+        core = u.get("core") if isinstance(u.get("core"), dict) else {}  # skema X baru: screen_name & name di user.core
+        return {"id": str(_first(u, "rest_id", "id_str", "id", default="") or _first(leg, "id_str", default="") or _first(t.get("legacy") or {}, "user_id_str", default="")),
+                "handle": _first(core, "screen_name", default="") or _first(leg, "screen_name", "username", "handle", default=""),
+                "name": _first(core, "name", default="") or _first(leg, "name", default=""),
                 "followers": int(_first(leg, "followers_count", "followers", default=0) or 0)}
 
     def fetch(self, job: JobConfig):
@@ -132,7 +141,7 @@ class ScrapeCreatorsInstagramCollector(_SCBase):
         if not tags:
             raise NotConfigured("IG_SC_HASHTAGS / IG_HASHTAGS belum diisi")
         self.hashtags = [h.strip().lstrip("#") for h in tags]
-        self.window = window or os.environ.get("DRNO_SC_IG_WINDOW", "last-week")
+        self.window = window or os.environ.get("DRNO_SC_IG_WINDOW", "last-month")
         self.comment_posts = int(comment_posts if comment_posts is not None else os.environ.get("DRNO_SC_IG_COMMENT_POSTS", 5))
 
     def fetch(self, job: JobConfig):

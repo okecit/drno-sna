@@ -5,6 +5,7 @@
   python -m drno.maintenance stats       # ringkasan isi database
   python -m drno.maintenance label-channels  # isi nama publik kanal pemilik video YouTube yang sudah tersimpan
   python -m drno.maintenance fb-pages bnptri https://www.facebook.com/kemenag.ri   # cari ID Page untuk FB_PAGE_IDS
+  python -m drno.maintenance discover-pages  # usulkan Page publik bernada serupa (ScrapeCreators) untuk ditinjau
 """
 from __future__ import annotations
 
@@ -116,6 +117,10 @@ if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "stats"
     if cmd == "label-channels":
         print(json.dumps(label_channels(), indent=2))
+        sys.exit(0)
+    if cmd == "discover-pages":
+        from .page_discovery import discover
+        print(json.dumps(discover(), indent=2))
         sys.exit(0)
     if cmd == "fb-pages":
         from .collectors.base import NotConfigured
