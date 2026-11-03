@@ -57,3 +57,19 @@ def test_geo_counts_negative_sentiment_per_province():
     g = {r["code"]: r for r in geo(posts, set())}
     assert (g["ST"]["negative_posts"], g["ST"]["positive_posts"], g["ST"]["negative_share"]) == (2, 1, 0.667)
     assert g["BA"]["negative_posts"] == 0 and g["BA"]["negative_share"] == 0.0 and g["AC"]["negative_share"] == 0
+
+
+def test_leaks_migration_coded_and_cross_page_brokers():
+    from drno.explorer import leaks, mask, migration_signals
+    assert migration_signals("japri ana ya, gabung grup kajian t.me/xyz") == ["telegram", "pesan_pribadi", "ajakan_gabung"]
+    assert migration_signals("saya pikir begitu") == []
+    assert mask("cek t.me/abc123 atau 081234567890 @budi") == "cek [tautan tertutup] atau [nomor] [akun]"
+    posts = [dict(_p("page:A", "posting A", [], platform="facebook"), post_id="facebook:1"),
+             dict(_p("page:B", "posting B", [], platform="facebook"), post_id="facebook:2"),
+             dict(_p("fa_x", "pemerintah thogut, japri ya", ["thaghut"], platform="facebook"), post_id="facebook:c1", reply_to="facebook:1"),
+             dict(_p("fa_x", "setuju", [], platform="facebook"), post_id="facebook:c2", reply_to="facebook:2"),
+             dict(_p("fa_y", "biasa saja", [], platform="facebook"), post_id="facebook:c3", reply_to="facebook:1")]
+    pub = {"page:A": {"name": "Page A"}}
+    sig, acc = leaks(posts, [], pub, {"thaghut"})
+    assert len(sig) == 1 and sig[0]["signals"] == "pesan_pribadi" and sig[0]["context"] == "Page A" and "fa_x" == sig[0]["entity_id"]
+    assert [a["entity_id"] for a in acc] == ["fa_x"] and acc[0]["spaces"] == 2 and acc[0]["score"] == 3 + 2 + 1

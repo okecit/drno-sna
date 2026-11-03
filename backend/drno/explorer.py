@@ -182,3 +182,77 @@ def geo(posts, triggers: set) -> list[dict]:
              "negative_posts": neg.get(code, 0), "positive_posts": pos.get(code, 0),
              "negative_share": round(neg[code] / n[code], 3) if n.get(code) else 0,
              "top_keywords": ";".join(k for k, _ in kw[code].most_common(3))} for code, name, _ in PROVINCES]
+
+
+# ---------------- Titik bocor: jejak publik dari jaringan tertutup ----------------
+# Pola ajakan pindah ke ruang tertutup (Telegram/WhatsApp/pesan pribadi). Dicocokkan pada teks ternormalisasi huruf kecil.
+MIGRATION = [
+    ("telegram", r"t\.me/|telegram\.me/|\btelegram\b|\btele\b|\bgrup tg\b|\bchannel tg\b"),
+    ("whatsapp", r"wa\.me/|chat\.whatsapp\.com|\bwhatsapp\b|\bgrup wa\b|\bgroup wa\b|\bwag\b|\bnomor wa\b|\bno wa\b"),
+    ("pesan_pribadi", r"\bjapri\b|\binbox\b|\bdm\b|\bpm\b|\bcek pesan\b|\bkirim pesan\b|\bchat (saya|ana|ane|aku)\b"),
+    ("ajakan_gabung", r"\bgabung (grup|group|kajian|halaqah)\b|\blink (grup|group|kajian)\b|\bjoin (grup|group|channel)\b|\bmasuk (grup|group)\b"),
+]
+_MIG = [(k, re.compile(p)) for k, p in MIGRATION]
+_MASK = [(re.compile(r"(https?://)?(t\.me|telegram\.me|wa\.me|chat\.whatsapp\.com)/\S+", re.I), "[tautan tertutup]"),
+         (re.compile(r"https?://\S+", re.I), "[tautan]"), (re.compile(r"(\+?62|0)8\d[\d\s-]{5,}\d"), "[nomor]"), (re.compile(r"@\w{2,}"), "[akun]")]
+
+
+def migration_signals(text: str) -> list[str]:
+    t = str(text).lower()
+    return [k for k, rx in _MIG if rx.search(t)]
+
+
+def mask(text: str, n: int = 160) -> str:
+    """Cuplikan untuk peninjauan internal: tautan, nomor telepon, dan @akun disamarkan."""
+    s = " ".join(str(text).split())
+    for rx, rep in _MASK:
+        s = rx.sub(rep, s)
+    return s[:n] + ("…" if len(s) > n else "")
+
+
+def leaks(posts, inter, public_names, coded: set, limit_signals: int = 800, limit_accounts: int = 400):
+    """(sinyal per komentar, ringkasan per akun). Hanya akun berpseudonim; entitas publik tidak dinilai.
+    - sinyal: komentar/unggahan dengan ajakan migrasi dan/atau istilah tersamar inti (kamus v1.0-v1.1)
+    - akun: jumlah ruang publik (Page/kanal/unggahan induk) yang dijangkau = calon penghubung lintas Page."""
+    labels = anon_labels(posts, inter, public_names)
+    by_id = {p.get("post_id"): p for p in posts}
+
+    def root_owner(p, hops=0):
+        """Pemilik unggahan induk (Page/kanal/video) dari sebuah komentar atau balasan."""
+        parent = by_id.get(p.get("reply_to"))
+        return p["author_id_pseudonym"] if parent is None or hops > 5 else root_owner(parent, hops + 1)
+
+    spaces = defaultdict(set)  # akun -> ruang publik (pemilik unggahan induk) tempat ia berkomentar
+    for p in posts:
+        if p.get("reply_to") and by_id.get(p["reply_to"]) is not None and root_owner(p) != p["author_id_pseudonym"]:
+            spaces[p["author_id_pseudonym"]].add(root_owner(p))
+    name_of = lambda n: entity_kind(n, public_names)[1] or labels.get(n, "")
+    sig_rows, acc = [], defaultdict(lambda: {"posts": 0, "coded": 0, "mig": Counter(), "terms": Counter(), "plat": "", "days": []})
+    for p in posts:
+        a = p["author_id_pseudonym"]
+        if entity_kind(a, public_names)[0] != "account" or a.endswith("_unknown_commenter"):
+            continue
+        r = acc[a]
+        r["posts"] += 1; r["plat"] = p["platform"]; r["days"].append(str(p["timestamp"])[:10])
+        terms = sorted(set(p.get("keyword_matched") or []) & coded)
+        mig = migration_signals(p["text"])
+        if not (terms or mig):
+            continue
+        r["coded"] += bool(terms); r["mig"].update(mig); r["terms"].update(terms)
+        sig_rows.append({"day": str(p["timestamp"])[:10], "platform": p["platform"], "entity_id": a, "anon_label": labels.get(a, ""),
+                         "signals": ";".join(mig), "coded_terms": ";".join(terms), "excerpt": mask(p["text"]),
+                         "context": name_of(root_owner(p)) if p.get("reply_to") else "unggahan sendiri"})
+    accounts = []
+    for a, r in acc.items():
+        n_sp, n_mig = len(spaces.get(a, ())), sum(r["mig"].values())
+        if not (r["coded"] or n_mig or n_sp >= 2):
+            continue
+        # skor penapisan (bukan tuduhan): migrasi berbobot 3, istilah tersamar 2, tiap ruang tambahan 1
+        score = 3 * n_mig + 2 * r["coded"] + max(0, n_sp - 1)
+        accounts.append({"entity_id": a, "anon_label": labels.get(a, ""), "platform": r["plat"], "posts": r["posts"],
+                         "coded_posts": r["coded"], "migration_signals": n_mig, "migration_types": ";".join(k for k, _ in r["mig"].most_common()),
+                         "spaces": n_sp, "top_terms": ";".join(k for k, _ in r["terms"].most_common(3)),
+                         "first_seen": min(r["days"]), "last_seen": max(r["days"]), "score": score})
+    accounts.sort(key=lambda x: (-x["score"], -x["spaces"], x["entity_id"]))
+    sig_rows.sort(key=lambda x: x["day"], reverse=True)
+    return sig_rows[:limit_signals], accounts[:limit_accounts]

@@ -130,6 +130,12 @@ def export_dashboard(posts, inter, out, mode: str, sentiment_model=None, public_
     m_daily, m_public = explorer.mentions(posts, public_names, {t: e["groups"] for t, e in kd.current.terms.items()})
     w("mentions_daily.csv", m_daily, ["day", "keyword", "group", "platform", "posts"])
     w("mentions_public.csv", m_public, ["day", "source", "type", "platform", "keywords", "groups", "excerpt", "url", "engagement"])
+    # Titik bocor: hanya istilah pemicu inti (kamus v1.0-v1.1), bukan istilah tinjauan yang bisa berupa kata umum
+    coded = {t for t, e in kd.versions[1].terms.items() if discovery.TRIGGER_GROUPS & set(e["groups"])}
+    l_sig, l_acc = explorer.leaks(posts, inter, public_names, coded)
+    w("leak_signals.csv", l_sig, ["day", "platform", "entity_id", "anon_label", "signals", "coded_terms", "excerpt", "context"])
+    w("leak_accounts.csv", l_acc, ["entity_id", "anon_label", "platform", "posts", "coded_posts", "migration_signals", "migration_types",
+                                   "spaces", "top_terms", "first_seen", "last_seen", "score"])
     w("geo_provinces.csv", explorer.geo(posts, triggers),
       ["code", "province", "posts", "trigger_posts", "negative_posts", "positive_posts", "negative_share", "top_keywords"])
 

@@ -482,6 +482,18 @@
       <div class="drno-table-wrap" style="max-height: 38rem" id="ent-wrap" data-source="entities"></div>
     </div>
     <div class="drno-card">
+      <h3 id="titik-bocor">Titik bocor: jejak publik jaringan tertutup</h3>
+      <p class="drno-note">Penapisan untuk peninjauan peneliti, <b>bukan tuduhan</b>. Menandai akun pseudonim yang (1) mengajak pindah ke ruang tertutup — Telegram, WhatsApp, pesan pribadi, “gabung grup” —, (2) memakai istilah pemicu inti (kamus v1.0–v1.1, termasuk ejaan tersamar), atau (3) berkomentar di ≥ 2 Page/kanal berbeda (calon penghubung). Skor = 3×ajakan migrasi + 2×unggahan bertermin + ruang tambahan. Tautan, nomor telepon, dan @akun pada cuplikan disamarkan. Klik baris akun untuk membuka posisinya di Network.</p>
+      <div class="drno-filters">
+        <label>Platform<select id="lk-plat"><option value="">Semua</option></select></label>
+        <label>Sinyal<select id="lk-sig"><option value="">Semua</option><option value="migrasi">Ajakan migrasi</option><option value="coded">Istilah tersamar</option><option value="broker">Penghubung (≥ 2 ruang)</option></select></label>
+        <span class="drno-note" id="lk-count"></span>
+      </div>
+      <div class="drno-table-wrap" style="max-height: 26rem" id="lk-acc" data-source="leak_accounts"></div>
+      <h4 style="margin: 14px 0 6px">Komentar bersinyal terbaru</h4>
+      <div class="drno-table-wrap" style="max-height: 26rem" id="lk-sig-wrap" data-source="leak_signals"></div>
+    </div>
+    <div class="drno-card">
       <h3 id="page-sejenis">Kandidat Page Facebook sejenis (nada takfiri / anti-thaghut)</h3>
       <p class="drno-note">Usulan otomatis dari pencarian (ScrapeCreators, pihak ketiga). Hanya <b>Page publik</b> dengan pengikut di atas ambang yang diusulkan; profil pribadi, grup, dan akun kecil dibuang tanpa dicatat. <b>Skor nada</b> = porsi posting sampel yang memuat penanda ideologis kamus DRNO; ini kriteria pemantauan, bukan bukti sikap atau afiliasi. Page yang diterima admin ikut di-crawl pada siklus berikutnya. Jalankan penemuan baru di VPS: <code>./deploy/vps/drno.sh discover-pages</code>.</p>
       <div id="pg-cand"></div>
@@ -1551,6 +1563,35 @@
       ['Pemicu', (r) => fmt(num(r.trigger_posts)), true], ['Engagement', (r) => fmt(num(r.engagement)), true], ['Interaksi masuk', (r) => fmt(num(r.interactions_in)), true],
       ['Komunitas', (r) => r.community], ['Aktif', (r) => `${r.first_seen} – ${r.last_seen}`], ['Kata kunci utama', (r) => String(r.top_keywords).replaceAll(';', ', ')]],
     rows.slice(0, 400), (r) => { if (!r.community && r.community !== 0) return; sxSel = r.entity_id; root.querySelector('.drno-tab[data-tab="sna"]').click(); }));
+    drawLeaks();
+  }
+
+  // ---------- Titik bocor ----------
+  const MIG_ID = { telegram: 'Telegram', whatsapp: 'WhatsApp', pesan_pribadi: 'Pesan pribadi', ajakan_gabung: 'Ajakan gabung' };
+  let lkReady = false;
+  function drawLeaks() {
+    const wa = document.getElementById('lk-acc'), ws = document.getElementById('lk-sig-wrap');
+    if (!prep(wa, ['leak_accounts']) || !prep(ws, ['leak_signals'])) return;
+    const acc = D('leak_accounts'), sig = D('leak_signals');
+    if (!lkReady) {
+      fillSelect(document.getElementById('lk-plat'), [...new Set(acc.map((r) => r.platform))].sort(), PLAT_ID);
+      ['lk-plat', 'lk-sig'].forEach((id) => document.getElementById(id).addEventListener('change', drawLeaks));
+      lkReady = true;
+    }
+    const pl = document.getElementById('lk-plat').value, sg = document.getElementById('lk-sig').value;
+    const ok = (r) => !sg || (sg === 'migrasi' ? num(r.migration_signals) > 0 : sg === 'coded' ? num(r.coded_posts) > 0 : num(r.spaces) >= 2);
+    const rows = acc.filter((r) => (!pl || r.platform === pl) && ok(r));
+    document.getElementById('lk-count').textContent = `${fmt(rows.length)} akun · ${fmt(acc.filter((r) => num(r.migration_signals) > 0).length)} dengan ajakan migrasi · ${fmt(acc.filter((r) => num(r.spaces) >= 2).length)} penghubung`;
+    const nm = (r) => { const s = document.createElement('span'); s.className = 'ent-name'; s.textContent = r.anon_label || r.entity_id; s.title = `Pseudonim: ${r.entity_id}`; return s; };
+    const migs = (v) => String(v || '').split(';').filter(Boolean).map((k) => MIG_ID[k] || k).join(', ');
+    wa.appendChild(makeTable([['Akun', nm], ['Platform', (r) => PLAT_ID[r.platform] || r.platform], ['Skor', (r) => fmt(num(r.score)), true],
+      ['Ajakan migrasi', (r) => fmt(num(r.migration_signals)), true], ['Jenis migrasi', (r) => migs(r.migration_types)], ['Bertermin', (r) => fmt(num(r.coded_posts)), true],
+      ['Ruang', (r) => fmt(num(r.spaces)), true], ['Istilah', (r) => String(r.top_terms).replaceAll(';', ', ')], ['Aktif', (r) => `${r.first_seen} – ${r.last_seen}`]],
+    rows.slice(0, 300), (r) => { sxSel = r.entity_id; root.querySelector('.drno-tab[data-tab="sna"]').click(); }));
+    const ids = new Set(rows.map((r) => r.entity_id));
+    ws.appendChild(makeTable([['Tanggal', (r) => r.day], ['Akun', nm], ['Sinyal', (r) => migs(r.signals)], ['Istilah', (r) => String(r.coded_terms).replaceAll(';', ', ')],
+      ['Di ruang', (r) => r.context], ['Cuplikan (disamarkan)', (r) => r.excerpt]],
+    sig.filter((r) => ids.has(r.entity_id)).slice(0, 300)));
   }
 
   // ---------- Kandidat Page sejenis (page_review.php; mode login PHP) ----------
